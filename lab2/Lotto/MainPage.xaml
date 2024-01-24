@@ -14,9 +14,8 @@
             <RowDefinition Height="*"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
-       
 
-        <Grid Grid.Row="0" Background="Beige">
+        <Grid Grid.Row="0" Background="Beige" Margin="10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="200"></ColumnDefinition>
                 <ColumnDefinition Width="*"></ColumnDefinition>
@@ -27,15 +26,16 @@
                 <ColumnDefinition Width="*"></ColumnDefinition>
                 <ColumnDefinition Width="*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" Text="Din lottorad" Height="50" FontSize="30"/>
-            <TextBox Grid.Column="1" Padding="5" Name="TextBoxLotto1" Width="100" Height="50" MaxLength="2" KeyUp="TextBoxLotto_OnKeyUp" InputScope="Digits"></TextBox>
-            <TextBox Grid.Column="2" Padding="5" Name="TextBoxLotto2" Width="100" Height="50" MaxLength="2" KeyUp="TextBoxLotto_OnKeyUp" InputScope="Digits"></TextBox>
-            <TextBox Grid.Column="3" Padding="5" Name="TextBoxLotto3" Width="100" Height="50" MaxLength="2" KeyUp="TextBoxLotto_OnKeyUp" InputScope="Digits"></TextBox>
-            <TextBox Grid.Column="4" Name="TextBoxLotto4" Width="100" Height="50" MaxLength="2" KeyUp="TextBoxLotto_OnKeyUp" InputScope="Digits"></TextBox>
-            <TextBox Grid.Column="5" Name="TextBoxLotto5" Width="100" Height="50" MaxLength="2" KeyUp="TextBoxLotto_OnKeyUp" InputScope="Digits"></TextBox>
-            <TextBox Grid.Column="6" Name="TextBoxLotto6" Width="100" Height="50" MaxLength="2" KeyUp="TextBoxLotto_OnKeyUp" InputScope="Digits"></TextBox>
-            <TextBox Grid.Column="7" Name="TextBoxLotto7" Width="100" Height="50" MaxLength="2" KeyUp="TextBoxLotto_OnKeyUp" InputScope="Digits"></TextBox>
+            <TextBlock Grid.Column="0" Text="Din lottorad" Height="50" FontSize="20" Margin="10"/>
+            <TextBox Grid.Column="1" Name="TextBoxLotto1" Width="50" Height="50" MaxLength="2" KeyUp="TextBoxLotto_OnKeyUp" InputScope="Digits" Margin="10,10,10,10" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBox>
+            <TextBox Grid.Column="2" Name="TextBoxLotto2" Width="50" Height="50" MaxLength="2" KeyUp="TextBoxLotto_OnKeyUp" InputScope="Digits" Margin="10,10,10,10" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBox>
+            <TextBox Grid.Column="3" Name="TextBoxLotto3" Width="50" Height="50" MaxLength="2" KeyUp="TextBoxLotto_OnKeyUp" InputScope="Digits" Margin="10,10,10,10" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBox>
+            <TextBox Grid.Column="4" Name="TextBoxLotto4" Width="50" Height="50" MaxLength="2" KeyUp="TextBoxLotto_OnKeyUp" InputScope="Digits" Margin="10,10,10,10" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBox>
+            <TextBox Grid.Column="5" Name="TextBoxLotto5" Width="50" Height="50" MaxLength="2" KeyUp="TextBoxLotto_OnKeyUp" InputScope="Digits" Margin="10,10,10,10" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBox>
+            <TextBox Grid.Column="6" Name="TextBoxLotto6" Width="50" Height="50" MaxLength="2" KeyUp="TextBoxLotto_OnKeyUp" InputScope="Digits" Margin="10,10,10,10" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBox>
+            <TextBox Grid.Column="7" Name="TextBoxLotto7" Width="50" Height="50" MaxLength="2" KeyUp="TextBoxLotto_OnKeyUp" InputScope="Digits" Margin="10,10,10,10" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBox>
         </Grid>
+        
         <Grid Grid.Row="1" Background="Aqua">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"></ColumnDefinition>
@@ -43,9 +43,10 @@
                 <ColumnDefinition Width="*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
             <TextBlock Grid.Column="0" Text="Antal dragningar" Height="50" FontSize="30"/>
-            <TextBox Grid.Column="1" Padding="5" Name="TextBoxDraws" Width="100" Height="50" MaxLength="6"></TextBox>
-            <Button Grid.Column="2"  Name="ButtonStartLotto" IsEnabled="False">Starta Lotto</Button>
+            <TextBox Grid.Column="1" Padding="5" Name="TextBoxDrawsNo" Width="100" Height="50" MaxLength="6"></TextBox>
+            <Button Grid.Column="2"  Name="ButtonStartLotto" IsEnabled="False" Click="ButtonStartLotto_OnClick">Starta Lotto</Button>
         </Grid>
+
         <Grid Grid.Row="2" Background="BurlyWood">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"></ColumnDefinition>
@@ -55,6 +56,14 @@
                 <ColumnDefinition Width="*"></ColumnDefinition>
                 <ColumnDefinition Width="*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Text="5 rätt" Height="50" FontSize="30"/>
+            <TextBox Grid.Column="1" Name="TextCorrectFive" Width="100" Height="50" Margin="10,10,10,10" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBox>
+            <TextBlock Grid.Column="2" Text="6 rätt" Height="50" FontSize="30"/>
+            <TextBox Grid.Column="3" Name="TextCorrectSix" Width="100" Height="50" Margin="10,10,10,10" HorizontalAlignment="Center" VerticalAlignment="Center" ></TextBox>
+            <TextBlock Grid.Column="4" Text="7 rätt" Height="50" FontSize="30"/>
+            <TextBox Grid.Column="5" Name="TextCorrectSeven" Width="100" Height="50" Margin="10,10,10,10" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBox>
+
         </Grid>
+
     </Grid>
 </Page>

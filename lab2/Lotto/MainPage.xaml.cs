@@ -73,6 +73,68 @@ namespace Lotto
 
         }
 
+        private void ButtonStartLotto_OnClick(object sender, RoutedEventArgs e)
+        {
+            ButtonStartLotto.IsEnabled = false;
+
+            var numberOfDraws = int.Parse(TextBoxDrawsNo.Text);
+
+            var sumWin5 = 0;
+            var sumWin6 = 0;
+            var sumWin7 = 0;
+
+            TextCorrectFive.Text = "";
+            TextCorrectSix.Text = "";
+            TextCorrectSeven.Text = "";
+
+            while (numberOfDraws-- > 0)
+            {
+                var newDraw = ExecuteNewDraw();
+
+                var correctUserNumbers = _lottoUserInput.Intersect(newDraw).Count();
+
+                switch (correctUserNumbers)
+                {
+                    case 5:
+                        sumWin5++;
+                        break;
+                    case 6:
+                        sumWin6++;
+                        break;
+                    case 7:
+                        sumWin6++;
+                        break;
+                }
+
+            }
+
+            TextCorrectFive.Text = sumWin5.ToString();
+            TextCorrectSix.Text = sumWin6.ToString();
+            TextCorrectSeven.Text = sumWin7.ToString();
+
+            ButtonStartLotto.IsEnabled = true;
+        }
+
+        private int[] ExecuteNewDraw()
+        {
+            var lottoNumberSet = new HashSet<int>();
+
+            while (lottoNumberSet.Count < 7)
+            {
+                // https://learn.microsoft.com/en-us/dotnet/api/system.random.-ctor?view=net-8.0
+                var rnd = new Random();
+                var number = rnd.Next(1, 35);
+
+                if (!lottoNumberSet.Contains(number))
+                {
+                    lottoNumberSet.Add(number);
+                }
+            }
+
+           // convert set to array with building function
+            return lottoNumberSet.ToArray();
+            
+        }
     }
     
 }
