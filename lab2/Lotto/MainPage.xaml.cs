@@ -131,10 +131,14 @@ namespace Lotto
                 }
             }
 
+            Debug.WriteLine("Slump : " + lottoNumberSet.ToString());
+
            // convert set to array with building function
             return lottoNumberSet.ToArray();
             
         }
+
+        //https://learn.microsoft.com/en-us/windows/apps/design/layout/grid-tutorial
     }
     
 }
