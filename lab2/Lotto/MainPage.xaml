@@ -6,72 +6,51 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" 
+    MinWidth="700">
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="*" ></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0" Background="Beige" Margin="10">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="200"></ColumnDefinition>
-                <ColumnDefinition Width="*"></ColumnDefinition>
-                <ColumnDefinition Width="*"></ColumnDefinition>
-                <ColumnDefinition Width="*"></ColumnDefinition>
-                <ColumnDefinition Width="*"></ColumnDefinition>
-                <ColumnDefinition Width="*"></ColumnDefinition>
-                <ColumnDefinition Width="*"></ColumnDefinition>
-                <ColumnDefinition Width="*"></ColumnDefinition>
-            </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" Text="Din lottorad" Height="50" FontSize="25" Margin="10" HorizontalAlignment="Right" />
-            <TextBox Grid.Column="1" Name="TextBoxLotto1" Width="70" MinWidth="70" Height="50" MaxLength="2" KeyUp="TextBoxLotto_OnKeyUp" InputScope="Digits" Margin="10,10,10,10" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18"></TextBox>
-            <TextBox Grid.Column="2" Name="TextBoxLotto2" Width="70" MinWidth="70" Height="50" MaxLength="2" KeyUp="TextBoxLotto_OnKeyUp" InputScope="Digits" Margin="10,10,10,10" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18"></TextBox>
-            <TextBox Grid.Column="3" Name="TextBoxLotto3" Width="70" MinWidth="70" Height="50" MaxLength="2" KeyUp="TextBoxLotto_OnKeyUp" InputScope="Digits" Margin="10,10,10,10" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18"></TextBox>
-            <TextBox Grid.Column="4" Name="TextBoxLotto4" Width="70" MinWidth="70" Height="50" MaxLength="2" KeyUp="TextBoxLotto_OnKeyUp" InputScope="Digits" Margin="10,10,10,10" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18"></TextBox>
-            <TextBox Grid.Column="5" Name="TextBoxLotto5" Width="70" MinWidth="70" Height="50" MaxLength="2" KeyUp="TextBoxLotto_OnKeyUp" InputScope="Digits" Margin="10,10,10,10" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18"></TextBox>
-            <TextBox Grid.Column="6" Name="TextBoxLotto6" Width="70" MinWidth="70" Height="50" MaxLength="2" KeyUp="TextBoxLotto_OnKeyUp" InputScope="Digits" Margin="10,10,10,10" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18"></TextBox>
-            <TextBox Grid.Column="7" Name="TextBoxLotto7" Width="70" MinWidth="70" Height="50" MaxLength="2" KeyUp="TextBoxLotto_OnKeyUp" InputScope="Digits" Margin="10,10,10,10" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18"></TextBox>
-        </Grid>
+        <Border Grid.Row="0"  Background="#b4b4b4"/>
+        <StackPanel Grid.Row="0"  Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <TextBlock Text="Din lottorad" Height="50" FontSize="25" Margin="10"/>
+            <TextBox Name="TextBoxLotto1" Width="70" MinWidth="70" Height="50" MaxLength="2" KeyUp="TextBoxLotto_OnKeyUp" InputScope="Digits" Margin="0,0,10,0" FontSize="18"></TextBox>
+            <TextBox Name="TextBoxLotto2" Width="70" MinWidth="70" Height="50" MaxLength="2" KeyUp="TextBoxLotto_OnKeyUp" InputScope="Digits" Margin="0,0,10,0" FontSize="18"></TextBox>
+            <TextBox Name="TextBoxLotto3" Width="70" MinWidth="70" Height="50" MaxLength="2" KeyUp="TextBoxLotto_OnKeyUp" InputScope="Digits" Margin="0,0,10,0" FontSize="18"></TextBox>
+            <TextBox Name="TextBoxLotto4" Width="70" MinWidth="70" Height="50" MaxLength="2" KeyUp="TextBoxLotto_OnKeyUp" InputScope="Digits" Margin="0,0,10,0" FontSize="18"></TextBox>
+            <TextBox Name="TextBoxLotto5" Width="70" MinWidth="70" Height="50" MaxLength="2" KeyUp="TextBoxLotto_OnKeyUp" InputScope="Digits" Margin="0,0,10,0" FontSize="18"></TextBox>
+            <TextBox Name="TextBoxLotto6" Width="70" MinWidth="70" Height="50" MaxLength="2" KeyUp="TextBoxLotto_OnKeyUp" InputScope="Digits" Margin="0,0,10,0" FontSize="18"></TextBox>
+            <TextBox Name="TextBoxLotto7" Width="70" MinWidth="70" Height="50" MaxLength="2" KeyUp="TextBoxLotto_OnKeyUp" InputScope="Digits"  FontSize="18"></TextBox>
+        </StackPanel>
 
-        <Grid Grid.Row="1" Background="Aqua" Margin="10">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"></ColumnDefinition>
-                <ColumnDefinition Width="200"></ColumnDefinition>
-                <ColumnDefinition Width="*"></ColumnDefinition>
-            </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" Text="Antal dragningar" Height="50" FontSize="25" HorizontalAlignment="Right" Margin="0,0,20,0"/>
-            <TextBox Grid.Column="1" Name="TextBoxDrawsNo" MinWidth="100" Height="50" MaxLength="6" FontSize="18" Margin="0,0,20,0"></TextBox>
-            <Button Grid.Column="2"  Name="ButtonStartLotto" IsEnabled="False" Click="ButtonStartLotto_OnClick" HorizontalAlignment="Left">Starta Lotto</Button>
-        </Grid>
+        <Border Grid.Row="1"  Background="#a2a2"/>
+        <StackPanel Grid.Row="1"  Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <TextBlock Text="Antal dragningar" Height="50" FontSize="25" Margin="0,0,20,0"/>
+            <TextBox Name="TextBoxDrawsNo" MinWidth="100" Height="50" MaxLength="6" FontSize="18" Margin="0,0,20,0"></TextBox>
+            <Button  Name="ButtonStartLotto" IsEnabled="False" Click="ButtonStartLotto_OnClick">Starta Lotto</Button>
+        </StackPanel>
 
-        <Grid Grid.Row="2" Background="BurlyWood" Margin="10">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"></ColumnDefinition>
-                <ColumnDefinition Width="*"></ColumnDefinition>
-                <ColumnDefinition Width="*"></ColumnDefinition>
-                <ColumnDefinition Width="*"></ColumnDefinition>
-                <ColumnDefinition Width="*"></ColumnDefinition>
-                <ColumnDefinition Width="*"></ColumnDefinition>
-            </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" Text="5 rätt" Height="50" FontSize="25" HorizontalAlignment="Right" />
-            <TextBox Grid.Column="1" Name="TextCorrectFive" Width="150" Height="50" Margin="10,10,10,10" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="18"></TextBox>
-            <TextBlock Grid.Column="2" Text="6 rätt" Height="50" FontSize="25" HorizontalAlignment="Right"/>
-            <TextBox Grid.Column="3" Name="TextCorrectSix" Width="150" Height="50" Margin="10,10,10,10" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="18"></TextBox>
-            <TextBlock Grid.Column="4" Text="7 rätt" Height="50" FontSize="25" HorizontalAlignment="Right"/>
-            <TextBox Grid.Column="5" Name="TextCorrectSeven" Width="150" Height="50" Margin="10,10,10,10" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="18"></TextBox>
+        <Border Grid.Row="2"  Background="#c2c2c2"/>
+        <StackPanel Grid.Row="2"  Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <TextBlock  Text="5 rätt" Height="50" FontSize="25"  Margin="0,0,10,0"/>
+            <TextBox Name="TextCorrectFive" Width="150" Height="50" Margin="0,0,40,0"  FontSize="18"></TextBox>
+            <TextBlock  Text="6 rätt" Height="50" FontSize="25" Margin="0,0,10,0"/>
+            <TextBox  Name="TextCorrectSix" Width="150" Height="50" Margin="0,0,40,0"  FontSize="18"></TextBox>
+            <TextBlock  Text="7 rätt" Height="50" FontSize="25" Margin="0,0,10,0"/>
+            <TextBox  Name="TextCorrectSeven" Width="150" Height="50"   FontSize="18"></TextBox>
+        </StackPanel>
 
-        </Grid>
-
-        <Border Grid.Row="4" Grid.ColumnSpan="2" Background="#152951"/>
-        <StackPanel Grid.Row="4"  Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+        <Border Grid.Row="3"  Background="#152951"/>
+        <StackPanel Grid.Row="3"  Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
             <TextBlock Foreground="White" FontSize="25" Text="5 rätt: 434" Margin="0,0,40,0"/>
             <TextBlock Foreground="White" FontSize="25" Text="6 rätt: 34" Margin="0,0,40,0"/>
             <TextBlock Foreground="White" FontSize="25" Text="7 rätt : 2"/>
         </StackPanel>
-
     </Grid>
 </Page>

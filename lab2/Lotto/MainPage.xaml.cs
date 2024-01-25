@@ -75,6 +75,7 @@ namespace Lotto
 
         private void ButtonStartLotto_OnClick(object sender, RoutedEventArgs e)
         {
+            
             ButtonStartLotto.IsEnabled = false;
 
             var numberOfDraws = int.Parse(TextBoxDrawsNo.Text);
