@@ -14,11 +14,13 @@
             <RowDefinition Height="*" ></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
-            <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition MinWidth="900" />
+        </Grid.ColumnDefinitions>
 
         <Border Grid.Row="0"  Background="#b4b4b4"/>
-        <StackPanel Grid.Row="0"  Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+        <StackPanel Grid.Row="0" MinWidth="700"  Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
             <TextBlock Text="Din lottorad" Height="50" FontSize="25" Margin="10"/>
             <TextBox Name="TextBoxLotto1" Width="70" MinWidth="70" Height="50" MaxLength="2" KeyUp="TextBoxLotto_OnKeyUp" InputScope="Digits" Margin="0,0,10,0" FontSize="18"></TextBox>
             <TextBox Name="TextBoxLotto2" Width="70" MinWidth="70" Height="50" MaxLength="2" KeyUp="TextBoxLotto_OnKeyUp" InputScope="Digits" Margin="0,0,10,0" FontSize="18"></TextBox>
@@ -29,28 +31,18 @@
             <TextBox Name="TextBoxLotto7" Width="70" MinWidth="70" Height="50" MaxLength="2" KeyUp="TextBoxLotto_OnKeyUp" InputScope="Digits"  FontSize="18"></TextBox>
         </StackPanel>
 
-        <Border Grid.Row="1"  Background="#a2a2"/>
-        <StackPanel Grid.Row="1"  Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <TextBlock Text="Antal dragningar" Height="50" FontSize="25" Margin="0,0,20,0"/>
-            <TextBox Name="TextBoxDrawsNo" MinWidth="100" Height="50" MaxLength="6" FontSize="18" Margin="0,0,20,0"></TextBox>
-            <Button  Name="ButtonStartLotto" IsEnabled="False" Click="ButtonStartLotto_OnClick">Starta Lotto</Button>
+        <Border Grid.Row="1"  Background="#b4b4b4"/>
+        <StackPanel Name="StackPanelDraw" Grid.Row="1"  Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <TextBlock Text="Antal dragningar" Height="50" FontSize="25" Margin="0,0,20,0" />
+            <TextBox Name="TextBoxDrawsNo" MinWidth="100" Height="50" MaxLength="6" FontSize="18" Margin="0,0,20,0" KeyUp="TextBoxDrawsNo_OnKeyUp"></TextBox>
+            <Button  Name="ButtonStartLotto" IsEnabled="False" Click="ButtonStartLotto_OnClick" Content="Starta Lotto"></Button>
         </StackPanel>
 
-        <Border Grid.Row="2"  Background="#c2c2c2"/>
-        <StackPanel Grid.Row="2"  Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <TextBlock  Text="5 rätt" Height="50" FontSize="25"  Margin="0,0,10,0"/>
-            <TextBox Name="TextCorrectFive" Width="150" Height="50" Margin="0,0,40,0"  FontSize="18"></TextBox>
-            <TextBlock  Text="6 rätt" Height="50" FontSize="25" Margin="0,0,10,0"/>
-            <TextBox  Name="TextCorrectSix" Width="150" Height="50" Margin="0,0,40,0"  FontSize="18"></TextBox>
-            <TextBlock  Text="7 rätt" Height="50" FontSize="25" Margin="0,0,10,0"/>
-            <TextBox  Name="TextCorrectSeven" Width="150" Height="50"   FontSize="18"></TextBox>
-        </StackPanel>
-
-        <Border Grid.Row="3"  Background="#152951"/>
+        <Border Grid.Row="2"  Background="#152951"/>
         <StackPanel Grid.Row="3"  Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <TextBlock Foreground="White" FontSize="25" Text="5 rätt: 434" Margin="0,0,40,0"/>
-            <TextBlock Foreground="White" FontSize="25" Text="6 rätt: 34" Margin="0,0,40,0"/>
-            <TextBlock Foreground="White" FontSize="25" Text="7 rätt : 2"/>
+            <TextBlock Name="TextBlockFiveInfo" Foreground="White" FontSize="25" Text="Win 5" Margin="0,0,40,0"/>
+            <TextBlock Name="TextBlockSixInfo" Foreground="White" FontSize="25" Text="Win 6" Margin="0,0,40,0"/>
+            <TextBlock Name="TextBlockSevenInfo" Foreground="White" FontSize="25" Text="Win 7"/>
         </StackPanel>
     </Grid>
 </Page>

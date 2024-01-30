@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Diagnostics;
-using System.Drawing;
 using System.Linq;
+using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
@@ -14,31 +13,59 @@ using Windows.UI.Xaml.Media;
 namespace Lotto
 {
     /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
+    /// Backend code for lotto GUI
+    ///
+    /// Grid is inspired from https://learn.microsoft.com/en-us/windows/apps/design/layout/grid-tutorial
     /// </summary>
     public sealed partial class MainPage : Page
     {
-       
-        int[] _lottoUserInput = { 0, 0, 0, 0, 0, 0, 0 };
-        //int[] lottoUserGenerate = { 0, 0, 0, 0, 0, 0, 0 };
+        // deafult set all values to 0
+        private int[] _lottoUserInput = { 0, 0, 0, 0, 0, 0, 0 };
+
+        // string constants for displaying number of wins
+        private const string WinInfoFive = "5 rätt: {0}";
+        private const string WinInfoSix = "6 rätt: {0}";
+        private const string WinInfoSeven = "7 rätt: {0}";
+
 
         public MainPage()
         {
             this.InitializeComponent();
+            SetWinnerInfo();
         }
 
-        private int GetTextBoxLottoInputPosition(string name)
-        {
-            var position = name.Replace("TextBoxLotto", "");
-            return int.Parse(position) - 1;
-        }
 
 
         private void CheckValidLottoInput()
         {
-            ButtonStartLotto.IsEnabled = !_lottoUserInput.Contains(0);
+            ButtonStartLotto.IsEnabled = !_lottoUserInput.Contains(0) && int.TryParse(TextBoxDrawsNo.Text, out int result);
         }
 
+
+        #region Events
+
+        private void TextBoxDrawsNo_OnKeyUp(object sender, KeyRoutedEventArgs e)
+        {
+
+            var textBox = sender as TextBox;
+
+            var textInput = textBox?.Text;
+            var textBoxName = textBox?.Name;
+
+            // verify that input is valid
+            if (!int.TryParse(textInput, out int inputValue) || (inputValue < 1 || inputValue > 999999))
+            {
+                textBox.BorderBrush = new SolidColorBrush(Windows.UI.Colors.Red);
+            }
+            else
+            {
+                // valid value
+                textBox.BorderBrush = new SolidColorBrush(Windows.UI.Colors.Green);
+            }
+
+            // check if all input is valid
+            CheckValidLottoInput();
+        }
 
         private void TextBoxLotto_OnKeyUp(object sender, KeyRoutedEventArgs e)
         {
@@ -48,10 +75,11 @@ namespace Lotto
             var textBoxName = textBox?.Name;
 
 
+            // always clear input value before verifying any new input
             _lottoUserInput[GetTextBoxLottoInputPosition(textBoxName)] = 0;
 
             // verify that input is valid
-            if (!int.TryParse(textInput, out int inputValue) || 
+            if (!int.TryParse(textInput, out int inputValue) ||
                 (inputValue < 1 || inputValue > 35) ||
                 _lottoUserInput.Contains(inputValue))
             {
@@ -65,28 +93,24 @@ namespace Lotto
                 _lottoUserInput[GetTextBoxLottoInputPosition(textBoxName)] = inputValue;
             }
 
-
+            // check if all input is valid
             CheckValidLottoInput();
-
-            //// Find common elements
-            //var commonNumbers = array1.Intersect(array2);
-
         }
 
+        /// <summary>
+        /// Calculate number of wins
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ButtonStartLotto_OnClick(object sender, RoutedEventArgs e)
         {
-            
             ButtonStartLotto.IsEnabled = false;
 
             var numberOfDraws = int.Parse(TextBoxDrawsNo.Text);
 
-            var sumWin5 = 0;
-            var sumWin6 = 0;
-            var sumWin7 = 0;
-
-            TextCorrectFive.Text = "";
-            TextCorrectSix.Text = "";
-            TextCorrectSeven.Text = "";
+            var winFiveCount = 0;
+            var winSixCount = 0;
+            var winSevenCount = 0;
 
             while (numberOfDraws-- > 0)
             {
@@ -97,23 +121,43 @@ namespace Lotto
                 switch (correctUserNumbers)
                 {
                     case 5:
-                        sumWin5++;
+                        winFiveCount++;
                         break;
                     case 6:
-                        sumWin6++;
+                        winSixCount++;
                         break;
                     case 7:
-                        sumWin6++;
+                        winSevenCount++;
                         break;
                 }
-
             }
 
-            TextCorrectFive.Text = sumWin5.ToString();
-            TextCorrectSix.Text = sumWin6.ToString();
-            TextCorrectSeven.Text = sumWin7.ToString();
-
+            SetWinnerInfo(winFiveCount, winSixCount, winSevenCount);
             ButtonStartLotto.IsEnabled = true;
+        }
+
+        #endregion
+
+
+
+        #region Helper functions
+        /// <summary>
+        /// Display number of wins
+        /// </summary>
+        /// <param name="winFiveCount"></param>
+        /// <param name="winSixCount"></param>
+        /// <param name="winSevenCount"></param>
+        private void SetWinnerInfo(int winFiveCount = 0, int winSixCount = 0, int winSevenCount = 0)
+        {
+            TextBlockFiveInfo.Text = string.Format(WinInfoFive, winFiveCount);
+            TextBlockSixInfo.Text = string.Format(WinInfoSix, winSixCount);
+            TextBlockSevenInfo.Text = string.Format(WinInfoSeven, winSevenCount);
+        }
+
+        private int GetTextBoxLottoInputPosition(string name)
+        {
+            var position = name.Replace("TextBoxLotto", "");
+            return int.Parse(position) - 1;
         }
 
         private int[] ExecuteNewDraw()
@@ -132,14 +176,13 @@ namespace Lotto
                 }
             }
 
-            Debug.WriteLine("Slump : " + lottoNumberSet.ToString());
-
-           // convert set to array with building function
+            // convert set to array with building function
             return lottoNumberSet.ToArray();
-            
-        }
 
-        //https://learn.microsoft.com/en-us/windows/apps/design/layout/grid-tutorial
+        }
+        #endregion
+
+
     }
-    
+
 }
