@@ -11,25 +11,12 @@ namespace calculator
     /// </summary>
     public sealed partial class MainPage : Page
     {
-        private int totalSum = 0;
-
 
         private int? previousResult = null;
-
         private string currentOperation = string.Empty;
-        private string previousOperation = string.Empty;
         private bool newNumberInput = true;
+        private bool hasCalculated = false;
 
-
-       
-
-
-        private string currentSelectedNumberInput = "";
-        //private string previousSelectedCalcOperation;
-        
-      
-        private string currentSelectedCalcOperation;
-        
         public MainPage()
         {
             this.InitializeComponent();
@@ -38,9 +25,7 @@ namespace calculator
 
         private void CalculateClear()
         {
-            totalSum = 0;
             previousResult = null;
-            previousOperation = string.Empty;
             TextBlockNumberInput.Text = "0";
         }
 
@@ -52,6 +37,9 @@ namespace calculator
                 TextBlockNumberInput.Text = "0";
                 newNumberInput = false;
             }
+
+            if (hasCalculated)
+                previousResult = null;
 
             var textBox = sender as Button;
             var number = textBox?.Content;
@@ -76,7 +64,7 @@ namespace calculator
                 case "-":
                     previousResult -= GetCurrentNumberInput();
                     break;
-                case "/":
+                case "/": // handle 00000
                     previousResult /= GetCurrentNumberInput();
                     break;
                 case "X":
@@ -90,9 +78,15 @@ namespace calculator
 
         private void ButtonCalculate_OnClick(object sender, RoutedEventArgs e)
         {
+            if (string.IsNullOrWhiteSpace(currentOperation) || previousResult == null)
+            {
+                return;
+            }
             Calculate(currentOperation);
-            previousOperation = currentOperation;
+            currentOperation = string.Empty;
             TextBlockNumberInput.Text = previousResult.ToString();
+            newNumberInput = true;
+            hasCalculated = true;
         }
 
         private void ButtonOperation_OnClick(object sender, RoutedEventArgs e)
@@ -102,15 +96,20 @@ namespace calculator
             {
                 return;
             }
-
+            var textBox = sender as Button;
+            var operation = textBox?.Content;
+            //passer på at kalkuleringen skjer når all info er på plass
             if (!string.IsNullOrWhiteSpace(currentOperation) && previousResult != null)
             {
+                if (newNumberInput)
+                {
+                    currentOperation = operation?.ToString();
+                    return;
+                }
                 Calculate(currentOperation);
                 TextBlockNumberInput.Text = previousResult.ToString();
             }
-
-            var textBox = sender as Button;
-            var operation = textBox?.Content;
+            
 
             currentOperation = operation?.ToString();
 
@@ -118,9 +117,8 @@ namespace calculator
             {
                 previousResult = GetCurrentNumberInput();
             }
-            
+            hasCalculated = false;
             newNumberInput = true;
-
         }
 
 
