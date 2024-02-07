@@ -15,6 +15,7 @@
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
@@ -23,27 +24,29 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        
-        <TextBlock Name="TextBlockNumberInput"  Grid.Row="0" Grid.ColumnSpan="4" Grid.Column="0" Text="----" Height="50" FontSize="25" Margin="0,0,20,0" />
 
-        <Button Grid.Row="1" Grid.Column="0" Content="1" Click="ButtonNumber_OnClick"    VerticalAlignment="Center" HorizontalAlignment="Center" Width="50" Height="50" Margin="10,10,10,10"></Button>
-        <Button Grid.Row="1" Grid.Column="1" Content="2" Click="ButtonNumber_OnClick"    VerticalAlignment="Center" HorizontalAlignment="Center" Width="50" Height="50" Margin="10,10,10,10"></Button>
-        <Button Grid.Row="1" Grid.Column="2" Content="3" Click="ButtonNumber_OnClick"    VerticalAlignment="Center" HorizontalAlignment="Center" Width="50" Height="50" Margin="10,10,10,10"></Button>
-        <Button Grid.Row="1" Grid.Column="3" Content="+" Click="ButtonOperation_OnClick" VerticalAlignment="Center" HorizontalAlignment="Center" Width="50" Height="50" Margin="10,10,10,10"></Button>
+        <TextBlock Name="TextBlockErrorInfo" Visibility="Collapsed"  Grid.Row="0" Grid.ColumnSpan="4" Grid.Column="0" Text="----" Height="50" FontSize="25" Margin="0,0,20,0" FocusVisualPrimaryBrush="#FFEC1D1D" />
 
-        <Button Grid.Row="2" Grid.Column="0" Content="4" Click="ButtonNumber_OnClick"    VerticalAlignment="Center" HorizontalAlignment="Center" Width="50" Height="50" Margin="10,10,10,10"></Button>
-        <Button Grid.Row="2" Grid.Column="1" Content="5" Click="ButtonNumber_OnClick"    VerticalAlignment="Center" HorizontalAlignment="Center" Width="50" Height="50" Margin="10,10,10,10"></Button>
-        <Button Grid.Row="2" Grid.Column="2" Content="6" Click="ButtonNumber_OnClick"    VerticalAlignment="Center" HorizontalAlignment="Center" Width="50" Height="50" Margin="10,10,10,10"></Button>
-        <Button Grid.Row="2" Grid.Column="3" Content="-" Click="ButtonOperation_OnClick" VerticalAlignment="Center" HorizontalAlignment="Center" Width="50" Height="50" Margin="10,10,10,10"></Button>
+        <TextBlock Name="TextBlockNumberInput"  Grid.Row="1" Grid.ColumnSpan="4" Grid.Column="0" Text="----" Height="50" FontSize="25" Margin="0,0,20,0" />
 
-        <Button Grid.Row="3" Grid.Column="0" Content="7" Click="ButtonNumber_OnClick"    VerticalAlignment="Center" HorizontalAlignment="Center" Width="50" Height="50" Margin="10,10,10,10"></Button>
-        <Button Grid.Row="3" Grid.Column="1" Content="8" Click="ButtonNumber_OnClick"    VerticalAlignment="Center" HorizontalAlignment="Center" Width="50" Height="50" Margin="10,10,10,10"></Button>
-        <Button Grid.Row="3" Grid.Column="2" Content="9" Click="ButtonNumber_OnClick"    VerticalAlignment="Center" HorizontalAlignment="Center" Width="50" Height="50" Margin="10,10,10,10"></Button>
-        <Button Grid.Row="3" Grid.Column="3" Content="X" Click="ButtonOperation_OnClick" VerticalAlignment="Center" HorizontalAlignment="Center" Width="50" Height="50" Margin="10,10,10,10"></Button>
+        <Button Grid.Row="2" Grid.Column="0" Content="1" Click="ButtonNumber_OnClick"    VerticalAlignment="Center" HorizontalAlignment="Center" Width="50" Height="50" Margin="10,10,10,10"></Button>
+        <Button Grid.Row="2" Grid.Column="1" Content="2" Click="ButtonNumber_OnClick"    VerticalAlignment="Center" HorizontalAlignment="Center" Width="50" Height="50" Margin="10,10,10,10"></Button>
+        <Button Grid.Row="2" Grid.Column="2" Content="3" Click="ButtonNumber_OnClick"    VerticalAlignment="Center" HorizontalAlignment="Center" Width="50" Height="50" Margin="10,10,10,10"></Button>
+        <Button Grid.Row="2" Grid.Column="3" Content="+" Click="ButtonOperation_OnClick" VerticalAlignment="Center" HorizontalAlignment="Center" Width="50" Height="50" Margin="10,10,10,10"></Button>
 
-        <Button Grid.Row="4" Grid.Column="0" Content="C" Click="ButtonClear_OnClick" VerticalAlignment="Center" HorizontalAlignment="Center" Width="50" Height="50" Margin="10,10,10,10"></Button>
-        <Button Grid.Row="4" Grid.Column="1" Content="0" Click="ButtonNumber_OnClick"    VerticalAlignment="Center" HorizontalAlignment="Center" Width="50" Height="50" Margin="10,10,10,10"></Button>
-        <Button Grid.Row="4" Grid.Column="2" Content="=" Click="ButtonCalculate_OnClick" VerticalAlignment="Center" HorizontalAlignment="Center" Width="50" Height="50" Margin="10,10,10,10"></Button>
-        <Button Grid.Row="4" Grid.Column="3" Content="/" Click="ButtonOperation_OnClick" VerticalAlignment="Center" HorizontalAlignment="Center" Width="50" Height="50" Margin="10,10,10,10"></Button>
+        <Button Grid.Row="3" Grid.Column="0" Content="4" Click="ButtonNumber_OnClick"    VerticalAlignment="Center" HorizontalAlignment="Center" Width="50" Height="50" Margin="10,10,10,10"></Button>
+        <Button Grid.Row="3" Grid.Column="1" Content="5" Click="ButtonNumber_OnClick"    VerticalAlignment="Center" HorizontalAlignment="Center" Width="50" Height="50" Margin="10,10,10,10"></Button>
+        <Button Grid.Row="3" Grid.Column="2" Content="6" Click="ButtonNumber_OnClick"    VerticalAlignment="Center" HorizontalAlignment="Center" Width="50" Height="50" Margin="10,10,10,10"></Button>
+        <Button Grid.Row="3" Grid.Column="3" Content="-" Click="ButtonOperation_OnClick" VerticalAlignment="Center" HorizontalAlignment="Center" Width="50" Height="50" Margin="10,10,10,10"></Button>
+
+        <Button Grid.Row="4" Grid.Column="0" Content="7" Click="ButtonNumber_OnClick"    VerticalAlignment="Center" HorizontalAlignment="Center" Width="50" Height="50" Margin="10,10,10,10"></Button>
+        <Button Grid.Row="4" Grid.Column="1" Content="8" Click="ButtonNumber_OnClick"    VerticalAlignment="Center" HorizontalAlignment="Center" Width="50" Height="50" Margin="10,10,10,10"></Button>
+        <Button Grid.Row="4" Grid.Column="2" Content="9" Click="ButtonNumber_OnClick"    VerticalAlignment="Center" HorizontalAlignment="Center" Width="50" Height="50" Margin="10,10,10,10"></Button>
+        <Button Grid.Row="4" Grid.Column="3" Content="X" Click="ButtonOperation_OnClick" VerticalAlignment="Center" HorizontalAlignment="Center" Width="50" Height="50" Margin="10,10,10,10"></Button>
+
+        <Button Grid.Row="5" Grid.Column="0" Content="C" Click="ButtonClear_OnClick" VerticalAlignment="Center" HorizontalAlignment="Center" Width="50" Height="50" Margin="10,10,10,10"></Button>
+        <Button Grid.Row="5" Grid.Column="1" Content="0" Click="ButtonNumber_OnClick"    VerticalAlignment="Center" HorizontalAlignment="Center" Width="50" Height="50" Margin="10,10,10,10"></Button>
+        <Button Grid.Row="5" Grid.Column="2" Content="=" Click="ButtonCalculate_OnClick" VerticalAlignment="Center" HorizontalAlignment="Center" Width="50" Height="50" Margin="10,10,10,10"></Button>
+        <Button Grid.Row="5" Grid.Column="3" Content="/" Click="ButtonOperation_OnClick" VerticalAlignment="Center" HorizontalAlignment="Center" Width="50" Height="50" Margin="10,10,10,10"></Button>
     </Grid>
 </Page>

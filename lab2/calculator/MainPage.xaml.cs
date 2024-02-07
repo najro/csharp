@@ -7,7 +7,7 @@ using Windows.UI.Xaml.Controls;
 namespace calculator
 {
     /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
+    /// Calculator app (lab2 - Örjan Andersson)
     /// </summary>
     public sealed partial class MainPage : Page
     {
@@ -25,25 +25,49 @@ namespace calculator
 
         private void CalculateClear()
         {
+            newNumberInput = true;
+            currentOperation = string.Empty;
             previousResult = null;
             TextBlockNumberInput.Text = "0";
         }
 
+      
+        /// <summary>
+        /// reset calculator
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ButtonClear_OnClick(object sender, RoutedEventArgs e)
+        {
+            CalculateClear();
+        }
+
+        /// <summary>
+        /// handle click on a number
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ButtonNumber_OnClick(object sender, RoutedEventArgs e)
         {
-
+            // start a new input serie
             if (newNumberInput)
             {
                 TextBlockNumberInput.Text = "0";
                 newNumberInput = false;
             }
 
+            // if = has been used, then a new input serie should reset earlier result and star over
             if (hasCalculated)
+            {
                 previousResult = null;
-
+            }
+            
+            // handle number display
+            // each button contains number in content property
             var textBox = sender as Button;
             var number = textBox?.Content;
 
+            // do not start to display a number with 0
             if (TextBlockNumberInput.Text.StartsWith("0"))
             {
                 TextBlockNumberInput.Text = TextBlockNumberInput.Text.Remove(0);
@@ -53,38 +77,21 @@ namespace calculator
         }
 
 
-
-        private void Calculate(string operation)
-        {
-            switch (operation)
-            {
-                case "+":
-                    previousResult += GetCurrentNumberInput();
-                    break;
-                case "-":
-                    previousResult -= GetCurrentNumberInput();
-                    break;
-                case "/": // handle 00000
-                    previousResult /= GetCurrentNumberInput();
-                    break;
-                case "X":
-                    previousResult *= GetCurrentNumberInput();
-                    break;
-
-            }
-        }
-
-       
-
+        /// <summary>
+        /// handle click on = button
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ButtonCalculate_OnClick(object sender, RoutedEventArgs e)
         {
+            // if no operation selected or previous result, then do nothing
             if (string.IsNullOrWhiteSpace(currentOperation) || previousResult == null)
             {
                 return;
             }
+
             Calculate(currentOperation);
             currentOperation = string.Empty;
-            TextBlockNumberInput.Text = previousResult.ToString();
             newNumberInput = true;
             hasCalculated = true;
         }
@@ -107,7 +114,7 @@ namespace calculator
                     return;
                 }
                 Calculate(currentOperation);
-                TextBlockNumberInput.Text = previousResult.ToString();
+                //SetCurrentNumberInputDisplay();
             }
             
 
@@ -121,19 +128,84 @@ namespace calculator
             newNumberInput = true;
         }
 
-
-
-
-
-        private int GetCurrentNumberInput()
+        private void ShowErrorMessage(string message)
         {
-            var inputNumber = int.Parse(TextBlockNumberInput.Text);
-            return inputNumber;
+            TextBlockErrorInfo.Text = message;
+            TextBlockErrorInfo.Visibility = Visibility.Visible;
+
+            // reset calculator and start over
+            CalculateClear();
         }
 
-        private void ButtonClear_OnClick(object sender, RoutedEventArgs e)
+        private void HideErrorMessage()
         {
-            CalculateClear();
+
+        }
+
+
+        private void Calculate(string operation)
+        {
+            try
+            {
+                var currentInput = GetCurrentNumberInput();
+
+                switch (operation)
+                {
+                    case "+":
+                        previousResult += currentInput;
+                        break;
+                    case "-":
+                        previousResult -= currentInput;
+                        break;
+                    case "/": // handle 00000
+
+                        if (currentInput == 0)
+                        {
+                            ShowErrorMessage("Du kan inte dela med 0!");
+                            return;
+                        }
+
+                        previousResult /= currentInput;
+                        break;
+                    case "X":
+                        previousResult *= currentInput;
+                        break;
+
+                }
+
+                TextBlockNumberInput.Text = previousResult.ToString();
+            }
+            catch (OverflowException)
+            {
+                // https://learn.microsoft.com/en-us/dotnet/api/system.overflowexception?view=net-8.0
+                ShowErrorMessage("Du jobbar med för stora tal");
+            }
+            catch
+            {
+                ShowErrorMessage("Okänt problem har uppstått");
+            }
+        }
+
+
+        // get current number input as integer
+        private int GetCurrentNumberInput()
+        {
+            try
+            {
+                var inputNumber = int.Parse(TextBlockNumberInput.Text);
+                return inputNumber;
+            }
+            catch (OverflowException)
+            {
+                // https://learn.microsoft.com/en-us/dotnet/api/system.overflowexception?view=net-8.0
+                ShowErrorMessage("Du jobbar med för stora tal");
+            }
+            catch
+            {
+                ShowErrorMessage("Okänt problem har uppstått");
+            }
+
+            return 0;
         }
 
     }
