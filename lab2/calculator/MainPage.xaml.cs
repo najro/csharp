@@ -82,7 +82,7 @@ namespace calculator
 
 
         /// <summary>
-        /// handle click on = button
+        /// handle click on equal (=) button
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -141,6 +141,8 @@ namespace calculator
             TextBlockErrorInfo.Visibility = Visibility.Visible;
             errorDialogIsVisible = true;
 
+            TextBlockNumberInput.Visibility = Visibility.Collapsed;
+
             // reset calculator and start over
             CalculateClear();
         }
@@ -149,6 +151,7 @@ namespace calculator
         {
             if (!errorDialogIsVisible) return;
 
+            TextBlockNumberInput.Visibility = Visibility.Visible;
             TextBlockErrorInfo.Visibility = Visibility.Collapsed;
             errorDialogIsVisible = false;
         }
