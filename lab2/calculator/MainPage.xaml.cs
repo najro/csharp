@@ -16,6 +16,7 @@ namespace calculator
         private string currentOperation = string.Empty;
         private bool newNumberInput = true;
         private bool hasCalculated = false;
+        private bool errorDialogIsVisible = false;
 
         public MainPage()
         {
@@ -39,6 +40,7 @@ namespace calculator
         /// <param name="e"></param>
         private void ButtonClear_OnClick(object sender, RoutedEventArgs e)
         {
+            HideErrorMessage();
             CalculateClear();
         }
 
@@ -49,6 +51,8 @@ namespace calculator
         /// <param name="e"></param>
         private void ButtonNumber_OnClick(object sender, RoutedEventArgs e)
         {
+            HideErrorMessage();
+
             // start a new input serie
             if (newNumberInput)
             {
@@ -84,6 +88,8 @@ namespace calculator
         /// <param name="e"></param>
         private void ButtonCalculate_OnClick(object sender, RoutedEventArgs e)
         {
+            HideErrorMessage();
+
             // if no operation selected or previous result, then do nothing
             if (string.IsNullOrWhiteSpace(currentOperation) || previousResult == null)
             {
@@ -98,6 +104,7 @@ namespace calculator
 
         private void ButtonOperation_OnClick(object sender, RoutedEventArgs e)
         {
+            HideErrorMessage();
 
             if (string.IsNullOrWhiteSpace(currentOperation) && previousResult == null && GetCurrentNumberInput() == 0)
             {
@@ -132,6 +139,7 @@ namespace calculator
         {
             TextBlockErrorInfo.Text = message;
             TextBlockErrorInfo.Visibility = Visibility.Visible;
+            errorDialogIsVisible = true;
 
             // reset calculator and start over
             CalculateClear();
@@ -139,7 +147,10 @@ namespace calculator
 
         private void HideErrorMessage()
         {
+            if (!errorDialogIsVisible) return;
 
+            TextBlockErrorInfo.Visibility = Visibility.Collapsed;
+            errorDialogIsVisible = false;
         }
 
 
