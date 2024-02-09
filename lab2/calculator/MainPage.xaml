@@ -25,7 +25,7 @@
         </Grid.ColumnDefinitions>
 
 
-        <TextBlock Name="TextBlockErrorInfo" Visibility="Collapsed"  Grid.Row="0" Grid.ColumnSpan="4" Grid.Column="0" Text="----" Height="50" FontSize="25" FocusVisualPrimaryBrush="#FFEC1D1D" HorizontalAlignment="Right" Margin="10,10,10,10" />
+        <TextBlock Foreground="Red" Name="TextBlockErrorInfo" Visibility="Collapsed"  Grid.Row="0" Grid.ColumnSpan="4" Grid.Column="0" Text="----" Height="50" FontSize="25" FocusVisualPrimaryBrush="#FFEC1D1D" HorizontalAlignment="Right" Margin="10,10,10,10" />
 
         <TextBlock Name="TextBlockNumberInput"  Grid.Row="1" Grid.ColumnSpan="4" Grid.Column="0" Text="----" Height="50" FontSize="25" HorizontalAlignment="Right" Margin="10,10,10,10" />
 
