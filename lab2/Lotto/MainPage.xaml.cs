@@ -13,7 +13,7 @@ using Windows.UI.Xaml.Media;
 namespace Lotto
 {
     /// <summary>
-    /// Backend code for lotto GUI
+    /// Backend code for lotto GUI  (lab2 - alfoande100 / Örjan Andersson)
     ///
     /// Grid is inspired from https://learn.microsoft.com/en-us/windows/apps/design/layout/grid-tutorial
     /// </summary>
@@ -27,23 +27,27 @@ namespace Lotto
         private const string WinInfoSix = "6 rätt: {0}";
         private const string WinInfoSeven = "7 rätt: {0}";
 
-
         public MainPage()
         {
             this.InitializeComponent();
             SetWinnerInfo();
         }
 
-
-
+        /// <summary>
+        /// Helper function to check if all input is valid and enable lotto start button
+        /// </summary>
         private void CheckValidLottoInput()
         {
             ButtonStartLotto.IsEnabled = !_lottoUserInput.Contains(0) && int.TryParse(TextBoxDrawsNo.Text, out int result);
         }
 
-
         #region Events
 
+        /// <summary>
+        /// Check numbers of input draws to play lotto
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void TextBoxDrawsNo_OnKeyUp(object sender, KeyRoutedEventArgs e)
         {
 
@@ -67,6 +71,11 @@ namespace Lotto
             CheckValidLottoInput();
         }
 
+        /// <summary>
+        /// Verify that input is valid for each users number and enable lotto start button
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void TextBoxLotto_OnKeyUp(object sender, KeyRoutedEventArgs e)
         {
             var textBox = sender as TextBox;
@@ -79,11 +88,8 @@ namespace Lotto
             _lottoUserInput[GetTextBoxLottoInputPosition(textBoxName)] = 0;
 
             // verify that input is valid
-            if (!int.TryParse(textInput, out int inputValue) ||
-                (inputValue < 1 || inputValue > 35) ||
-                _lottoUserInput.Contains(inputValue))
+            if (!int.TryParse(textInput, out int inputValue) || (inputValue < 1 || inputValue > 35) || _lottoUserInput.Contains(inputValue))
             {
-
                 textBox.BorderBrush = new SolidColorBrush(Windows.UI.Colors.Red);
             }
             else
@@ -98,7 +104,7 @@ namespace Lotto
         }
 
         /// <summary>
-        /// Calculate number of wins
+        /// Perform lotto draw and calculate number of wins
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -139,7 +145,6 @@ namespace Lotto
         #endregion
 
 
-
         #region Helper functions
         /// <summary>
         /// Display number of wins
@@ -154,12 +159,22 @@ namespace Lotto
             TextBlockSevenInfo.Text = string.Format(WinInfoSeven, winSevenCount);
         }
 
+        /// <summary>
+        /// Get position of input of users lotto numbers in array
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+
         private int GetTextBoxLottoInputPosition(string name)
         {
             var position = name.Replace("TextBoxLotto", "");
             return int.Parse(position) - 1;
         }
 
+        /// <summary>
+        /// Execute new draw and return array of lotto numbers for new draw
+        /// </summary>
+        /// <returns></returns>
         private int[] ExecuteNewDraw()
         {
             var lottoNumberSet = new HashSet<int>();
@@ -181,8 +196,5 @@ namespace Lotto
 
         }
         #endregion
-
-
     }
-
 }
