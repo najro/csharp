@@ -7,7 +7,7 @@ using Windows.UI.Xaml.Controls;
 namespace calculator
 {
     /// <summary>
-    /// Calculator app (lab2 - Örjan Andersson)
+    /// Calculator app (lab2 - alfoande100 / Örjan Andersson)
     /// </summary>
     public sealed partial class MainPage : Page
     {
@@ -24,6 +24,9 @@ namespace calculator
             CalculateClear();
         }
 
+        /// <summary>
+        /// Reset calculator variabled
+        /// </summary>
         private void CalculateClear()
         {
             newNumberInput = true;
@@ -32,9 +35,8 @@ namespace calculator
             TextBlockNumberInput.Text = "0";
         }
 
-      
         /// <summary>
-        /// reset calculator
+        /// Clear calculator to start over
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -45,7 +47,7 @@ namespace calculator
         }
 
         /// <summary>
-        /// handle click on a number
+        /// Candle click on a numeric number
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -82,7 +84,7 @@ namespace calculator
 
 
         /// <summary>
-        /// handle click on equal (=) button
+        /// Handle click on equal (=) button
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -90,7 +92,7 @@ namespace calculator
         {
             HideErrorMessage();
 
-            // if no operation selected or previous result, then do nothing
+            // If no operation selected or previous result, then do nothing
             if (string.IsNullOrWhiteSpace(currentOperation) || previousResult == null)
             {
                 return;
@@ -102,6 +104,11 @@ namespace calculator
             hasCalculated = true;
         }
 
+        /// <summary>
+        /// Handle click on operation buttons (+, -, /, *)
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ButtonOperation_OnClick(object sender, RoutedEventArgs e)
         {
             HideErrorMessage();
@@ -113,6 +120,9 @@ namespace calculator
             var textBox = sender as Button;
             var operation = textBox?.Content;
             //passer på at kalkuleringen skjer når all info er på plass
+
+
+            // calculate if new input is indicated and there is a previous result and operation
             if (!string.IsNullOrWhiteSpace(currentOperation) && previousResult != null)
             {
                 if (newNumberInput)
@@ -121,20 +131,25 @@ namespace calculator
                     return;
                 }
                 Calculate(currentOperation);
-                //SetCurrentNumberInputDisplay();
             }
             
-
+            // set current operation
             currentOperation = operation?.ToString();
 
+            // if no previous result, then set current input as previous result
             if (previousResult == null)
             {
                 previousResult = GetCurrentNumberInput();
             }
+
             hasCalculated = false;
             newNumberInput = true;
         }
 
+        /// <summary>
+        /// Show error message for dived by zero or other errors and hide number input + reset calculator
+        /// </summary>
+        /// <param name="message"></param>
         private void ShowErrorMessage(string message)
         {
             TextBlockErrorInfo.Text = message;
@@ -147,6 +162,9 @@ namespace calculator
             CalculateClear();
         }
 
+        /// <summary>
+        /// Hide error message, if visible and show number input
+        /// </summary>
         private void HideErrorMessage()
         {
             if (!errorDialogIsVisible) return;
@@ -157,6 +175,10 @@ namespace calculator
         }
 
 
+        /// <summary>
+        /// Calculate operation and set result to previous result + display result and handle errors
+        /// </summary>
+        /// <param name="operation"></param>
         private void Calculate(string operation)
         {
             try
@@ -171,7 +193,7 @@ namespace calculator
                     case "-":
                         previousResult -= currentInput;
                         break;
-                    case "/": // handle 00000
+                    case "/": 
 
                         if (currentInput == 0)
                         {
@@ -201,7 +223,10 @@ namespace calculator
         }
 
 
-        // get current number input as integer
+        /// <summary>
+        /// Get current number input as integer
+        /// </summary>
+        /// <returns></returns>
         private int GetCurrentNumberInput()
         {
             try
