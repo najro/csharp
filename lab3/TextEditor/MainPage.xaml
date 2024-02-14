@@ -1,0 +1,52 @@
+﻿<Page
+    x:Class="TextEditor.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:TextEditor"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <!-- row for the menu -->
+            <RowDefinition Height="Auto"/>
+            <!-- row for the TextBox   * will take upp remaining space when menu and footer is added -->
+            <RowDefinition Height="*"/>
+            <!-- row for meta-information -->
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Menu -->
+
+        <CommandBar Name="CommandBarEditor" Grid.Row="0"  HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,0,0,0" Height="50" Background="LightGray">
+            <AppBarButton Name="AppBarButtonNew" Icon="Page"  Label="Om" Click="AppBarButtonNew_OnClick"/>
+            <AppBarButton Name="AppBarButtonOpen" Icon="OpenFile" Label="Öppna" Click="AppBarButtonOpen_OnClick"/>
+            <AppBarButton Name="AppBarButtonSave" Icon="Save" Label="Spara" Click="AppBarButtonSave_OnClick"/>
+        </CommandBar>
+    
+
+        <!-- TextBox for user text -->
+        <TextBox Name="TextInputBox" Grid.Row="1"  HorizontalAlignment="Stretch" VerticalContentAlignment="Stretch" Margin="10,10,0,0" VerticalAlignment="Top"  TextWrapping="Wrap" AcceptsReturn="True" TextChanged="TextInputBox_OnTextChanged"
+                 />
+
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Left">
+            <!-- Meta-information -->
+            <TextBlock Name="TextBlockMetaData" Grid.Row="2" VerticalAlignment="Bottom" Text="Tecken med mellanslag:"></TextBlock>
+
+            <!-- Meta-information -->
+            <TextBlock Name="TextBlockMetaData2" Grid.Row="2" VerticalAlignment="Bottom" Text="Tecken utan mellanslag:"></TextBlock>
+
+
+            <!-- Meta-information -->
+            <TextBlock Name="TextBlockMetaData3" Grid.Row="2" VerticalAlignment="Bottom" Text="Antalet ord"></TextBlock>
+            <!-- Add your metadata elements here -->
+
+            <!-- Meta-information -->
+            <TextBlock Name="TextBlockMetaData4" Grid.Row="2" VerticalAlignment="Bottom" Text="Antalet rader"></TextBlock>
+            <!-- Add your metadata elements here -->
+        </StackPanel>
+    </Grid>
+</Page>
