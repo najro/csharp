@@ -14,6 +14,7 @@ namespace TextEditor
     public sealed partial class MainPage : Page
     {
         private bool _isTextChanged = false;
+        private const string TextExtension = ".txt";
         public MainPage()
         {
             this.InitializeComponent();
@@ -22,33 +23,41 @@ namespace TextEditor
         private void TextInputBox_OnTextChanged(object sender, TextChangedEventArgs e)
         {
             _isTextChanged = true;
+            UpdateMetaDataInfo();
         }
 
-        private void AppBarButtonOpen_OnClick(object sender, RoutedEventArgs e)
+        private void UpdateMetaDataInfo()
+        {
+            TextBlockMetaData.Text = $"Last updated: {DateTime.Now}";
+        }
+
+        private async void AppBarButtonOpen_OnClick(object sender, RoutedEventArgs e)
         {
             var fileOpenPicker = new FileOpenPicker();
-            fileOpenPicker.FileTypeFilter.Add(".txt");
-            var result = fileOpenPicker.PickSingleFileAsync();
+            fileOpenPicker.FileTypeFilter.Add(TextExtension);
+            var result = await fileOpenPicker.PickSingleFileAsync();
 
-            var file = result?.GetResults();
-            
-            if (file == null) return;
+            if (result != null)
+            {
+                var text = await FileIO.ReadTextAsync(result);
+                TextInputBox.Text = text;
+            }
 
-            var text = FileIO.ReadTextAsync(file).GetResults();
-            TextInputBox.Text = text;
+            UpdateMetaDataInfo();
+
         }
 
         private async void AppBarButtonSave_OnClick(object sender, RoutedEventArgs e)
         {
             var fileSavePicker = new FileSavePicker();
-            fileSavePicker.FileTypeChoices.Add("Plain Text", new[] { ".txt" });
+            fileSavePicker.FileTypeChoices.Add("Plain Text", new[] { TextExtension });
 
-            var result = fileSavePicker.PickSaveFileAsync();
+            var result = await fileSavePicker.PickSaveFileAsync();
 
-            var file = result?.GetResults();
-            if (file == null) return;
-
-            await FileIO.WriteTextAsync(file, TextInputBox.Text);
+            if (result != null)
+            {
+                await FileIO.WriteTextAsync(result, TextInputBox.Text);
+            }
         }
 
 
