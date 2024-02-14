@@ -33,20 +33,18 @@
 
 
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Left">
-            <!-- Meta-information -->
-            <TextBlock Name="TextBlockMetaData" Grid.Row="2" VerticalAlignment="Bottom" Text="Tecken med mellanslag:"></TextBlock>
+            <!-- Meta-information : Tecken med mellanslag -->
+            <TextBlock Name="TextBlockNumberCharactersIncludingSpace" Grid.Row="2" VerticalAlignment="Center" Padding="10 0 0 0"></TextBlock>
 
-            <!-- Meta-information -->
-            <TextBlock Name="TextBlockMetaData2" Grid.Row="2" VerticalAlignment="Bottom" Text="Tecken utan mellanslag:"></TextBlock>
+            <!-- Meta-information : Tecken utan mellanslag -->
+            <TextBlock Name="TextBlockNumberCharactersWithoutSpace" Grid.Row="2" VerticalAlignment="Center" Padding="20 0 0 0"></TextBlock>
 
-
-            <!-- Meta-information -->
-            <TextBlock Name="TextBlockMetaData3" Grid.Row="2" VerticalAlignment="Bottom" Text="Antalet ord"></TextBlock>
-            <!-- Add your metadata elements here -->
-
-            <!-- Meta-information -->
-            <TextBlock Name="TextBlockMetaData4" Grid.Row="2" VerticalAlignment="Bottom" Text="Antalet rader"></TextBlock>
-            <!-- Add your metadata elements here -->
+            <!-- Meta-information : Antal ord -->
+            <TextBlock Name="TextBlockNumberWords" Grid.Row="2" VerticalAlignment="Center" Padding="20 0 0 0"></TextBlock>
+          
+            <!-- Meta-information : Antal rader-->
+            <TextBlock Name="TextBlockNumberLines" Grid.Row="2" VerticalAlignment="Center" Padding="20 0 0 0"></TextBlock>
+          
         </StackPanel>
     </Grid>
 </Page>
