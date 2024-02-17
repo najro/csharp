@@ -1,8 +1,10 @@
 ﻿using System;
+using Windows.ApplicationModel.Calls.Background;
 using Windows.Storage;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.Storage.Pickers;
+using Windows.UI.ViewManagement;
 using static System.Net.Mime.MediaTypeNames;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
@@ -17,11 +19,15 @@ namespace TextEditor
         private bool _isTextChanged = false;
         private bool _openNewOrStartOver = true;
         private const string TextExtension = ".txt";
+        private const string DefaultFileName = "dok1.txt";
+        private string CurrentFileName = DefaultFileName;
 
         private const string MetaDataNumberCharactersIncludingSpace = "Tecken med mellanslag: {0}";
         private const string MetaDataNumberCharactersWithoutSpace = "Tecken utan mellanslag: {0}";
         private const string MetaDataNumberWords = "Antal ord: {0}";
         private const string MetaDataNumberLines = "Antal rader: {0}";
+
+        private StorageFile CurrentStorageFile = null;
 
         public MainPage()
         {
@@ -36,12 +42,18 @@ namespace TextEditor
                 _isTextChanged = false;
                 _openNewOrStartOver = false;
             }
+            else if (TextInputBox.Text.Length == 0 && CurrentFileName == DefaultFileName)
+            {
+                _isTextChanged = false;
+            }
             else
             {
                 _isTextChanged = true;
             }
-            
+
+            SetAppTitle(CurrentFileName);
             UpdateMetaDataInfo();
+
         }
 
         private void UpdateMetaDataInfo()
@@ -58,6 +70,19 @@ namespace TextEditor
             TextBlockNumberCharactersWithoutSpace.Text = string.Format(MetaDataNumberCharactersWithoutSpace, numberOfCharactersWithoutSpace);
             TextBlockNumberWords.Text = string.Format(MetaDataNumberWords, numberOfWords);
             TextBlockNumberLines.Text = string.Format(MetaDataNumberLines, numberOfLines);
+
+            
+        }
+
+        private void SetAppTitle(string title)
+        {
+            if (_isTextChanged)
+            {
+                title = $"*{title}";
+            }
+
+            // https://learn.microsoft.com/en-us/windows/uwp/ui-input/title-bar
+            ApplicationView.GetForCurrentView().Title = title;
         }
 
 
@@ -66,6 +91,8 @@ namespace TextEditor
             TextInputBox.Text = string.Empty;
             _isTextChanged = false;
             _openNewOrStartOver = true;
+            CurrentFileName = DefaultFileName;
+            CurrentStorageFile = null;
         }
 
 
@@ -77,17 +104,28 @@ namespace TextEditor
 
             if (result != null)
             {
+                CurrentStorageFile = result;
+                CurrentFileName = result.Name;
                 var text = await FileIO.ReadTextAsync(result);
-                TextInputBox.Text = text;
                 _openNewOrStartOver = true;
+                TextInputBox.Text = text;
             }
 
             UpdateMetaDataInfo();
-
         }
 
         private async void AppBarButtonSave_OnClick(object sender, RoutedEventArgs e)
         {
+
+            if (CurrentStorageFile != null)
+            {
+                await FileIO.WriteTextAsync(CurrentStorageFile, TextInputBox.Text);
+                _isTextChanged = false;
+                SetAppTitle(CurrentFileName);
+                return;
+            }
+
+
             var fileSavePicker = new FileSavePicker();
             fileSavePicker.FileTypeChoices.Add("Plain Text", new[] { TextExtension });
 
@@ -96,6 +134,10 @@ namespace TextEditor
             if (result != null)
             {
                 await FileIO.WriteTextAsync(result, TextInputBox.Text);
+                CurrentStorageFile = result;
+                CurrentFileName = result.Name;
+                _isTextChanged = false;
+                SetAppTitle(CurrentFileName);
             }
         }
 
@@ -109,12 +151,16 @@ namespace TextEditor
             if (result != null)
             {
                 await FileIO.WriteTextAsync(result, TextInputBox.Text);
+                CurrentStorageFile = result;
+                CurrentFileName = result.Name;
+                _isTextChanged = false;
+                SetAppTitle(CurrentFileName);
             }
         }
 
-
         private void AppBarButtonNew_OnClick(object sender, RoutedEventArgs e)
         {
+
             if (_isTextChanged)
             {
                 // add documentation for ContentDialog
