@@ -12,38 +12,55 @@
         <Grid.RowDefinitions>
             <!-- row for the menu -->
             <RowDefinition Height="Auto"/>
-            <!-- row for the TextBox   * will take upp remaining space when menu and footer is added -->
+            <!-- row for the TextBox -->
             <RowDefinition Height="*"/>
             <!-- row for meta-information -->
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <!-- Menu -->
+        <CommandBar Name="CommandBarEditor" Grid.Row="0"  HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,0,0,0" Height="50" Background="LightGray" OverflowButtonVisibility="Collapsed">
+            <AppBarButton Name="AppBarButtonNew" Icon="Page"  Label="Ny" Click="AppBarButtonNew_OnClick">
+                <ToolTipService.ToolTip>
+                    <ToolTip Content="Ny" />
+                </ToolTipService.ToolTip>
+            </AppBarButton>
+            <AppBarButton Name="AppBarButtonOpen" Icon="OpenFile" Label="Öppna" Click="AppBarButtonOpen_OnClick">
+                <ToolTipService.ToolTip>
+                    <ToolTip Content="Öppna" />
+                </ToolTipService.ToolTip>
+            </AppBarButton>
 
-        <CommandBar Name="CommandBarEditor" Grid.Row="0"  HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,0,0,0" Height="50" Background="LightGray">
-            <AppBarButton Name="AppBarButtonNew" Icon="Page"  Label="Om" Click="AppBarButtonNew_OnClick"/>
-            <AppBarButton Name="AppBarButtonOpen" Icon="OpenFile" Label="Öppna" Click="AppBarButtonOpen_OnClick"/>
-            <AppBarButton Name="AppBarButtonSave" Icon="Save" Label="Spara" Click="AppBarButtonSave_OnClick"/>
+            <AppBarButton Name="AppBarButtonSave" Icon="Save" Label="Spara" Click="AppBarButtonSave_OnClick">
+                <ToolTipService.ToolTip>
+                    <ToolTip Content="Spara" />
+                </ToolTipService.ToolTip>
+            </AppBarButton>
+
+            <AppBarButton Name="AppBarButtonSaveAs" Icon="Save" Label="Spara som" Click="AppBarButtonSaveAs_OnClick">
+                <ToolTipService.ToolTip>
+                    <ToolTip Content="Spara som" />
+                </ToolTipService.ToolTip>
+            </AppBarButton>
         </CommandBar>
     
 
         <!-- TextBox for user text -->
-        <TextBox Name="TextInputBox" Grid.Row="1"  HorizontalAlignment="Stretch" VerticalContentAlignment="Stretch" Margin="10,10,0,0" VerticalAlignment="Top"  TextWrapping="Wrap" AcceptsReturn="True" TextChanged="TextInputBox_OnTextChanged"
-                 />
+        <TextBox Name="TextInputBox" Grid.Row="1"  HorizontalAlignment="Stretch" VerticalContentAlignment="Stretch" Margin="10,10,10, 10" VerticalAlignment="Top"  TextWrapping="Wrap" AcceptsReturn="True" TextChanged="TextInputBox_OnTextChanged" Background="White"/>
 
 
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Left">
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Left" Background="Silver" VerticalAlignment="Stretch">
             <!-- Meta-information : Tecken med mellanslag -->
-            <TextBlock Name="TextBlockNumberCharactersIncludingSpace" Grid.Row="2" VerticalAlignment="Center" Padding="10 0 0 0"></TextBlock>
+            <TextBlock Name="TextBlockNumberCharactersIncludingSpace" Grid.Row="2" VerticalAlignment="Center" Padding="10 10 10 10"></TextBlock>
 
             <!-- Meta-information : Tecken utan mellanslag -->
-            <TextBlock Name="TextBlockNumberCharactersWithoutSpace" Grid.Row="2" VerticalAlignment="Center" Padding="20 0 0 0"></TextBlock>
+            <TextBlock Name="TextBlockNumberCharactersWithoutSpace" Grid.Row="2" VerticalAlignment="Center" Padding="10 10 10 10"></TextBlock>
 
             <!-- Meta-information : Antal ord -->
-            <TextBlock Name="TextBlockNumberWords" Grid.Row="2" VerticalAlignment="Center" Padding="20 0 0 0"></TextBlock>
+            <TextBlock Name="TextBlockNumberWords" Grid.Row="2" VerticalAlignment="Center" Padding="10 10 10 10"></TextBlock>
           
             <!-- Meta-information : Antal rader-->
-            <TextBlock Name="TextBlockNumberLines" Grid.Row="2" VerticalAlignment="Center" Padding="20 0 0 0"></TextBlock>
+            <TextBlock Name="TextBlockNumberLines" Grid.Row="2" VerticalAlignment="Center" Padding="10 10 10 10"></TextBlock>
           
         </StackPanel>
     </Grid>

@@ -15,6 +15,7 @@ namespace TextEditor
     public sealed partial class MainPage : Page
     {
         private bool _isTextChanged = false;
+        private bool _openNewOrStartOver = true;
         private const string TextExtension = ".txt";
 
         private const string MetaDataNumberCharactersIncludingSpace = "Tecken med mellanslag: {0}";
@@ -30,7 +31,16 @@ namespace TextEditor
 
         private void TextInputBox_OnTextChanged(object sender, TextChangedEventArgs e)
         {
-            _isTextChanged = true;
+            if (_openNewOrStartOver)
+            {
+                _isTextChanged = false;
+                _openNewOrStartOver = false;
+            }
+            else
+            {
+                _isTextChanged = true;
+            }
+            
             UpdateMetaDataInfo();
         }
 
@@ -50,6 +60,15 @@ namespace TextEditor
             TextBlockNumberLines.Text = string.Format(MetaDataNumberLines, numberOfLines);
         }
 
+
+        private void ClearTextInput()
+        {
+            TextInputBox.Text = string.Empty;
+            _isTextChanged = false;
+            _openNewOrStartOver = true;
+        }
+
+
         private async void AppBarButtonOpen_OnClick(object sender, RoutedEventArgs e)
         {
             var fileOpenPicker = new FileOpenPicker();
@@ -60,6 +79,7 @@ namespace TextEditor
             {
                 var text = await FileIO.ReadTextAsync(result);
                 TextInputBox.Text = text;
+                _openNewOrStartOver = true;
             }
 
             UpdateMetaDataInfo();
@@ -79,36 +99,49 @@ namespace TextEditor
             }
         }
 
+        private async void AppBarButtonSaveAs_OnClick(object sender, RoutedEventArgs e)
+        {
+            var fileSavePicker = new FileSavePicker();
+            fileSavePicker.FileTypeChoices.Add("Plain Text", new[] { TextExtension });
+
+            var result = await fileSavePicker.PickSaveFileAsync();
+
+            if (result != null)
+            {
+                await FileIO.WriteTextAsync(result, TextInputBox.Text);
+            }
+        }
+
 
         private void AppBarButtonNew_OnClick(object sender, RoutedEventArgs e)
         {
             if (_isTextChanged)
             {
+                // add documentation for ContentDialog
                 var dialog = new ContentDialog
                 {
-                    Title = "Unsaved changes",
-                    Content = "Do you want to save changes?",
-                    PrimaryButtonText = "Yes",
-                    SecondaryButtonText = "No",
-                    CloseButtonText = "Cancel"
+                    Title = "Osparade ändringar",
+                    Content = "Vill du lagra dina ändringar?",
+                    PrimaryButtonText = "Ja",
+                    SecondaryButtonText = "Nej",
+                    CloseButtonText = "Avbryt"
                 };
 
-                dialog.PrimaryButtonClick += async (s, args) =>
+                dialog.PrimaryButtonClick += (s, args) =>
                 {
-                    //await AppBarButtonSave_OnClick(sender, e);
-                    //TextInputBox.Text = string.Empty;
+                    AppBarButtonSave_OnClick(sender, e);
                 };
 
                 dialog.SecondaryButtonClick += (s, args) =>
                 {
-                    TextInputBox.Text = string.Empty;
+                    ClearTextInput();
                 };
 
                 dialog.ShowAsync();
             }
             else
             {
-                TextInputBox.Text = string.Empty;
+                ClearTextInput();
             }
 
         }
