@@ -17,6 +17,8 @@ namespace calculator
         private bool newNumberInput = true;
         private bool hasCalculated = false;
         private bool errorDialogIsVisible = false;
+        private int previousInputNumber;
+      
 
         public MainPage()
         {
@@ -33,6 +35,8 @@ namespace calculator
             currentOperation = string.Empty;
             previousResult = null;
             TextBlockNumberInput.Text = "0";
+            hasCalculated = false;
+            previousInputNumber = 0;
         }
 
         /// <summary>
@@ -62,12 +66,6 @@ namespace calculator
                 newNumberInput = false;
             }
 
-            // if = has been used, then a new input serie should reset earlier result and star over
-            if (hasCalculated)
-            {
-                previousResult = null;
-            }
-            
             // handle number display
             // each button contains number in content property
             var textBox = sender as Button;
@@ -98,10 +96,17 @@ namespace calculator
                 return;
             }
 
-            Calculate(currentOperation);
-            currentOperation = string.Empty;
+            if (!hasCalculated)
+            {
+                Calculate(currentOperation);
+                hasCalculated = true;
+            }
+            else
+            {
+                Calculate(currentOperation, true);
+            }
+
             newNumberInput = true;
-            hasCalculated = true;
         }
 
         /// <summary>
@@ -113,15 +118,15 @@ namespace calculator
         {
             HideErrorMessage();
 
+            hasCalculated = false;
+
             if (string.IsNullOrWhiteSpace(currentOperation) && previousResult == null && GetCurrentNumberInput() == 0)
             {
                 return;
             }
             var textBox = sender as Button;
             var operation = textBox?.Content;
-            //passer på at kalkuleringen skjer når all info er på plass
-
-
+            
             // calculate if new input is indicated and there is a previous result and operation
             if (!string.IsNullOrWhiteSpace(currentOperation) && previousResult != null)
             {
@@ -140,6 +145,7 @@ namespace calculator
             if (previousResult == null)
             {
                 previousResult = GetCurrentNumberInput();
+                previousInputNumber = previousResult.Value;
             }
 
             hasCalculated = false;
@@ -179,17 +185,18 @@ namespace calculator
         /// Calculate operation and set result to previous result + display result and handle errors
         /// </summary>
         /// <param name="operation"></param>
-        private void Calculate(string operation)
+        private void Calculate(string operation, bool useLatestInputValue = false)
         {
             try
             {
-                var currentInput = GetCurrentNumberInput();
+                var currentInput = useLatestInputValue ? previousInputNumber : GetCurrentNumberInput();
+                previousInputNumber = currentInput;
 
                 switch (operation)
                 {
                     case "+":
 
-                        if (previousResult.HasValue && currentInput > int.MaxValue - previousResult)
+                        if (previousResult.HasValue && (((long)currentInput + (long)previousResult) >= int.MaxValue))
                         {
                             throw new OverflowException();
                         }
@@ -198,7 +205,7 @@ namespace calculator
                         break;
                     case "-":
 
-                        if (previousResult.HasValue && currentInput < int.MinValue + previousResult)
+                        if (previousResult.HasValue && (((long)previousResult - (long)currentInput) <= int.MinValue))
                         {
                             throw new OverflowException();
                         }
@@ -213,7 +220,7 @@ namespace calculator
                             return;
                         }
 
-                        if (previousResult.HasValue && currentInput > int.MaxValue / previousResult)
+                        if (previousResult.HasValue && (((long)previousResult / (long)currentInput) >= int.MaxValue))
                         {
                             throw new OverflowException();
                         }
@@ -222,7 +229,7 @@ namespace calculator
                         break;
                     case "X":
 
-                        if (previousResult.HasValue && currentInput > int.MaxValue / previousResult)
+                        if (previousResult.HasValue && (((long)currentInput * (long)previousResult) >= int.MaxValue) )
                         {
                             throw new OverflowException();
                         }
@@ -237,14 +244,13 @@ namespace calculator
             catch (OverflowException)
             {
                 // https://learn.microsoft.com/en-us/dotnet/api/system.overflowexception?view=net-8.0
-                ShowErrorMessage("Du jobbar med för stora tal");
+                ShowErrorMessage("Du jobbar med för stora/små tal");
             }
             catch
             {
                 ShowErrorMessage("Okänt problem har uppstått");
             }
         }
-
 
         /// <summary>
         /// Get current number input as integer
