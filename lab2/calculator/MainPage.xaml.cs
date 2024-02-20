@@ -18,7 +18,7 @@ namespace calculator
         private bool hasCalculated = false;
         private bool errorDialogIsVisible = false;
         private int previousInputNumber;
-      
+
 
         public MainPage()
         {
@@ -126,7 +126,7 @@ namespace calculator
             }
             var textBox = sender as Button;
             var operation = textBox?.Content;
-            
+
             // calculate if new input is indicated and there is a previous result and operation
             if (!string.IsNullOrWhiteSpace(currentOperation) && previousResult != null)
             {
@@ -137,7 +137,7 @@ namespace calculator
                 }
                 Calculate(currentOperation);
             }
-            
+
             // set current operation
             currentOperation = operation?.ToString();
 
@@ -182,6 +182,27 @@ namespace calculator
 
 
         /// <summary>
+        /// Check if result will be overflowed
+        /// </summary>
+        /// <param name="operation"></param>
+        /// <param name="currentResult"></param>
+        /// <param name="operationValueInput"></param>
+        /// <returns></returns>
+        private bool CheckResultForOverflowException(string operation, long currentResult, long operationValueInput)
+        {
+            switch (operation)
+            {
+                case "+": return (currentResult + operationValueInput) >= int.MaxValue || (currentResult + operationValueInput) <= int.MinValue;
+                case "-": return (currentResult - operationValueInput) >= int.MaxValue || (currentResult - operationValueInput) <= int.MinValue;
+                case "/": return (currentResult / operationValueInput) >= int.MaxValue || (currentResult / operationValueInput) <= int.MinValue;
+                case "X": return (currentResult * operationValueInput) >= int.MaxValue || (currentResult * operationValueInput) <= int.MinValue;
+            }
+
+            return false;
+        }
+
+
+        /// <summary>
         /// Calculate operation and set result to previous result + display result and handle errors
         /// </summary>
         /// <param name="operation"></param>
@@ -192,11 +213,13 @@ namespace calculator
                 var currentInput = useLatestInputValue ? previousInputNumber : GetCurrentNumberInput();
                 previousInputNumber = currentInput;
 
+
+
                 switch (operation)
                 {
                     case "+":
 
-                        if (previousResult.HasValue && (((long)currentInput + (long)previousResult) >= int.MaxValue))
+                        if (CheckResultForOverflowException(operation, previousResult.Value, currentInput))
                         {
                             throw new OverflowException();
                         }
@@ -205,14 +228,14 @@ namespace calculator
                         break;
                     case "-":
 
-                        if (previousResult.HasValue && (((long)previousResult - (long)currentInput) <= int.MinValue))
+                        if (CheckResultForOverflowException(operation, previousResult.Value, currentInput))
                         {
                             throw new OverflowException();
                         }
 
                         previousResult -= currentInput;
                         break;
-                    case "/": 
+                    case "/":
 
                         if (currentInput == 0)
                         {
@@ -220,7 +243,7 @@ namespace calculator
                             return;
                         }
 
-                        if (previousResult.HasValue && (((long)previousResult / (long)currentInput) >= int.MaxValue))
+                        if (CheckResultForOverflowException(operation, previousResult.Value, currentInput))
                         {
                             throw new OverflowException();
                         }
@@ -229,7 +252,7 @@ namespace calculator
                         break;
                     case "X":
 
-                        if (previousResult.HasValue && (((long)currentInput * (long)previousResult) >= int.MaxValue) )
+                        if (CheckResultForOverflowException(operation, previousResult.Value, currentInput))
                         {
                             throw new OverflowException();
                         }
