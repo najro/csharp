@@ -188,9 +188,21 @@ namespace calculator
                 switch (operation)
                 {
                     case "+":
+
+                        if (previousResult.HasValue && currentInput > int.MaxValue - previousResult)
+                        {
+                            throw new OverflowException();
+                        }
+
                         previousResult += currentInput;
                         break;
                     case "-":
+
+                        if (previousResult.HasValue && currentInput < int.MinValue + previousResult)
+                        {
+                            throw new OverflowException();
+                        }
+
                         previousResult -= currentInput;
                         break;
                     case "/": 
@@ -201,9 +213,20 @@ namespace calculator
                             return;
                         }
 
+                        if (previousResult.HasValue && currentInput > int.MaxValue / previousResult)
+                        {
+                            throw new OverflowException();
+                        }
+
                         previousResult /= currentInput;
                         break;
                     case "X":
+
+                        if (previousResult.HasValue && currentInput > int.MaxValue / previousResult)
+                        {
+                            throw new OverflowException();
+                        }
+
                         previousResult *= currentInput;
                         break;
 
