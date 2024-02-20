@@ -183,7 +183,7 @@ namespace Lotto
             {
                 // https://learn.microsoft.com/en-us/dotnet/api/system.random.-ctor?view=net-8.0
                 var rnd = new Random();
-                var number = rnd.Next(1, 35);
+                var number = rnd.Next(1, 36);
 
                 if (!lottoNumberSet.Contains(number))
                 {
