@@ -26,11 +26,14 @@ namespace Lotto
         private const string WinInfoFive = "5 rätt: {0}";
         private const string WinInfoSix = "6 rätt: {0}";
         private const string WinInfoSeven = "7 rätt: {0}";
+        private Random RandomGenerator;
 
         public MainPage()
         {
             this.InitializeComponent();
             SetWinnerInfo();
+            // https://learn.microsoft.com/en-us/dotnet/api/system.random.-ctor?view=net-8.0
+            RandomGenerator = new Random();
         }
 
         /// <summary>
@@ -179,12 +182,9 @@ namespace Lotto
         {
             var lottoNumberSet = new HashSet<int>();
 
-            // https://learn.microsoft.com/en-us/dotnet/api/system.random.-ctor?view=net-8.0
-            var rnd = new Random();
-
             while (lottoNumberSet.Count < 7)
             {
-                var number = rnd.Next(1, 36);
+                var number = RandomGenerator.Next(1, 36);
 
                 if (!lottoNumberSet.Contains(number))
                 {
