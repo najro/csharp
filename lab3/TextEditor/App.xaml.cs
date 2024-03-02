@@ -30,6 +30,7 @@ namespace TextEditor
         {
             this.InitializeComponent();
             this.Suspending += OnSuspending;
+       
         }
 
         /// <summary>
@@ -93,7 +94,6 @@ namespace TextEditor
         private void OnSuspending(object sender, SuspendingEventArgs e)
         {
             var deferral = e.SuspendingOperation.GetDeferral();
-            //TODO: Save application state and stop any background activity
             deferral.Complete();
         }
     }

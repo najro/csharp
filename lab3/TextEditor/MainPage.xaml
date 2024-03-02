@@ -42,11 +42,17 @@
                     <ToolTip Content="Spara som" />
                 </ToolTipService.ToolTip>
             </AppBarButton>
+
+            <AppBarButton Name="AppBarButtonClose" Icon="Clear" Label="Stäng" Click="AppBarButtonClose_OnClick">
+                <ToolTipService.ToolTip>
+                    <ToolTip Content="Stäng" />
+                </ToolTipService.ToolTip>
+            </AppBarButton>
         </CommandBar>
     
 
         <!-- TextBox for user text -->
-        <TextBox Name="TextInputBox" Grid.Row="1"  HorizontalAlignment="Stretch" VerticalContentAlignment="Stretch" Margin="10,10,10, 10" VerticalAlignment="Top"  TextWrapping="Wrap" AcceptsReturn="True" TextChanged="TextInputBox_OnTextChanged" Background="White"/>
+        <TextBox Name="TextInputBox" Grid.Row="1"  HorizontalAlignment="Stretch" VerticalContentAlignment="Stretch" Margin="10,10,10, 10"  TextWrapping="Wrap" AcceptsReturn="True" TextChanged="TextInputBox_OnTextChanged" Background="White"/>
 
 
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Left" Background="Silver" VerticalAlignment="Stretch">

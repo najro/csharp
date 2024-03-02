@@ -1,6 +1,9 @@
 ﻿using System;
+using Windows.ApplicationModel.Core;
 using Windows.Storage;
 using Windows.Storage.Pickers;
+using Windows.UI.Core.Preview;
+using Windows.UI.Popups;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -224,6 +227,11 @@ namespace TextEditor
                 ClearTextInput();
             }
 
+        }
+
+        private void AppBarButtonClose_OnClick(object sender, RoutedEventArgs e)
+        {
+            AppBarButtonNew_OnClick(sender, e);
         }
     }
 }
