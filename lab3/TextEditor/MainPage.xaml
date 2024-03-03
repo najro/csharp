@@ -21,6 +21,7 @@
         <!-- Menu -->
         <CommandBar Name="CommandBarEditor" Grid.Row="0"  HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,0,0,0" Height="50" Background="LightGray" OverflowButtonVisibility="Collapsed">
             <AppBarButton Name="AppBarButtonNew" Icon="Page"  Label="Ny" Click="AppBarButtonNew_OnClick">
+                <!--https://learn.microsoft.com/en-us/windows/apps/design/controls/tooltips-->
                 <ToolTipService.ToolTip>
                     <ToolTip Content="Ny" />
                 </ToolTipService.ToolTip>
@@ -52,20 +53,20 @@
     
 
         <!-- TextBox for user text -->
-        <TextBox Name="TextInputBox" Grid.Row="1"  HorizontalAlignment="Stretch" AllowDrop="True"  Drop="TextInputBox_OnDrop"  VerticalContentAlignment="Stretch" Margin="10,10,10, 10"  TextWrapping="Wrap" AcceptsReturn="True" TextChanged="TextInputBox_OnTextChanged" Background="White" />
+        <TextBox Name="TextInputBox" Grid.Row="1"  HorizontalAlignment="Stretch" AllowDrop="True"  Drop="TextInputBox_OnDrop" DragOver="TextInputBox_OnDragOver"  VerticalContentAlignment="Stretch" Margin="10,10,10, 10"  TextWrapping="Wrap" AcceptsReturn="True" TextChanged="TextInputBox_OnTextChanged" Background="White" />
 
 
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Left" Background="Silver" VerticalAlignment="Stretch">
-            <!-- Meta-information : Tecken med mellanslag -->
+            <!-- Meta-information : Character with space -->
             <TextBlock Name="TextBlockNumberCharactersIncludingSpace" Grid.Row="2" VerticalAlignment="Center" Padding="10 10 10 10"></TextBlock>
 
-            <!-- Meta-information : Tecken utan mellanslag -->
+            <!-- Meta-information : Characters without mellanslag -->
             <TextBlock Name="TextBlockNumberCharactersWithoutSpace" Grid.Row="2" VerticalAlignment="Center" Padding="10 10 10 10"></TextBlock>
 
-            <!-- Meta-information : Antal ord -->
+            <!-- Meta-information : Number of words -->
             <TextBlock Name="TextBlockNumberWords" Grid.Row="2" VerticalAlignment="Center" Padding="10 10 10 10"></TextBlock>
           
-            <!-- Meta-information : Antal rader-->
+            <!-- Meta-information : Number of rows -->
             <TextBlock Name="TextBlockNumberLines" Grid.Row="2" VerticalAlignment="Center" Padding="10 10 10 10"></TextBlock>
           
         </StackPanel>
