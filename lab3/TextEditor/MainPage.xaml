@@ -53,7 +53,8 @@
     
 
         <!-- TextBox for user text -->
-        <TextBox Name="TextInputBox" Grid.Row="1"  HorizontalAlignment="Stretch" AllowDrop="True"  Drop="TextInputBox_OnDrop" DragOver="TextInputBox_OnDragOver"  VerticalContentAlignment="Stretch" Margin="10,10,10, 10"  TextWrapping="Wrap" AcceptsReturn="True" TextChanged="TextInputBox_OnTextChanged" Background="White" />
+        <!-- https://stackoverflow.com/questions/1192335/automatic-vertical-scroll-bar-in-wpf-textblock -->
+        <TextBox Name="TextInputBox" Grid.Row="1"  HorizontalAlignment="Stretch" AllowDrop="True"  Drop="TextInputBox_OnDrop" DragOver="TextInputBox_OnDragOver"  VerticalContentAlignment="Stretch" Margin="10,10,10, 10"  TextWrapping="Wrap" AcceptsReturn="True" TextChanged="TextInputBox_OnTextChanged" Background="White" ScrollViewer.VerticalScrollBarVisibility="Auto"  />
 
 
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Left" Background="Silver" VerticalAlignment="Stretch">

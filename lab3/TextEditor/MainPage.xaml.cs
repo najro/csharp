@@ -27,6 +27,7 @@ namespace TextEditor
         private const string TextExtension = ".txt";
         private const string DefaultFileName = "dok1.txt";
         private string CurrentFileName = DefaultFileName;
+        private string OriginalText = string.Empty;
 
         private const string MetaDataNumberCharactersIncludingSpace = "Tecken med mellanslag: {0}";
         private const string MetaDataNumberCharactersWithoutSpace = "Tecken utan mellanslag: {0}";
@@ -60,7 +61,13 @@ namespace TextEditor
                 _isTextChanged = false;
                 _openNewOrStartOver = false;
             }
-            else if (TextInputBox.Text.Length == 0 && CurrentFileName == DefaultFileName)
+
+
+            if (TextInputBox.Text.Length == 0 && CurrentFileName == DefaultFileName)
+            {
+                _isTextChanged = false;
+            }
+            else if (TextInputBox.Text == OriginalText)
             {
                 _isTextChanged = false;
             }
@@ -114,6 +121,7 @@ namespace TextEditor
             _openNewOrStartOver = true;
             CurrentFileName = DefaultFileName;
             CurrentStorageFile = null;
+            OriginalText = string.Empty;
 
             SetAppTitle(CurrentFileName);
             UpdateMetaDataInfo();
@@ -176,7 +184,7 @@ namespace TextEditor
         /// <param name="e"></param>
         private async void AppBarButtonSaveAs_OnClick(object sender, RoutedEventArgs e)
         {
-            SaveFile(forceFilePicker: true);
+            await SaveFile(forceFilePicker: true);
         }
 
         /// <summary>
@@ -275,6 +283,7 @@ namespace TextEditor
                 var text = await FileIO.ReadTextAsync(result);
                 _openNewOrStartOver = true;
                 TextInputBox.Text = text;
+                OriginalText = text;
             }
 
             UpdateMetaDataInfo();
@@ -290,6 +299,7 @@ namespace TextEditor
             if (CurrentStorageFile != null && forceFilePicker != true)
             {
                 await FileIO.WriteTextAsync(CurrentStorageFile, TextInputBox.Text);
+                OriginalText = TextInputBox.Text;
                 _isTextChanged = false;
                 SetAppTitle(CurrentFileName);
                 return;
@@ -306,6 +316,7 @@ namespace TextEditor
                 await FileIO.WriteTextAsync(result, TextInputBox.Text);
                 CurrentStorageFile = result;
                 CurrentFileName = result.Name;
+                OriginalText = TextInputBox.Text;
                 _isTextChanged = false;
                 SetAppTitle(CurrentFileName);
             }
@@ -320,7 +331,7 @@ namespace TextEditor
         {
             // https://mzikmund.dev/blog/the-right-way-to-check-for-key-state-in-uwp-apps
             // https://learn.microsoft.com/en-us/uwp/api/windows.ui.core.corevirtualkeystates?view=winrt-22621
-            var ctrlPressed =  Window.Current.CoreWindow.GetKeyState(VirtualKey.Control).HasFlag(CoreVirtualKeyStates.Down);
+            var ctrlPressed = Window.Current.CoreWindow.GetKeyState(VirtualKey.Control).HasFlag(CoreVirtualKeyStates.Down);
             var shiftPressed = Window.Current.CoreWindow.GetKeyState(VirtualKey.Shift).HasFlag(CoreVirtualKeyStates.Down);
             var textFromFile = string.Empty;
 
@@ -350,6 +361,7 @@ namespace TextEditor
                         {
                             ClearTextInput();
                             TextInputBox.Text = textFromFile;
+                            OriginalText = textFromFile;
                             UpdateMetaDataInfo();
                             SetAppTitle(CurrentFileName);
                         }
