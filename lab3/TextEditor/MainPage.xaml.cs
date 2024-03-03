@@ -177,6 +177,7 @@ namespace TextEditor
         {
             await SaveFile();
         }
+
         /// <summary>
         /// Handle the save as button click
         /// </summary>
