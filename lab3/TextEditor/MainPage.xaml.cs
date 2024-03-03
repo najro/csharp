@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;
 using Windows.Storage;
 using Windows.Storage.Pickers;
@@ -27,6 +28,13 @@ namespace TextEditor
         private const string MetaDataNumberCharactersWithoutSpace = "Tecken utan mellanslag: {0}";
         private const string MetaDataNumberWords = "Antal ord: {0}";
         private const string MetaDataNumberLines = "Antal rader: {0}";
+
+        private const string UnsavedChangesTitle = "Osparade ändringar";
+        private const string UnsavedChangesContent = "Vill du lagra dina ändringar?";
+        private const string UnsavedChangesPrimaryButtonTextYes = "Ja";
+        private const string UnsavedChangesSecondaryButtonTextNo = "Nej";
+        private const string UnsavedChangesCloseButtonTextCancel = "Avbryt";
+
 
         private StorageFile CurrentStorageFile = null;
 
@@ -95,6 +103,9 @@ namespace TextEditor
             _openNewOrStartOver = true;
             CurrentFileName = DefaultFileName;
             CurrentStorageFile = null;
+
+            SetAppTitle(CurrentFileName);
+            UpdateMetaDataInfo();
         }
 
 
@@ -107,16 +118,17 @@ namespace TextEditor
                 // add documentation for ContentDialog
                 var dialog = new ContentDialog
                 {
-                    Title = "Osparade ändringar",
-                    Content = "Vill du lagra dina ändringar?",
-                    PrimaryButtonText = "Ja",
-                    SecondaryButtonText = "Nej",
-                    CloseButtonText = "Avbryt"
+                    Title = UnsavedChangesTitle,
+                    Content = UnsavedChangesContent,
+                    PrimaryButtonText = UnsavedChangesPrimaryButtonTextYes,
+                    SecondaryButtonText = UnsavedChangesSecondaryButtonTextNo,
+                    CloseButtonText = UnsavedChangesCloseButtonTextCancel
                 };
 
-                dialog.PrimaryButtonClick += (s, args) =>
+                dialog.PrimaryButtonClick += async (s, args) =>
                 {
-                    AppBarButtonSave_OnClick(sender, e);
+                    await SaveFile();
+                    OpenFile();
                 };
 
                 dialog.SecondaryButtonClick += (s, args) =>
@@ -153,8 +165,12 @@ namespace TextEditor
 
         private async void AppBarButtonSave_OnClick(object sender, RoutedEventArgs e)
         {
+            await SaveFile();
+        }
 
-            if (CurrentStorageFile != null)
+        private async Task SaveFile(bool forceFilePicker = false)
+        {
+            if (CurrentStorageFile != null && forceFilePicker != true)
             {
                 await FileIO.WriteTextAsync(CurrentStorageFile, TextInputBox.Text);
                 _isTextChanged = false;
@@ -180,19 +196,20 @@ namespace TextEditor
 
         private async void AppBarButtonSaveAs_OnClick(object sender, RoutedEventArgs e)
         {
-            var fileSavePicker = new FileSavePicker();
-            fileSavePicker.FileTypeChoices.Add("Plain Text", new[] { TextExtension });
+            SaveFile(forceFilePicker:true);
+            //var fileSavePicker = new FileSavePicker();
+            //fileSavePicker.FileTypeChoices.Add("Plain Text", new[] { TextExtension });
 
-            var result = await fileSavePicker.PickSaveFileAsync();
+            //var result = await fileSavePicker.PickSaveFileAsync();
 
-            if (result != null)
-            {
-                await FileIO.WriteTextAsync(result, TextInputBox.Text);
-                CurrentStorageFile = result;
-                CurrentFileName = result.Name;
-                _isTextChanged = false;
-                SetAppTitle(CurrentFileName);
-            }
+            //if (result != null)
+            //{
+            //    await FileIO.WriteTextAsync(result, TextInputBox.Text);
+            //    CurrentStorageFile = result;
+            //    CurrentFileName = result.Name;
+            //    _isTextChanged = false;
+            //    SetAppTitle(CurrentFileName);
+            //}
         }
 
         private async void AppBarButtonNew_OnClick(object sender, RoutedEventArgs e)
@@ -203,16 +220,18 @@ namespace TextEditor
                 // add documentation for ContentDialog
                 var dialog = new ContentDialog
                 {
-                    Title = "Osparade ändringar",
-                    Content = "Vill du lagra dina ändringar?",
-                    PrimaryButtonText = "Ja",
-                    SecondaryButtonText = "Nej",
-                    CloseButtonText = "Avbryt"
+                    Title = UnsavedChangesTitle,
+                    Content = UnsavedChangesContent,
+                    PrimaryButtonText = UnsavedChangesPrimaryButtonTextYes,
+                    SecondaryButtonText = UnsavedChangesSecondaryButtonTextNo,
+                    CloseButtonText = UnsavedChangesCloseButtonTextCancel
                 };
 
-                dialog.PrimaryButtonClick += (s, args) =>
+                dialog.PrimaryButtonClick += async (s, args) =>
                 {
-                    AppBarButtonSave_OnClick(sender, e);
+                    //AppBarButtonSave_OnClick(sender, e);
+                    await SaveFile();
+                    ClearTextInput();
                 };
 
                 dialog.SecondaryButtonClick += (s, args) =>
@@ -226,12 +245,47 @@ namespace TextEditor
             {
                 ClearTextInput();
             }
+        }
+
+        private async void AppBarButtonClose_OnClick(object sender, RoutedEventArgs e)
+        {
+
+            if (_isTextChanged)
+            {
+                // add documentation for ContentDialog
+                var dialog = new ContentDialog
+                {
+                    Title = UnsavedChangesTitle,
+                    Content = UnsavedChangesContent,
+                    PrimaryButtonText = UnsavedChangesPrimaryButtonTextYes,
+                    SecondaryButtonText = UnsavedChangesSecondaryButtonTextNo,
+                    CloseButtonText = UnsavedChangesCloseButtonTextCancel
+                };
+
+                dialog.PrimaryButtonClick += async (s, args) =>
+                {
+                    await SaveFile();
+                    CoreApplication.Exit();
+                };
+
+                dialog.SecondaryButtonClick += (s, args) =>
+                {
+                    CoreApplication.Exit();
+                };
+
+                await dialog.ShowAsync();
+            }
+            else
+            {
+                // https://learn.microsoft.com/en-us/uwp/api/windows.ui.xaml.application.exit?view=winrt-22621
+                CoreApplication.Exit();
+            }
 
         }
 
-        private void AppBarButtonClose_OnClick(object sender, RoutedEventArgs e)
+        private void TextInputBox_OnDrop(object sender, DragEventArgs e)
         {
-            AppBarButtonNew_OnClick(sender, e);
+            throw new NotImplementedException();
         }
     }
 }
