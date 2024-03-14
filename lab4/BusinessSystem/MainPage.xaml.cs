@@ -14,54 +14,66 @@ namespace BusinessSystem
     /// </summary>
     public sealed partial class MainPage : Page
     {
-        ObservableCollection<Models.Product> products = new ObservableCollection<Models.Product>();
         Models.Product _selectedProduct;
 
         public ICollectionView FilteredViewProducts { get; private set; }
         public ICollectionView FilteredViewBasket { get; private set; }
 
 
+        ObservableCollection<Models.Product> _products = new ObservableCollection<Models.Product>();
+        public ObservableCollection<Models.Product> Products
+        {
+            get
+            {
+                return _products;
+            }
+            set
+            {
+                if (_products != value)
+                {
+                    _products = value;
+                }
+            }
+        }
+
+
         public MainPage()
         {
             this.InitializeComponent();
 
-
-
-            products = new repository.CsvRepository().ReadProductsFromFile();
+            Products = new repository.CsvRepository().ReadProductsFromFile();
 
 
             FilteredViewProducts = new CollectionViewSource
             {
-                Source = products
+                Source = Products
             }.View;
 
             
-
             FilteredViewBasket = new CollectionViewSource
             {
-                Source = products.Where(p => ((Product)p).Reserved > 0)
+                Source = Products.Where(p => ((Product)p).Reserved > 0)
             }.View;
             
 
-
-            ListViewProducts.ItemsSource = FilteredViewProducts;
+            ListViewProducts.ItemsSource = Products;
             ListViewBasket.ItemsSource = FilteredViewBasket;
 
-            this.DataContext = this;
+            //this.DataContext = this;
         }
 
         private void RefreshViews()
         {
-            //FilteredViewProducts.GetDefaultView(Products).Refresh();
-            // FilteredViewProducts
-            ListViewProducts.UpdateLayout();
+           
+
         }
 
         private void ListViewProducts_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             _selectedProduct = ((Models.Product)ListViewProducts.SelectedItem);
 
-            ValidateProductFromBasket();
+            ButtonProductFromBasket.IsEnabled = false;
+            
             ValidateProductToBasket();
         }
 

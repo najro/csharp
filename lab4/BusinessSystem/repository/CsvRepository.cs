@@ -80,20 +80,7 @@ namespace BusinessSystem.repository
                     }
                 }
 
-                //var product = new Product
-                //{
-                //    Type = columns[0],
-                //    Name = columns[1],
-                //    Price = decimal.Parse(columns[2]),
-                //    Author = columns[3],
-                //    Platform = columns[4],
-                //    Genre = columns[5],
-                //    Format = columns[6],
-                //    Language = columns[7],
-                //    GameTime = columns[8]
-                //};
-
-                //products.Add(product);
+               
             }
             return products;
         }
