@@ -36,5 +36,11 @@ namespace BusinessSystem
 
             ListViewProducts.ItemsSource = products;
         }
+
+        private void ListViewProducts_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var product = ((Models.Product) ListViewProducts.SelectedItem);
+
+        }
     }
 }

@@ -8,18 +8,29 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <Grid>
-        <ListView x:Name="ListViewProducts" HorizontalAlignment="Left" Height="500" Margin="10,10,0,0" VerticalAlignment="Top" Width="1000">
-            <ListView.ItemTemplate>
-                <DataTemplate>
-                    <StackPanel Orientation="Horizontal">
-                        <StackPanel Orientation="Horizontal">
-                            <Image Source="{Binding Image}" Height="20" Width="20" Margin="0 0 10 0"/>
-                            <TextBlock Text="{Binding Description}" FontSize="12"/>
-                        </StackPanel>
-                    </StackPanel>
-                </DataTemplate>
-            </ListView.ItemTemplate></ListView>
 
-    </Grid>
+    <Pivot Name="PivotMainView">
+        <PivotItem Header="Butik">
+            <Grid>
+                <ListView x:Name="ListViewProducts" HorizontalAlignment="Left" Height="500" Margin="10,10,0,0" VerticalAlignment="Top" Width="1000" SelectionChanged="ListViewProducts_OnSelectionChanged">
+                    <ListView.ItemTemplate >
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <StackPanel Orientation="Horizontal">
+                                    <Image Source="{Binding Image}" Height="20" Width="20" Margin="0 0 10 0"/>
+                                    <TextBlock Text="{Binding Description}" FontSize="12"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+
+            </Grid>
+        </PivotItem>
+        <PivotItem Header="Lager">
+
+        </PivotItem>
+    </Pivot>
+
+    
 </Page>
