@@ -12,18 +12,40 @@
     <Pivot Name="PivotMainView">
         <PivotItem Header="Butik">
             <Grid>
-                <ListView x:Name="ListViewProducts" HorizontalAlignment="Left" Height="500" Margin="10,10,0,0" VerticalAlignment="Top" Width="1000" SelectionChanged="ListViewProducts_OnSelectionChanged">
-                    <ListView.ItemTemplate >
-                        <DataTemplate>
-                            <StackPanel Orientation="Horizontal">
+                <StackPanel Orientation="Horizontal">
+                    <ListView x:Name="ListViewProducts" HorizontalAlignment="Left" Height="500"   Margin="10,10,0,0" VerticalAlignment="Top" Width="400" SelectionChanged="ListViewProducts_OnSelectionChanged">
+                        <ListView.ItemTemplate >
+                            <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
-                                    <Image Source="{Binding Image}" Height="20" Width="20" Margin="0 0 10 0"/>
-                                    <TextBlock Text="{Binding Description}" FontSize="12"/>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image Source="{Binding Image}" Height="20" Width="20" Margin="0 0 10 0"/>
+                                        <TextBlock Text="{Binding Description}" FontSize="12"/>
+                                    </StackPanel>
                                 </StackPanel>
-                            </StackPanel>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+
+                    <Button x:Name="ButtonProductToBasket" IsEnabled="False" Content="Köp vald produkt" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Click="ButtonProductToBasket_OnClick"/>
+                    
+                    <Button x:Name="ButtonProductFromBasket" IsEnabled="False" Content="Ta bort vald produkt" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Click="ButtonProductFromBasket_OnClick"/>
+
+                    <ListView x:Name="ListViewBasket" HorizontalAlignment="Left" Height="500" Margin="10,10,0,0" VerticalAlignment="Top" Width="400" SelectionChanged="ListViewProducts_OnSelectionChanged">
+                        <ListView.ItemTemplate >
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image Source="{Binding Image}" Height="20" Width="20" Margin="0 0 10 0"/>
+                                        <TextBlock Text="{Binding Description}" FontSize="12"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+
+
+                </StackPanel>
+               
 
             </Grid>
         </PivotItem>

@@ -1,19 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using BusinessSystem.Models;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.ApplicationModel.Store;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -25,22 +15,98 @@ namespace BusinessSystem
     public sealed partial class MainPage : Page
     {
         ObservableCollection<Models.Product> products = new ObservableCollection<Models.Product>();
+        Models.Product _selectedProduct;
+
+        public ICollectionView FilteredViewProducts { get; private set; }
+        public ICollectionView FilteredViewBasket { get; private set; }
+
 
         public MainPage()
         {
             this.InitializeComponent();
 
-            
+
 
             products = new repository.CsvRepository().ReadProductsFromFile();
 
-            ListViewProducts.ItemsSource = products;
+
+            FilteredViewProducts = new CollectionViewSource
+            {
+                Source = products
+            }.View;
+
+            
+
+            FilteredViewBasket = new CollectionViewSource
+            {
+                Source = products.Where(p => ((Product)p).Reserved > 0)
+            }.View;
+            
+
+
+            ListViewProducts.ItemsSource = FilteredViewProducts;
+            ListViewBasket.ItemsSource = FilteredViewBasket;
+
+            this.DataContext = this;
+        }
+
+        private void RefreshViews()
+        {
+            //FilteredViewProducts.GetDefaultView(Products).Refresh();
+            // FilteredViewProducts
+            ListViewProducts.UpdateLayout();
         }
 
         private void ListViewProducts_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var product = ((Models.Product) ListViewProducts.SelectedItem);
+            _selectedProduct = ((Models.Product)ListViewProducts.SelectedItem);
 
+            ValidateProductFromBasket();
+            ValidateProductToBasket();
+        }
+
+        private void ValidateProductToBasket()
+        {
+            ButtonProductToBasket.IsEnabled = _selectedProduct != null;
+
+            if (_selectedProduct == null || _selectedProduct.Stock <= 0 || _selectedProduct.Reserved >= _selectedProduct.Stock)
+            {
+                ButtonProductToBasket.IsEnabled = false;
+            }
+            else
+            {
+                ButtonProductToBasket.IsEnabled = true;
+            }
+        }
+
+        private void ValidateProductFromBasket()
+        {
+            ButtonProductFromBasket.IsEnabled = _selectedProduct != null;
+
+            if (_selectedProduct == null || _selectedProduct.Stock <= 0 || _selectedProduct.Reserved >= _selectedProduct.Stock)
+            {
+                ButtonProductToBasket.IsEnabled = false;
+            }
+            else
+            {
+                ButtonProductToBasket.IsEnabled = true;
+            }
+        }
+
+        private void ButtonProductToBasket_OnClick(object sender, RoutedEventArgs e)
+        {
+            _selectedProduct.Reserved += 1;
+            ValidateProductFromBasket();
+            ValidateProductToBasket();
+            RefreshViews();
+        }
+
+        private void ButtonProductFromBasket_OnClick(object sender, RoutedEventArgs e)
+        {
+            _selectedProduct.Reserved -= 1;
+            ValidateProductFromBasket();
+            ValidateProductToBasket();
+            RefreshViews();
         }
     }
 }
