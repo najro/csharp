@@ -20,7 +20,23 @@ namespace BusinessSystem
         public ICollectionView FilteredViewBasket { get; private set; }
 
 
-        ObservableCollection<Models.Product> _products = new ObservableCollection<Models.Product>();
+        public CollectionViewSource FilteredViewSource { get; set; }
+
+        //// Apply a filter to the CollectionViewSource
+        //FilteredViewSource.View.Filter = (item) =>
+        //{
+        //    // Implement your filter logic here
+        //    // For example, filtering based on price
+        //    // This example filters out products with a price less than 10
+        //    if (item is Product product)
+        //    {
+        //        return product.Price >= 10;
+        //    }
+        //    return false;
+        //};
+
+
+ObservableCollection<Models.Product> _products = new ObservableCollection<Models.Product>();
         public ObservableCollection<Models.Product> Products
         {
             get
@@ -36,6 +52,19 @@ namespace BusinessSystem
             }
         }
 
+   
+
+        private void UpdateBasketFilter()
+        {
+             var filteredProducts = Products.Where(p => p.Reserved > 0).ToList();
+            FilteredViewSource.Source = new ObservableCollection<Product>(filteredProducts);
+            //ListViewBasket.ItemsSource = FilteredViewSource.View;
+
+            ListViewBasket.ItemsSource = null;
+            ListViewBasket.ItemsSource = FilteredViewSource.View;
+
+            ListViewBasket.SelectedItem = null;
+        }
 
         public MainPage()
         {
@@ -44,27 +73,62 @@ namespace BusinessSystem
             Products = new repository.CsvRepository().ReadProductsFromFile();
 
 
-            FilteredViewProducts = new CollectionViewSource
-            {
-                Source = Products
-            }.View;
-
-            
-            FilteredViewBasket = new CollectionViewSource
-            {
-                Source = Products.Where(p => ((Product)p).Reserved > 0)
-            }.View;
             
 
-            ListViewProducts.ItemsSource = Products;
-            ListViewBasket.ItemsSource = FilteredViewBasket;
+            FilteredViewSource = new CollectionViewSource();
+            UpdateBasketFilter();
+            //FilteredViewSource.Source = Products;
+            //ListViewBasket.ItemsSource = FilteredViewSource.View;
+
+
+            //FilteredViewSource.Source = Products;
+
+            // Set the ListView's ItemsSource to the filtered view
+            //ListViewBasket.ItemsSource = FilteredViewSource.View;
+
+
+
+            // FilteredViewProducts = new CollectionViewSource
+            // {
+            //     Source = Products
+            // }.View;
+
+
+            //var FilteredViewBasket2 = new CollectionViewSource
+            // {
+            //     Source = Products.Where(p => ((Product) p).Reserved > 0)
+            // };
+
+
+            // ListViewProducts.ItemsSource = FilteredViewProducts;
+            // ListViewBasket.ItemsSource = FilteredViewBasket;
 
             //this.DataContext = this;
         }
 
         private void RefreshViews()
         {
-           
+
+            //FilteredViewProducts = new CollectionViewSource
+            //{
+            //    Source = Products
+            //}.View;
+
+            //FilteredViewBasket = new CollectionViewSource
+            //{
+            //    Source = BasketProducts
+            //}.View;
+
+            //ListViewProducts.ItemsSource = FilteredViewProducts;
+            //ListViewBasket.ItemsSource = BasketProducts;
+            // FilteredViewBasket2.Source = Products;
+
+
+            //// refresh the view
+            // FilteredViewProducts.Refresh();
+            // FilteredViewBasket.Refresh();
+
+            UpdateBasketFilter();
 
         }
 
@@ -95,13 +159,13 @@ namespace BusinessSystem
         {
             ButtonProductFromBasket.IsEnabled = _selectedProduct != null;
 
-            if (_selectedProduct == null || _selectedProduct.Stock <= 0 || _selectedProduct.Reserved >= _selectedProduct.Stock)
+            if (_selectedProduct == null || _selectedProduct.Stock <= 0 || _selectedProduct.Reserved == 0 )
             {
-                ButtonProductToBasket.IsEnabled = false;
+                ButtonProductFromBasket.IsEnabled = false;
             }
             else
             {
-                ButtonProductToBasket.IsEnabled = true;
+                ButtonProductFromBasket.IsEnabled = true;
             }
         }
 
@@ -111,6 +175,8 @@ namespace BusinessSystem
             ValidateProductFromBasket();
             ValidateProductToBasket();
             RefreshViews();
+
+            //Products.Remove(_selectedProduct);
         }
 
         private void ButtonProductFromBasket_OnClick(object sender, RoutedEventArgs e)

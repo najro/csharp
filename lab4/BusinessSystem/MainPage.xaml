@@ -13,7 +13,7 @@
         <PivotItem Header="Butik">
             <Grid>
                 <StackPanel Orientation="Horizontal">
-                    <ListView x:Name="ListViewProducts" HorizontalAlignment="Left" VerticalContentAlignment="Stretch"  Margin="10,10,0,0" VerticalAlignment="Top" Width="400" SelectionChanged="ListViewProducts_OnSelectionChanged">
+                    <ListView ItemsSource="{x:Bind Products}" x:Name="ListViewProducts" HorizontalAlignment="Left" VerticalContentAlignment="Stretch"  Margin="10,10,0,0" VerticalAlignment="Top" Width="400" SelectionChanged="ListViewProducts_OnSelectionChanged">
                         <ListView.ItemTemplate >
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
@@ -32,13 +32,14 @@
                         <Button x:Name="ButtonProductFromBasket" IsEnabled="False" Content="Ta bort vald produkt" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Click="ButtonProductFromBasket_OnClick"/>
                     </StackPanel>
 
-                    <ListView x:Name="ListViewBasket" HorizontalAlignment="Left"  VerticalContentAlignment="Stretch" Margin="10,10,0,0" VerticalAlignment="Top" Width="400" SelectionChanged="ListViewProducts_OnSelectionChanged">
+                    <ListView  x:Name="ListViewBasket" HorizontalAlignment="Left"  VerticalContentAlignment="Stretch" Margin="10,10,0,0" VerticalAlignment="Top" Width="400" SelectionChanged="ListViewProducts_OnSelectionChanged">
                         <ListView.ItemTemplate >
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
                                     <StackPanel Orientation="Horizontal">
                                         <Image Source="{Binding Image}" Height="20" Width="20" Margin="0 0 10 0"/>
                                         <TextBlock Text="{Binding Description}" FontSize="12"/>
+                                        <TextBlock Text="{Binding Reserved}" FontSize="12"/>
                                     </StackPanel>
                                 </StackPanel>
                             </DataTemplate>
