@@ -20,9 +20,9 @@ namespace BusinessSystem.repository
             var lines = System.IO.File.ReadAllLines("repository/products.csv");
 
 
-            bool firstElementSkipped = false;
+            var firstElementSkipped = false;
 
-            foreach (string line in lines)
+            foreach (var line in lines)
             {
                 if (!firstElementSkipped)
                 {

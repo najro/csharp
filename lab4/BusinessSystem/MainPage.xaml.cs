@@ -15,6 +15,7 @@ namespace BusinessSystem
     public sealed partial class MainPage : Page
     {
         Models.Product _selectedProduct;
+        Models.Product _selectedBasketProduct;
 
         public ICollectionView FilteredViewProducts { get; private set; }
         public ICollectionView FilteredViewBasket { get; private set; }
@@ -72,64 +73,16 @@ ObservableCollection<Models.Product> _products = new ObservableCollection<Models
 
             Products = new repository.CsvRepository().ReadProductsFromFile();
 
-
-            
-
             FilteredViewSource = new CollectionViewSource();
             UpdateBasketFilter();
-            //FilteredViewSource.Source = Products;
-            //ListViewBasket.ItemsSource = FilteredViewSource.View;
-
-
-            //FilteredViewSource.Source = Products;
-
-            // Set the ListView's ItemsSource to the filtered view
-            //ListViewBasket.ItemsSource = FilteredViewSource.View;
-
-
-
-            // FilteredViewProducts = new CollectionViewSource
-            // {
-            //     Source = Products
-            // }.View;
-
-
-            //var FilteredViewBasket2 = new CollectionViewSource
-            // {
-            //     Source = Products.Where(p => ((Product) p).Reserved > 0)
-            // };
-
-
-            // ListViewProducts.ItemsSource = FilteredViewProducts;
-            // ListViewBasket.ItemsSource = FilteredViewBasket;
-
-            //this.DataContext = this;
+           
         }
 
         private void RefreshViews()
         {
-
-            //FilteredViewProducts = new CollectionViewSource
-            //{
-            //    Source = Products
-            //}.View;
-
-            //FilteredViewBasket = new CollectionViewSource
-            //{
-            //    Source = BasketProducts
-            //}.View;
-
-            //ListViewProducts.ItemsSource = FilteredViewProducts;
-            //ListViewBasket.ItemsSource = BasketProducts;
-            // FilteredViewBasket2.Source = Products;
-
-
-            //// refresh the view
-            // FilteredViewProducts.Refresh();
-            // FilteredViewBasket.Refresh();
-
+            ValidateProductFromBasket();
+            ValidateProductToBasket();
             UpdateBasketFilter();
-
         }
 
         private void ListViewProducts_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -138,6 +91,14 @@ ObservableCollection<Models.Product> _products = new ObservableCollection<Models
 
             ButtonProductFromBasket.IsEnabled = false;
             
+            ValidateProductToBasket();
+        }
+
+        private void ListViewBasket_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            _selectedBasketProduct = ((Models.Product)ListViewProducts.SelectedItem);
+
+            ValidateProductFromBasket();
             ValidateProductToBasket();
         }
 
@@ -157,9 +118,9 @@ ObservableCollection<Models.Product> _products = new ObservableCollection<Models
 
         private void ValidateProductFromBasket()
         {
-            ButtonProductFromBasket.IsEnabled = _selectedProduct != null;
+            ButtonProductFromBasket.IsEnabled = _selectedBasketProduct != null;
 
-            if (_selectedProduct == null || _selectedProduct.Stock <= 0 || _selectedProduct.Reserved == 0 )
+            if (_selectedBasketProduct == null || _selectedBasketProduct.Stock <= 0 || _selectedBasketProduct.Reserved == 0 )
             {
                 ButtonProductFromBasket.IsEnabled = false;
             }

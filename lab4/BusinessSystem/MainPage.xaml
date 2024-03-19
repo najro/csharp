@@ -32,7 +32,7 @@
                         <Button x:Name="ButtonProductFromBasket" IsEnabled="False" Content="Ta bort vald produkt" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Click="ButtonProductFromBasket_OnClick"/>
                     </StackPanel>
 
-                    <ListView  x:Name="ListViewBasket" HorizontalAlignment="Left"  VerticalContentAlignment="Stretch" Margin="10,10,0,0" VerticalAlignment="Top" Width="400" SelectionChanged="ListViewProducts_OnSelectionChanged">
+                    <ListView  x:Name="ListViewBasket" HorizontalAlignment="Left"  VerticalContentAlignment="Stretch" Margin="10,10,0,0" VerticalAlignment="Top" Width="400" SelectionChanged="ListViewBasket_OnSelectionChanged">
                         <ListView.ItemTemplate >
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
