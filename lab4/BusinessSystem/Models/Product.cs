@@ -6,7 +6,7 @@ using Windows.UI.Xaml.Media.Imaging;
 
 namespace BusinessSystem.Models
 {
-    public abstract class Product  : INotifyPropertyChanged
+    public class Product  : INotifyPropertyChanged
     {
         public Product()
         {

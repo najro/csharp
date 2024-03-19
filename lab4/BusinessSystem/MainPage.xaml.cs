@@ -147,5 +147,16 @@ ObservableCollection<Models.Product> _products = new ObservableCollection<Models
             ValidateProductToBasket();
             RefreshViews();
         }
+
+        private void ButtonProductNew_OnClick(object sender, RoutedEventArgs e)
+        {
+            ProductIdTextBox.Visibility = Visibility.Visible;
+        }
+
+        private void ButtonProductStore_OnClick(object sender, RoutedEventArgs e)
+        {
+            Products.Add(new Models.Product { Name = ProductNameTextBox.Text, Price = 100, Stock = 5 });
+            
+        }
     }
 }
