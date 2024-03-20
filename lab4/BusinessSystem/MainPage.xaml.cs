@@ -1,6 +1,7 @@
 ﻿using BusinessSystem.Models;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Windows.Storage.Streams;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Data;
@@ -150,13 +151,61 @@ ObservableCollection<Models.Product> _products = new ObservableCollection<Models
 
         private void ButtonProductNew_OnClick(object sender, RoutedEventArgs e)
         {
-            ProductIdTextBox.Visibility = Visibility.Visible;
+            ButtonProductNew.Visibility = Visibility.Collapsed;
+            SetAllProductTextBoxesToDefault();
         }
 
-        private void ButtonProductStore_OnClick(object sender, RoutedEventArgs e)
+        private void ButtonProductSave_OnClick(object sender, RoutedEventArgs e)
         {
-            Products.Add(new Models.Product { Name = ProductNameTextBox.Text, Price = 100, Stock = 5 });
+            Products.Add(new Models.Product { Name = TextBoxProductName.Text, Price = 100, Stock = 5 });
             
+        }
+
+        private void FormatComboBox_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var comboBox = (ComboBox)sender;
+            var selectedValue = (ComboBoxItem)comboBox.SelectedValue;
+
+            
+
+            switch (selectedValue?.Content)
+            {
+                case "Book":
+                    TextBoxProductAuthor.IsEnabled = true;
+                    break;
+                case "Video":
+                    TextBoxProductAuthor.IsEnabled = false;
+                    break;
+                case "Game":
+                    break;
+            }
+        }
+
+        private void SetAllProductTextBoxesToDefault()
+        {
+            // clear all textboxes
+            TextBoxProductId.Text = "";
+            TextBoxProductName.Text = "";
+            TextBoxProductPrice.Text = "";
+            TextBoxProductStock.Text = "";
+            TextBoxProductAuthor.Text = "";
+            TextBoxProductGenre.Text = "";
+            TextBoxProductFormat.Text = "";
+            TextBoxProductLanguage.Text = "";
+            TextBoxProductPlatform.Text = "";
+            TextBoxProductPlayTime.Text = "";
+
+            // enable all textboxes 
+            TextBoxProductId.IsEnabled = true;
+            TextBoxProductName.IsEnabled = true;
+            TextBoxProductPrice.IsEnabled = true;
+            TextBoxProductStock.IsEnabled = true;
+            TextBoxProductAuthor.IsEnabled = true;
+            TextBoxProductGenre.IsEnabled = true;
+            TextBoxProductFormat.IsEnabled = true;
+            TextBoxProductLanguage.IsEnabled = true;
+            TextBoxProductPlatform.IsEnabled = true;
+            TextBoxProductPlayTime.IsEnabled = true;
         }
     }
 }
