@@ -55,7 +55,7 @@
         <PivotItem Header="Lager">
             <Grid>
                 <StackPanel Orientation="Horizontal">
-                    <ListView ItemsSource="{x:Bind Products}" x:Name="ListViewStorage" HorizontalAlignment="Left" VerticalContentAlignment="Stretch"  Margin="10,10,0,0" VerticalAlignment="Top" Width="400" SelectionChanged="ListViewProducts_OnSelectionChanged">
+                    <ListView ItemsSource="{x:Bind Products}" x:Name="ListViewStorage" HorizontalAlignment="Left" VerticalContentAlignment="Stretch"  Margin="10,10,0,0" VerticalAlignment="Top" Width="400" SelectionChanged="ListViewStorage_OnSelectionChanged">
                         <ListView.ItemTemplate >
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
@@ -73,70 +73,73 @@
                         <Button x:Name="ButtonProductNew"  Content="Ny produkt" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Click="ButtonProductNew_OnClick"/>
 
 
-                        <StackPanel Orientation="Horizontal">
+                        <StackPanel Orientation="Vertical" Name="StackPanelProductEdit" Visibility="Collapsed">
+                            
+                       
+                            <StackPanel Orientation="Horizontal">
                             <TextBlock Width="100" Text="Produkttyp" Margin="5"/>
-                            <ComboBox x:Name="FormatComboBox" PlaceholderText="Select Format" Margin="5" SelectionChanged="FormatComboBox_OnSelectionChanged">
+                                <ComboBox x:Name="ComboBoxProductType" PlaceholderText="Välg typ" Margin="5" SelectionChanged="ComboBoxProductType_OnSelectionChanged">
                                 <ComboBoxItem Content="Produkt"/>
+                                <ComboBoxItem Content="Bok"/>
                                 <ComboBoxItem Content="Film"/>
-                                <ComboBoxItem Content="Video"/>
                                 <ComboBoxItem Content="Musik"/>
                             </ComboBox>
                         </StackPanel>
 
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Width="100" Text="Produkt ID" Margin="5"/>
-                            <TextBox x:Name="TextBoxProductId" PlaceholderText="Product ID" Margin="5"/>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Width="100" Text="Produkt ID" Margin="5"/>
+                                <TextBox x:Name="TextBoxProductId" PlaceholderText="Product ID" Margin="5"/>
+                            </StackPanel>
+
+
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Width="100" Text="Namn" Margin="5"/>
+                                <TextBox x:Name="TextBoxProductName" PlaceholderText="Namn" Margin="5"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Width="100" Text="Pris" Margin="5"/>
+                                <TextBox x:Name="TextBoxProductPrice" PlaceholderText="Pris" Margin="5"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Width="100" Text="Antal" Margin="5"/>
+                                <TextBox x:Name="TextBoxProductStock" PlaceholderText="Antal" Margin="5"/>
+                            </StackPanel>
+
+                           <StackPanel Orientation="Horizontal">
+                                <TextBlock Width="100" Text="Bild" Margin="5"/>
+                                <TextBox x:Name="TextBoxProductAuthor" PlaceholderText="Författare" Margin="5"/>
+                           </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Name="StackPanelGenre">
+                                <TextBlock Width="100" Text="Genre" Margin="5"/>
+                                <TextBox x:Name="TextBoxProductGenre" PlaceholderText="Genre" Margin="5"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Width="100" Text="Format" Margin="5"/>
+                                <TextBox x:Name="TextBoxProductFormat" PlaceholderText="Format" Margin="5"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Width="100" Text="Språk" Margin="5"/>
+                                <TextBox x:Name="TextBoxProductLanguage" PlaceholderText="Språk" Margin="5"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Width="100" Text="Plattform" Margin="5"/>
+                                <TextBox x:Name="TextBoxProductPlatform" PlaceholderText="Plattform" Margin="5"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Width="100" Text="Speltid" Margin="5"/>
+                                <TextBox x:Name="TextBoxProductPlayTime" PlaceholderText="Speltid" Margin="5"/>
+                            </StackPanel>
+
+                            <Button x:Name="ButtonProductSave"  Content="Lagra produkt" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Click="ButtonProductSave_OnClick"/>
+
                         </StackPanel>
-
-
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Width="100" Text="Namn" Margin="5"/>
-                            <TextBox x:Name="TextBoxProductName" PlaceholderText="Namn" Margin="5"/>
-                        </StackPanel>
-
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Width="100" Text="Pris" Margin="5"/>
-                            <TextBox x:Name="TextBoxProductPrice" PlaceholderText="Pris" Margin="5"/>
-                        </StackPanel>
-
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Width="100" Text="Antal" Margin="5"/>
-                            <TextBox x:Name="TextBoxProductStock" PlaceholderText="Antal" Margin="5"/>
-                        </StackPanel>
-
-                       <StackPanel Orientation="Horizontal">
-                            <TextBlock Width="100" Text="Bild" Margin="5"/>
-                            <TextBox x:Name="TextBoxProductAuthor" PlaceholderText="Författare" Margin="5"/>
-                       </StackPanel>
-
-                        <StackPanel Orientation="Horizontal" Name="StackPanelGenre">
-                            <TextBlock Width="100" Text="Genre" Margin="5"/>
-                            <TextBox x:Name="TextBoxProductGenre" PlaceholderText="Genre" Margin="5"/>
-                        </StackPanel>
-
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Width="100" Text="Format" Margin="5"/>
-                            <TextBox x:Name="TextBoxProductFormat" PlaceholderText="Format" Margin="5"/>
-                        </StackPanel>
-
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Width="100" Text="Språk" Margin="5"/>
-                            <TextBox x:Name="TextBoxProductLanguage" PlaceholderText="Språk" Margin="5"/>
-                        </StackPanel>
-
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Width="100" Text="Plattform" Margin="5"/>
-                            <TextBox x:Name="TextBoxProductPlatform" PlaceholderText="Plattform" Margin="5"/>
-                        </StackPanel>
-
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Width="100" Text="Speltid" Margin="5"/>
-                            <TextBox x:Name="TextBoxProductPlayTime" PlaceholderText="Speltid" Margin="5"/>
-                        </StackPanel>
-
-                        <Button x:Name="ButtonProductSave"  Content="Lagra produkt" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Click="ButtonProductSave_OnClick"/>
-
-
 
                     </StackPanel>
 

@@ -1,4 +1,5 @@
-﻿using BusinessSystem.Models;
+﻿using System;
+using BusinessSystem.Models;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Windows.Storage.Streams;
@@ -17,6 +18,7 @@ namespace BusinessSystem
     {
         Models.Product _selectedProduct;
         Models.Product _selectedBasketProduct;
+        Models.Product _selectedStorageProduct;
 
         public ICollectionView FilteredViewProducts { get; private set; }
         public ICollectionView FilteredViewBasket { get; private set; }
@@ -97,11 +99,28 @@ ObservableCollection<Models.Product> _products = new ObservableCollection<Models
 
         private void ListViewBasket_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            _selectedBasketProduct = ((Models.Product)ListViewProducts.SelectedItem);
+            _selectedBasketProduct = ((Models.Product)ListViewBasket.SelectedItem);
 
             ValidateProductFromBasket();
             ValidateProductToBasket();
         }
+
+
+        private void ListViewStorage_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            _selectedStorageProduct = ((Models.Product)ListViewStorage.SelectedItem);
+
+
+            TextBoxProductId.IsEnabled = false;
+            ComboBoxProductType.IsEnabled = false;
+            TextBoxProductId.Text = _selectedStorageProduct.Id.ToString();
+            TextBoxProductName.Text = _selectedStorageProduct.Name;
+            TextBoxProductPrice.Text = _selectedStorageProduct.Price.ToString();
+            TextBoxProductStock.Text = _selectedStorageProduct.Stock.ToString();
+
+        }
+
+
 
         private void ValidateProductToBasket()
         {
@@ -152,7 +171,9 @@ ObservableCollection<Models.Product> _products = new ObservableCollection<Models
         private void ButtonProductNew_OnClick(object sender, RoutedEventArgs e)
         {
             ButtonProductNew.Visibility = Visibility.Collapsed;
-            SetAllProductTextBoxesToDefault();
+            StackPanelProductEdit.Visibility = Visibility.Visible;
+            SetAllProductTextBoxesToEmpty();
+            SetAllProductTextBoxesDefaultEnabled();
         }
 
         private void ButtonProductSave_OnClick(object sender, RoutedEventArgs e)
@@ -161,27 +182,17 @@ ObservableCollection<Models.Product> _products = new ObservableCollection<Models
             
         }
 
-        private void FormatComboBox_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        // only active when a new product is created
+        private void ComboBoxProductType_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var comboBox = (ComboBox)sender;
             var selectedValue = (ComboBoxItem)comboBox.SelectedValue;
 
-            
-
-            switch (selectedValue?.Content)
-            {
-                case "Book":
-                    TextBoxProductAuthor.IsEnabled = true;
-                    break;
-                case "Video":
-                    TextBoxProductAuthor.IsEnabled = false;
-                    break;
-                case "Game":
-                    break;
-            }
+            SetAllProductTextBoxesDefaultEnabled(selectedValue?.Content.ToString());
         }
 
-        private void SetAllProductTextBoxesToDefault()
+        
+        private void SetAllProductTextBoxesToEmpty()
         {
             // clear all textboxes
             TextBoxProductId.Text = "";
@@ -194,18 +205,43 @@ ObservableCollection<Models.Product> _products = new ObservableCollection<Models
             TextBoxProductLanguage.Text = "";
             TextBoxProductPlatform.Text = "";
             TextBoxProductPlayTime.Text = "";
+        }
 
-            // enable all textboxes 
+        private void SetAllProductTextBoxesDefaultEnabled(string selectedProductType = "")
+        {
+            // enable/disable all textboxes 
+            ComboBoxProductType.Visibility = Visibility.Visible;
+            ComboBoxProductType.IsEnabled = true;
             TextBoxProductId.IsEnabled = true;
             TextBoxProductName.IsEnabled = true;
             TextBoxProductPrice.IsEnabled = true;
             TextBoxProductStock.IsEnabled = true;
-            TextBoxProductAuthor.IsEnabled = true;
-            TextBoxProductGenre.IsEnabled = true;
-            TextBoxProductFormat.IsEnabled = true;
-            TextBoxProductLanguage.IsEnabled = true;
-            TextBoxProductPlatform.IsEnabled = true;
-            TextBoxProductPlayTime.IsEnabled = true;
+
+            TextBoxProductAuthor.IsEnabled = false;
+            TextBoxProductGenre.IsEnabled = false;
+            TextBoxProductFormat.IsEnabled = false;
+            TextBoxProductLanguage.IsEnabled = false;
+            TextBoxProductPlatform.IsEnabled = false;
+            TextBoxProductPlayTime.IsEnabled = false;
+
+            switch (selectedProductType)
+            {
+                case "Bok":
+                    TextBoxProductAuthor.IsEnabled = true;
+                    TextBoxProductGenre.IsEnabled = true;
+                    TextBoxProductFormat.IsEnabled = true;
+                    TextBoxProductLanguage.IsEnabled = true;
+                    break;
+
+                case "Film":
+                    TextBoxProductFormat.IsEnabled = true;
+                    TextBoxProductPlayTime.IsEnabled = true;
+                    break;
+
+                case "Musik":
+                    TextBoxProductPlatform.IsEnabled = true;
+                    break;
+            }
         }
     }
 }
