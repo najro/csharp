@@ -6,6 +6,7 @@ using Windows.Storage.Streams;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Data;
+using BusinessSystem.Models.Enums;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -106,19 +107,7 @@ ObservableCollection<Models.Product> _products = new ObservableCollection<Models
         }
 
 
-        private void ListViewStorage_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            _selectedStorageProduct = ((Models.Product)ListViewStorage.SelectedItem);
-
-
-            TextBoxProductId.IsEnabled = false;
-            ComboBoxProductType.IsEnabled = false;
-            TextBoxProductId.Text = _selectedStorageProduct.Id.ToString();
-            TextBoxProductName.Text = _selectedStorageProduct.Name;
-            TextBoxProductPrice.Text = _selectedStorageProduct.Price.ToString();
-            TextBoxProductStock.Text = _selectedStorageProduct.Stock.ToString();
-
-        }
+        
 
 
 
@@ -173,7 +162,7 @@ ObservableCollection<Models.Product> _products = new ObservableCollection<Models
             ButtonProductNew.Visibility = Visibility.Collapsed;
             StackPanelProductEdit.Visibility = Visibility.Visible;
             SetAllProductTextBoxesToEmpty();
-            SetAllProductTextBoxesDefaultEnabled();
+            SetProductTextBoxesEnabledBySelectedProduct(new Product(), ProductMode.New);
         }
 
         private void ButtonProductSave_OnClick(object sender, RoutedEventArgs e)
@@ -182,19 +171,82 @@ ObservableCollection<Models.Product> _products = new ObservableCollection<Models
             
         }
 
-        // only active when a new product is created
+
+
+        private void ListViewStorage_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            _selectedStorageProduct = ((Product)ListViewStorage.SelectedItem);
+
+            ButtonProductNew.Visibility = Visibility.Collapsed;
+            StackPanelProductEdit.Visibility = Visibility.Visible;
+
+            SetProductTextBoxesEnabledBySelectedProduct(_selectedStorageProduct, ProductMode.Edit);
+            PopulateTextBoxesInputForm(_selectedStorageProduct);
+        }
+
+        private void PopulateTextBoxesInputForm(Product product)
+        {
+            TextBoxProductId.Text = product.Id.ToString();
+            TextBoxProductName.Text = product.Name;
+            TextBoxProductPrice.Text = product.Price.ToString();
+            TextBoxProductStock.Text = product.Stock.ToString();
+
+            
+            if (product is Book book)
+            {
+                ComboBoxProductType.SelectedIndex = 1;
+                TextBoxProductAuthor.Text = book.Author;
+                TextBoxProductGenre.Text = book.Genre;
+                TextBoxProductFormat.Text = book.Format;
+                TextBoxProductLanguage.Text = book.Language;
+            }
+            else if (product is Movie movie)
+            {
+                ComboBoxProductType.SelectedIndex = 2;
+                TextBoxProductFormat.Text = movie.Format;
+                TextBoxProductPlayTime.Text = movie.PlayTime;
+            }
+            else if (product is Game game)
+            {
+                ComboBoxProductType.SelectedIndex = 3;
+                TextBoxProductPlatform.Text = game.Platform;
+            }
+         
+        }
+
+
+        /// <summary>
+        /// Only acctive when a new product is created. Handle the selection of product input based on selected product type
+        /// </summary>
         private void ComboBoxProductType_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var comboBox = (ComboBox)sender;
             var selectedValue = (ComboBoxItem)comboBox.SelectedValue;
 
-            SetAllProductTextBoxesDefaultEnabled(selectedValue?.Content.ToString());
+            Product seletedProductType = new Product();
+
+            if (selectedValue?.Content.ToString() == "Bok")
+            {
+                seletedProductType = new Book();
+            }
+            else if (selectedValue?.Content.ToString() == "Film")
+            {
+                seletedProductType = new Movie();
+            }
+            else if (selectedValue?.Content.ToString() == "Spel")
+            {
+                seletedProductType = new Game();
+            }
+            
+            
+            SetProductTextBoxesEnabledBySelectedProduct(seletedProductType, ProductMode.New);
         }
 
-        
+        /// <summary>
+        /// Set all textboxes to default empty state
+        /// </summary>
         private void SetAllProductTextBoxesToEmpty()
         {
-            // clear all textboxes
             TextBoxProductId.Text = "";
             TextBoxProductName.Text = "";
             TextBoxProductPrice.Text = "";
@@ -207,16 +259,30 @@ ObservableCollection<Models.Product> _products = new ObservableCollection<Models
             TextBoxProductPlayTime.Text = "";
         }
 
-        private void SetAllProductTextBoxesDefaultEnabled(string selectedProductType = "")
+        /// <summary>
+        /// Set all textboxes to default enabled state based on selected product and mode (edit/new)
+        /// </summary>
+        private void SetProductTextBoxesEnabledBySelectedProduct(Product product, ProductMode mode)
         {
-            // enable/disable all textboxes 
-            ComboBoxProductType.Visibility = Visibility.Visible;
-            ComboBoxProductType.IsEnabled = true;
-            TextBoxProductId.IsEnabled = true;
+            
+            // enable selction and id for new product, existing product is not editable
+            if (mode == ProductMode.New)
+            {
+                ComboBoxProductType.IsEnabled = true;
+                TextBoxProductId.IsEnabled = true;
+            }
+            else
+            {
+                ComboBoxProductType.IsEnabled = false;
+                TextBoxProductId.IsEnabled = false;
+            }
+            
+            // enable all textboxes for new product
             TextBoxProductName.IsEnabled = true;
             TextBoxProductPrice.IsEnabled = true;
             TextBoxProductStock.IsEnabled = true;
 
+            // disable all textboxes
             TextBoxProductAuthor.IsEnabled = false;
             TextBoxProductGenre.IsEnabled = false;
             TextBoxProductFormat.IsEnabled = false;
@@ -224,24 +290,45 @@ ObservableCollection<Models.Product> _products = new ObservableCollection<Models
             TextBoxProductPlatform.IsEnabled = false;
             TextBoxProductPlayTime.IsEnabled = false;
 
-            switch (selectedProductType)
+            // enable textboxes based on product type
+            switch (product)
             {
-                case "Bok":
+                case Book book:
+                    ComboBoxProductType.SelectedIndex = 1;
                     TextBoxProductAuthor.IsEnabled = true;
                     TextBoxProductGenre.IsEnabled = true;
                     TextBoxProductFormat.IsEnabled = true;
                     TextBoxProductLanguage.IsEnabled = true;
                     break;
 
-                case "Film":
+                case Movie movie:
+                    ComboBoxProductType.SelectedIndex = 2;
                     TextBoxProductFormat.IsEnabled = true;
                     TextBoxProductPlayTime.IsEnabled = true;
                     break;
 
-                case "Musik":
+                case Game game:
+                    ComboBoxProductType.SelectedIndex = 3;
                     TextBoxProductPlatform.IsEnabled = true;
                     break;
             }
+
+    
         }
+
+        private void ButtonProductCancel_OnClick(object sender, RoutedEventArgs e)
+        {
+            _selectedStorageProduct = null;
+
+            ButtonProductNew.Visibility = Visibility.Visible;
+            StackPanelProductEdit.Visibility = Visibility.Collapsed;
+
+        }
+
+        private void ButtonProductDelete_OnClick(object sender, RoutedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+        
     }
 }

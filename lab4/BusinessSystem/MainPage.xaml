@@ -82,7 +82,7 @@
                                 <ComboBoxItem Content="Produkt"/>
                                 <ComboBoxItem Content="Bok"/>
                                 <ComboBoxItem Content="Film"/>
-                                <ComboBoxItem Content="Musik"/>
+                                <ComboBoxItem Content="Spel"/>
                             </ComboBox>
                         </StackPanel>
 
@@ -108,7 +108,7 @@
                             </StackPanel>
 
                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Width="100" Text="Bild" Margin="5"/>
+                                <TextBlock Width="100" Text="Författare" Margin="5"/>
                                 <TextBox x:Name="TextBoxProductAuthor" PlaceholderText="Författare" Margin="5"/>
                            </StackPanel>
 
@@ -137,8 +137,12 @@
                                 <TextBox x:Name="TextBoxProductPlayTime" PlaceholderText="Speltid" Margin="5"/>
                             </StackPanel>
 
-                            <Button x:Name="ButtonProductSave"  Content="Lagra produkt" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Click="ButtonProductSave_OnClick"/>
-
+                            <StackPanel Orientation="Horizontal">
+                               
+                                <Button x:Name="ButtonProductSave"  Content="Lagra produkt" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Click="ButtonProductSave_OnClick"/>
+                                <Button x:Name="ButtonProductCancel" Content="Avbryt" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Click="ButtonProductCancel_OnClick"/>
+                                <Button x:Name="ButtonProductDelete" Content="Ta bort" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Click="ButtonProductDelete_OnClick"/>
+                            </StackPanel>
                         </StackPanel>
 
                     </StackPanel>
