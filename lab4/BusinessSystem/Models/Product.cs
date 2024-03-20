@@ -21,8 +21,25 @@ namespace BusinessSystem.Models
         public virtual ImageSource Image { get; set; } = new BitmapImage(new Uri("ms-appx:///Assets/product.png"));
 
         public string Name { get; set; }
-        public decimal Price { get; set; }
-        //public int Stock { get; set; } = 5;
+
+      
+
+        decimal _price = 0;
+        public decimal Price
+        {
+            get
+            {
+                return _price;
+            }
+            set
+            {
+                _price = value;
+                OnNotifyPropertyChanged();
+
+                Description = ToString();
+            }
+        }
+
 
         int _stock = 0;
         public int Stock
@@ -35,6 +52,8 @@ namespace BusinessSystem.Models
             {
                 _stock = value;
                 OnNotifyPropertyChanged();
+
+                Description = ToString();
             }
         }
 
@@ -51,16 +70,24 @@ namespace BusinessSystem.Models
             {
                 _reserved = value;
                 OnNotifyPropertyChanged();
+
+                Description = ToString();
             }
         }
 
 
+        string _description = "";
 
         public virtual string Description
         {
             get
             {
-                return ToString();
+                return _description;
+            }
+            set
+            {
+                _description = value;
+                OnNotifyPropertyChanged();
             }
         }
 
@@ -76,7 +103,7 @@ namespace BusinessSystem.Models
 
         public override string ToString()
         {
-            return $"{Id}, {Name}, Pris: {Price}, Antal på lager : {Stock}";
+            return $"{Id}, {Name}, Pris: {Price}, Antal på lager : {Stock}, Reserverade : {Reserved}";
         }
 
         private BitmapImage LoadImage(string filename)

@@ -15,7 +15,7 @@ namespace BusinessSystem.Models
         public string Language { get; set; }
         public override string ToString()
         {
-            return $"Type: {Type}, {Name}, Pris: {Price}, Antal på lager : {Stock}";
+            return $"Type: {Type}, {Name}, Pris: {Price}, Antal på lager : {Stock}, Reserverade : {Reserved}";
         }
     }
 }
