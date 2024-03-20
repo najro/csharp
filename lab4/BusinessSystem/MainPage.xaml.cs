@@ -41,7 +41,7 @@ namespace BusinessSystem
         //};
 
 
-ObservableCollection<Models.Product> _products = new ObservableCollection<Models.Product>();
+        ObservableCollection<Models.Product> _products = new ObservableCollection<Models.Product>();
         public ObservableCollection<Models.Product> Products
         {
             get
@@ -57,8 +57,6 @@ ObservableCollection<Models.Product> _products = new ObservableCollection<Models
             }
         }
 
-   
-
         private void UpdateBasketFilter()
         {
              var filteredProducts = Products.Where(p => p.Reserved > 0).ToList();
@@ -68,8 +66,22 @@ ObservableCollection<Models.Product> _products = new ObservableCollection<Models
             ListViewBasket.ItemsSource = null;
             ListViewBasket.ItemsSource = FilteredViewSource.View;
 
-            ListViewBasket.SelectedItem = null;
+           ListViewBasket.SelectedItem = null;
         }
+
+        //private void UpdateListViewProducts()
+        //{
+        //    ListViewProducts.ItemsSource = null;
+        //    ListViewProducts.ItemsSource = Products;
+        //    //ListViewBasket.SelectedItem = null;
+        //}
+
+        //private void UpdateListViewStorage()
+        //{
+        //    ListViewStorage.ItemsSource = null;
+        //    ListViewStorage.ItemsSource = Products;
+        //    //ListViewStorage.SelectedItem = null;
+        //}
 
         public MainPage()
         {
@@ -105,10 +117,6 @@ ObservableCollection<Models.Product> _products = new ObservableCollection<Models
             ValidateProductFromBasket();
             ValidateProductToBasket();
         }
-
-
-        
-
 
 
         private void ValidateProductToBasket()
@@ -162,13 +170,67 @@ ObservableCollection<Models.Product> _products = new ObservableCollection<Models
             ButtonProductNew.Visibility = Visibility.Collapsed;
             StackPanelProductEdit.Visibility = Visibility.Visible;
             SetAllProductTextBoxesToEmpty();
-            SetProductTextBoxesEnabledBySelectedProduct(new Product(), ProductMode.New);
+            EnableTextBoxesByProductAndMode(new Product(), ProductMode.New);
         }
 
         private void ButtonProductSave_OnClick(object sender, RoutedEventArgs e)
         {
-            Products.Add(new Models.Product { Name = TextBoxProductName.Text, Price = 100, Stock = 5 });
-            
+
+            if (_selectedStorageProduct != null)
+            {
+                _selectedStorageProduct.Name = TextBoxProductName.Text;
+                _selectedStorageProduct.Price = Convert.ToDecimal(TextBoxProductPrice.Text);
+                _selectedStorageProduct.Stock = Convert.ToInt32(TextBoxProductStock.Text);
+
+                switch (_selectedStorageProduct)
+                {
+                    case Book book:
+                        book.Author = TextBoxProductAuthor.Text;
+                        book.Genre = TextBoxProductGenre.Text;
+                        book.Format = TextBoxProductFormat.Text;
+                        book.Language = TextBoxProductLanguage.Text;
+                        break;
+                    case Movie movie:
+                        movie.Format = TextBoxProductFormat.Text;
+                        movie.PlayTime = TextBoxProductPlayTime.Text;
+                        break;
+                    case Game game:
+                        game.Platform = TextBoxProductPlatform.Text;
+                        break;
+                }
+            }
+            else
+            {
+                var newProduct = GetProductTypeBySelectionName(((ComboBoxItem)ComboBoxProductType.SelectedValue)?.Content.ToString());
+                newProduct.Name = TextBoxProductName.Text;
+                newProduct.Price = Convert.ToDecimal(TextBoxProductPrice.Text);
+                newProduct.Stock = Convert.ToInt32(TextBoxProductStock.Text);
+
+                switch (newProduct)
+                {
+                    case Book book:
+                        book.Author = TextBoxProductAuthor.Text;
+                        book.Genre = TextBoxProductGenre.Text;
+                        book.Format = TextBoxProductFormat.Text;
+                        book.Language = TextBoxProductLanguage.Text;
+                        break;
+                    case Movie movie:
+                        movie.Format = TextBoxProductFormat.Text;
+                        movie.PlayTime = TextBoxProductPlayTime.Text;
+                        break;
+                    case Game game:
+                        game.Platform = TextBoxProductPlatform.Text;
+                        break;
+                }
+
+                Products.Add(newProduct);
+            }
+
+            //UpdateListViewProducts();
+            //UpdateListViewStorage();
+            //RefreshViews();
+
+
         }
 
 
@@ -180,39 +242,46 @@ ObservableCollection<Models.Product> _products = new ObservableCollection<Models
             ButtonProductNew.Visibility = Visibility.Collapsed;
             StackPanelProductEdit.Visibility = Visibility.Visible;
 
-            SetProductTextBoxesEnabledBySelectedProduct(_selectedStorageProduct, ProductMode.Edit);
-            PopulateTextBoxesInputForm(_selectedStorageProduct);
+            EnableTextBoxesByProductAndMode(_selectedStorageProduct, ProductMode.Edit);
+            PopulateTextBoxesInputFormByProduct(_selectedStorageProduct);
         }
 
-        private void PopulateTextBoxesInputForm(Product product)
+        private void PopulateTextBoxesInputFormByProduct(Product product)
         {
+            SetAllProductTextBoxesToEmpty();
+
             TextBoxProductId.Text = product.Id.ToString();
             TextBoxProductName.Text = product.Name;
             TextBoxProductPrice.Text = product.Price.ToString();
             TextBoxProductStock.Text = product.Stock.ToString();
 
-            
-            if (product is Book book)
+            switch (product)
             {
-                ComboBoxProductType.SelectedIndex = 1;
-                TextBoxProductAuthor.Text = book.Author;
-                TextBoxProductGenre.Text = book.Genre;
-                TextBoxProductFormat.Text = book.Format;
-                TextBoxProductLanguage.Text = book.Language;
-            }
-            else if (product is Movie movie)
-            {
-                ComboBoxProductType.SelectedIndex = 2;
-                TextBoxProductFormat.Text = movie.Format;
-                TextBoxProductPlayTime.Text = movie.PlayTime;
-            }
-            else if (product is Game game)
-            {
-                ComboBoxProductType.SelectedIndex = 3;
-                TextBoxProductPlatform.Text = game.Platform;
+                case Book book:
+                    //ComboBoxProductType.SelectedIndex = 1;
+                    ComboBoxProductType.IsEditable = false;
+                    TextBoxProductAuthor.Text = book.Author;
+                    TextBoxProductGenre.Text = book.Genre;
+                    TextBoxProductFormat.Text = book.Format;
+                    TextBoxProductLanguage.Text = book.Language;
+                    break;
+                case Movie movie:
+                    //ComboBoxProductType.SelectedIndex = 2;
+
+                    ComboBoxProductType.IsEditable = false;
+                    TextBoxProductFormat.Text = movie.Format;
+                    TextBoxProductPlayTime.Text = movie.PlayTime;
+                    break;
+                case Game game:
+                    //ComboBoxProductType.SelectedIndex = 3;
+                    ComboBoxProductType.IsEditable = false;
+                    TextBoxProductPlatform.Text = game.Platform;
+                    break;
             }
          
         }
+
+
 
 
         /// <summary>
@@ -223,23 +292,30 @@ ObservableCollection<Models.Product> _products = new ObservableCollection<Models
             var comboBox = (ComboBox)sender;
             var selectedValue = (ComboBoxItem)comboBox.SelectedValue;
 
-            Product seletedProductType = new Product();
+            var seletedProductType = GetProductTypeBySelectionName(selectedValue?.Content.ToString());
 
-            if (selectedValue?.Content.ToString() == "Bok")
+
+            EnableTextBoxesByProductAndMode(seletedProductType, ProductMode.New);
+        }
+
+        private static Product GetProductTypeBySelectionName(string selectedValue)
+        {
+            var seletedProductType = new Product();
+
+            if (selectedValue == "Bok")
             {
                 seletedProductType = new Book();
             }
-            else if (selectedValue?.Content.ToString() == "Film")
+            else if (selectedValue == "Film")
             {
                 seletedProductType = new Movie();
             }
-            else if (selectedValue?.Content.ToString() == "Spel")
+            else if (selectedValue == "Spel")
             {
                 seletedProductType = new Game();
             }
-            
-            
-            SetProductTextBoxesEnabledBySelectedProduct(seletedProductType, ProductMode.New);
+
+            return seletedProductType;
         }
 
         /// <summary>
@@ -262,7 +338,7 @@ ObservableCollection<Models.Product> _products = new ObservableCollection<Models
         /// <summary>
         /// Set all textboxes to default enabled state based on selected product and mode (edit/new)
         /// </summary>
-        private void SetProductTextBoxesEnabledBySelectedProduct(Product product, ProductMode mode)
+        private void EnableTextBoxesByProductAndMode(Product product, ProductMode mode)
         {
             
             // enable selction and id for new product, existing product is not editable
@@ -294,7 +370,7 @@ ObservableCollection<Models.Product> _products = new ObservableCollection<Models
             switch (product)
             {
                 case Book book:
-                    ComboBoxProductType.SelectedIndex = 1;
+                    //ComboBoxProductType.SelectedIndex = 1;
                     TextBoxProductAuthor.IsEnabled = true;
                     TextBoxProductGenre.IsEnabled = true;
                     TextBoxProductFormat.IsEnabled = true;
@@ -302,13 +378,13 @@ ObservableCollection<Models.Product> _products = new ObservableCollection<Models
                     break;
 
                 case Movie movie:
-                    ComboBoxProductType.SelectedIndex = 2;
+                    //ComboBoxProductType.SelectedIndex = 2;
                     TextBoxProductFormat.IsEnabled = true;
                     TextBoxProductPlayTime.IsEnabled = true;
                     break;
 
                 case Game game:
-                    ComboBoxProductType.SelectedIndex = 3;
+                    //ComboBoxProductType.SelectedIndex = 3;
                     TextBoxProductPlatform.IsEnabled = true;
                     break;
             }
