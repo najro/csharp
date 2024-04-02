@@ -14,7 +14,7 @@
             <Grid>
                 <StackPanel Orientation="Horizontal">
                     <StackPanel Orientation="Vertical">
-                        <TextBlock Text="Produkter" FontSize="16" Margin="10 0 0 10"/>
+                        <TextBlock Text="Produkter" FontSize="16" Margin="30 20 0 10"/>
                         <ListView ItemsSource="{x:Bind Products}" x:Name="ListViewProducts" HorizontalAlignment="Left" VerticalContentAlignment="Stretch"  Margin="10,10,0,0" VerticalAlignment="Top" Width="500" SelectionChanged="ListViewProducts_OnSelectionChanged">
                             <ListView.ItemTemplate >
                                 <DataTemplate>
@@ -22,9 +22,6 @@
                                         <StackPanel Orientation="Horizontal">
                                             <Image Source="{Binding Image}" Height="20" Width="20" Margin="0 0 10 0"/>
                                             <TextBlock Text="{Binding Description}" FontSize="12"/>
-                                            <!--<TextBlock Text="{Binding Stock}" FontSize="12"/>
-                                            <TextBlock Text="{Binding Reserved}" FontSize="12"/>
-                                            <TextBlock Text="{Binding Price}" FontSize="12"/>-->
                                         </StackPanel>
                                     </StackPanel>
                                 </DataTemplate>
@@ -39,17 +36,15 @@
 
 
                     <StackPanel Orientation="Vertical">
-                        <TextBlock Text="Kundkorg" FontSize="16" Margin="10 0 0 10"/>
-                        <ListView  x:Name="ListViewBasket" HorizontalAlignment="Left"  VerticalContentAlignment="Stretch" Margin="10,10,0,0" VerticalAlignment="Top" Width="500" SelectionChanged="ListViewBasket_OnSelectionChanged">
+                        <TextBlock Text="Kundkorg" FontSize="16" Margin="30 20 0 10"/>
+                        <ListView ItemsSource="{x:Bind ViewModel.FilteredProducts1}"  x:Name="ListViewBasket"  HorizontalAlignment="Left"  VerticalContentAlignment="Stretch" Margin="10,10,0,0" VerticalAlignment="Top" Width="500" SelectionChanged="ListViewBasket_OnSelectionChanged">
                             <ListView.ItemTemplate >
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
                                         <StackPanel Orientation="Horizontal">
                                             <Image Source="{Binding Image}" Height="20" Width="20" Margin="0 0 10 0"/>
                                             <TextBlock Text="{Binding Description}" FontSize="12"/>
-                                            <!--<TextBlock Text="{Binding Stock}" FontSize="12"/>
                                             <TextBlock Text="{Binding Reserved}" FontSize="12"/>
-                                            <TextBlock Text="{Binding Price}" FontSize="12"/>-->
                                         </StackPanel>
                                     </StackPanel>
                                 </DataTemplate>
@@ -73,9 +68,6 @@
                                     <StackPanel Orientation="Horizontal">
                                         <Image Source="{Binding Image}" Height="20" Width="20" Margin="0 0 10 0"/>
                                         <TextBlock Text="{Binding Description}" FontSize="12"/>
-                                        <!--<TextBlock Text="{Binding Stock}" FontSize="12"/>
-                                        <TextBlock Text="{Binding Reserved}" FontSize="12"/>
-                                        <TextBlock Text="{Binding Price}" FontSize="12"/>-->
                                     </StackPanel>
                                 </StackPanel>
                             </DataTemplate>

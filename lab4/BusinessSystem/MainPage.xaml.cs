@@ -7,41 +7,58 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Data;
 using BusinessSystem.Models.Enums;
+using System.Collections.Generic;
+using System.ComponentModel;
+using Windows.UI.Core;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
 namespace BusinessSystem
 {
+
+
+    public class MainPageViewModel : INotifyPropertyChanged
+    {
+        private ObservableCollection<Product> _filteredProducts1;
+
+        public ObservableCollection<Product> FilteredProducts1
+        {
+            get { return _filteredProducts1; }
+            set
+            {
+                if (_filteredProducts1 != value)
+                {
+                    _filteredProducts1 = value;
+                    OnPropertyChanged(nameof(FilteredProducts1));
+                }
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class MainPage : Page
+    public sealed partial class MainPage : Page, INotifyPropertyChanged
     {
         Models.Product _selectedProduct;
         Models.Product _selectedBasketProduct;
         Models.Product _selectedStorageProduct;
 
-        public ICollectionView FilteredViewProducts { get; private set; }
-        public ICollectionView FilteredViewBasket { get; private set; }
+        public MainPageViewModel ViewModel { get; set; }
 
 
-        public CollectionViewSource FilteredViewSource { get; set; }
+        private ObservableCollection<Models.Product> _products;
+        
+        ///private ObservableCollection<Product> _filteredProducts1;
 
-        //// Apply a filter to the CollectionViewSource
-        //FilteredViewSource.View.Filter = (item) =>
-        //{
-        //    // Implement your filter logic here
-        //    // For example, filtering based on price
-        //    // This example filters out products with a price less than 10
-        //    if (item is Product product)
-        //    {
-        //        return product.Price >= 10;
-        //    }
-        //    return false;
-        //};
+        public event PropertyChangedEventHandler PropertyChanged;
 
-
-        ObservableCollection<Models.Product> _products = new ObservableCollection<Models.Product>();
         public ObservableCollection<Models.Product> Products
         {
             get
@@ -53,35 +70,38 @@ namespace BusinessSystem
                 if (_products != value)
                 {
                     _products = value;
+                    OnPropertyChanged(nameof(Products));
+                    //UpdateFilteredCollections();
                 }
             }
         }
 
-        private void UpdateBasketFilter()
+        //public ObservableCollection<Product> FilteredProducts1
+        //{
+        //    get { return _filteredProducts1; }
+        //    private set
+        //    {
+        //        _filteredProducts1 = value;
+        //        OnPropertyChanged(nameof(FilteredProducts1));
+        //    }
+        //}
+
+        private void OnPropertyChanged(string propertyName)
         {
-             var filteredProducts = Products.Where(p => p.Reserved > 0).ToList();
-            FilteredViewSource.Source = new ObservableCollection<Product>(filteredProducts);
-            //ListViewBasket.ItemsSource = FilteredViewSource.View;
-
-            ListViewBasket.ItemsSource = null;
-            ListViewBasket.ItemsSource = FilteredViewSource.View;
-
-           ListViewBasket.SelectedItem = null;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        //private void UpdateListViewProducts()
-        //{
-        //    ListViewProducts.ItemsSource = null;
-        //    ListViewProducts.ItemsSource = Products;
-        //    //ListViewBasket.SelectedItem = null;
-        //}
+        private void UpdateBasketFilter()
+        {
 
-        //private void UpdateListViewStorage()
-        //{
-        //    ListViewStorage.ItemsSource = null;
-        //    ListViewStorage.ItemsSource = Products;
-        //    //ListViewStorage.SelectedItem = null;
-        //}
+
+            ViewModel.FilteredProducts1 = new ObservableCollection<Product>(Products.Where(p => p.Reserved > 0));
+            ListViewBasket.ItemsSource = null;
+            ListViewBasket.ItemsSource = ViewModel.FilteredProducts1;
+            
+        }
+
+
 
         public MainPage()
         {
@@ -89,9 +109,31 @@ namespace BusinessSystem
 
             Products = new repository.CsvRepository().ReadProductsFromFile();
 
-            FilteredViewSource = new CollectionViewSource();
-            UpdateBasketFilter();
-           
+            //FilteredProducts1 = new ObservableCollection<Product>(Products.Where(p => p.Reserved > 0));
+
+            ViewModel = new MainPageViewModel();
+            ViewModel.FilteredProducts1 = new ObservableCollection<Product>(Products.Where(p => p.Reserved > 0));
+
+
+            //Set up event handlers for collection changes
+            Products.CollectionChanged += Products_CollectionChanged;
+
+            this.DataContext = this;
+
+        }
+
+        private void UpdateFilteredCollections()
+        {
+            ViewModel.FilteredProducts1 = new ObservableCollection<Product>(Products.Where(p => p.Reserved > 0));
+        }
+
+
+        private async void Products_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                UpdateFilteredCollections();
+            });
         }
 
         private void RefreshViews()
