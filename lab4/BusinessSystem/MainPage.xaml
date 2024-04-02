@@ -12,10 +12,14 @@
     <Pivot Name="PivotMainView">
         <PivotItem Header="Butik" FontSize="20">
             <Grid>
+
                 <StackPanel Orientation="Horizontal">
+
+
                     <StackPanel Orientation="Vertical">
                         <TextBlock Text="Produkter" FontSize="16" Margin="30 20 0 10"/>
-                        <ListView ItemsSource="{x:Bind Products}" x:Name="ListViewProducts" HorizontalAlignment="Left" VerticalContentAlignment="Stretch"  Margin="10,10,0,0" VerticalAlignment="Top" Width="500" SelectionChanged="ListViewProducts_OnSelectionChanged">
+                        <TextBox Name="TextBoxSearch"   TextChanged="TextBoxSearch_OnTextChanged"></TextBox>
+                        <ListView ItemsSource="{x:Bind FilteredProducts}" x:Name="ListViewProducts" HorizontalAlignment="Left" VerticalContentAlignment="Stretch"  Margin="10,10,0,0" VerticalAlignment="Top" Width="500" SelectionChanged="ListViewProducts_OnSelectionChanged">
                             <ListView.ItemTemplate >
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">

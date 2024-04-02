@@ -1,17 +1,22 @@
-﻿using BusinessSystem.Models;
-using BusinessSystem.Models.Enums;
-using System;
+﻿using System;
+using BusinessSystem.Models;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Linq;
+using Windows.Storage.Streams;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Data;
+using BusinessSystem.Models.Enums;
+using System.Collections.Generic;
+using System.ComponentModel;
+using Windows.UI.Core;
+using Windows.UI.Xaml.Input;
 
 
 namespace BusinessSystem
 {
 
-
+    
 
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
@@ -26,17 +31,20 @@ namespace BusinessSystem
 
 
         private ObservableCollection<Models.Product> _products;
-
+        
 
 
         public event PropertyChangedEventHandler PropertyChanged;
 
         public ObservableCollection<Models.Product> Products { get; set; }
 
+        public ObservableCollection<Models.Product> FilteredProducts { get; set; }
+
+
         public ObservableCollection<Models.Product> BasketProducts { get; set; }
+        
 
-
-
+        
 
 
         public MainPage()
@@ -45,9 +53,16 @@ namespace BusinessSystem
 
             Products = new repository.CsvRepository().ReadProductsFromFile();
 
+            FilteredProducts = new ObservableCollection<Product>();
+
+            foreach (var product in Products)
+            {
+                FilteredProducts.Add(product);
+            }
+
             BasketProducts = new ObservableCollection<Product>(Products.Where(p => p.Reserved > 0));
 
-
+ 
 
             this.DataContext = this;
 
@@ -67,7 +82,7 @@ namespace BusinessSystem
             _selectedProduct = ((Models.Product)ListViewProducts.SelectedItem);
 
             ButtonProductFromBasket.IsEnabled = false;
-
+            
             ValidateProductToBasket();
         }
 
@@ -98,7 +113,7 @@ namespace BusinessSystem
         {
             ButtonProductFromBasket.IsEnabled = _selectedBasketProduct != null;
 
-            if (_selectedBasketProduct == null || _selectedBasketProduct.Stock <= 0 || _selectedBasketProduct.Reserved == 0)
+            if (_selectedBasketProduct == null || _selectedBasketProduct.Stock <= 0 || _selectedBasketProduct.Reserved == 0 )
             {
                 ButtonProductFromBasket.IsEnabled = false;
             }
@@ -137,18 +152,18 @@ namespace BusinessSystem
             _selectedBasketProduct.Reserved -= 1;
             ValidateProductFromBasket();
             ValidateProductToBasket();
-            // RefreshViews();
-            //remove _selectedProduct from BasketProducts if exist
-            if (BasketProducts.Contains(_selectedBasketProduct) && _selectedBasketProduct.Reserved == 0)
-            {
-                BasketProducts.Remove(_selectedBasketProduct);
-            }
-            //else
-            //{
-            //    _selectedBasketProduct.Reserved -= 1;
-            //     BasketProducts.Remove(_selectedBasketProduct);
-            //     BasketProducts.Add(_selectedBasketProduct);
-            // }
+           // RefreshViews();
+           //remove _selectedProduct from BasketProducts if exist
+           if (BasketProducts.Contains(_selectedBasketProduct) && _selectedBasketProduct.Reserved == 0)
+           {
+               BasketProducts.Remove(_selectedBasketProduct);
+           }
+           //else
+           //{
+           //    _selectedBasketProduct.Reserved -= 1;
+           //     BasketProducts.Remove(_selectedBasketProduct);
+           //     BasketProducts.Add(_selectedBasketProduct);
+           // }
         }
 
         private void ButtonProductNew_OnClick(object sender, RoutedEventArgs e)
@@ -264,7 +279,7 @@ namespace BusinessSystem
                     TextBoxProductPlatform.Text = game.Platform;
                     break;
             }
-
+         
         }
 
 
@@ -326,7 +341,7 @@ namespace BusinessSystem
         /// </summary>
         private void EnableTextBoxesByProductAndMode(Product product, ProductMode mode)
         {
-
+            
             // enable selction and id for new product, existing product is not editable
             if (mode == ProductMode.New)
             {
@@ -338,7 +353,7 @@ namespace BusinessSystem
                 ComboBoxProductType.IsEnabled = false;
                 TextBoxProductId.IsEnabled = false;
             }
-
+            
             // enable all textboxes for new product
             TextBoxProductName.IsEnabled = true;
             TextBoxProductPrice.IsEnabled = true;
@@ -375,7 +390,7 @@ namespace BusinessSystem
                     break;
             }
 
-
+    
         }
 
         private void ButtonProductCancel_OnClick(object sender, RoutedEventArgs e)
@@ -392,5 +407,59 @@ namespace BusinessSystem
             throw new NotImplementedException();
         }
 
+        //private void TextBoxSearch_OnKeyUp(object sender, KeyRoutedEventArgs e)
+        //{
+
+        //    var searchText  = TextBoxSearch.Text.ToLower();
+
+        //    if (string.IsNullOrEmpty(searchText))
+        //    {
+        //        FilteredProducts.Clear();
+        //        foreach (var product in Products)
+        //        {
+        //            FilteredProducts.Add(product);
+        //        }
+        //    }
+        //    else
+        //    {
+        //        var filteredProducts = Products.Where(p => p.Name.ToLower().Contains(searchText));
+
+        //        FilteredProducts.Clear();
+
+        //        foreach (var product in filteredProducts)
+        //        {
+        //            FilteredProducts.Add(product);
+        //        }
+                
+        //    }
+
+
+        //}
+
+        private void TextBoxSearch_OnTextChanged(object sender, TextChangedEventArgs e)
+        {
+            var searchText = TextBoxSearch.Text.ToLower();
+
+            if (string.IsNullOrEmpty(searchText))
+            {
+                FilteredProducts.Clear();
+                foreach (var product in Products)
+                {
+                    FilteredProducts.Add(product);
+                }
+            }
+            else
+            {
+                var filteredProducts = Products.Where(p => p.Name.ToLower().Contains(searchText));
+
+                FilteredProducts.Clear();
+
+                foreach (var product in filteredProducts)
+                {
+                    FilteredProducts.Add(product);
+                }
+
+            }
+        }
     }
 }
