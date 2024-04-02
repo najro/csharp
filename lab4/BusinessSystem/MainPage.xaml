@@ -37,7 +37,7 @@
 
                     <StackPanel Orientation="Vertical">
                         <TextBlock Text="Kundkorg" FontSize="16" Margin="30 20 0 10"/>
-                        <ListView ItemsSource="{x:Bind ViewModel.FilteredProducts1}"  x:Name="ListViewBasket"  HorizontalAlignment="Left"  VerticalContentAlignment="Stretch" Margin="10,10,0,0" VerticalAlignment="Top" Width="500" SelectionChanged="ListViewBasket_OnSelectionChanged">
+                        <ListView ItemsSource="{x:Bind BasketProducts}"  x:Name="ListViewBasket"  HorizontalAlignment="Left"  VerticalContentAlignment="Stretch" Margin="10,10,0,0" VerticalAlignment="Top" Width="500" SelectionChanged="ListViewBasket_OnSelectionChanged">
                             <ListView.ItemTemplate >
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">

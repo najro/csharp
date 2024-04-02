@@ -1,45 +1,17 @@
-﻿using System;
-using BusinessSystem.Models;
+﻿using BusinessSystem.Models;
+using BusinessSystem.Models.Enums;
+using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
-using Windows.Storage.Streams;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Data;
-using BusinessSystem.Models.Enums;
-using System.Collections.Generic;
-using System.ComponentModel;
-using Windows.UI.Core;
 
-// The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
 namespace BusinessSystem
 {
 
 
-    public class MainPageViewModel : INotifyPropertyChanged
-    {
-        private ObservableCollection<Product> _filteredProducts1;
-
-        public ObservableCollection<Product> FilteredProducts1
-        {
-            get { return _filteredProducts1; }
-            set
-            {
-                if (_filteredProducts1 != value)
-                {
-                    _filteredProducts1 = value;
-                    OnPropertyChanged(nameof(FilteredProducts1));
-                }
-            }
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-    }
 
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
@@ -50,56 +22,20 @@ namespace BusinessSystem
         Models.Product _selectedBasketProduct;
         Models.Product _selectedStorageProduct;
 
-        public MainPageViewModel ViewModel { get; set; }
+        //public MainPageViewModel ViewModel { get; set; }
 
 
         private ObservableCollection<Models.Product> _products;
-        
-        ///private ObservableCollection<Product> _filteredProducts1;
+
+
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public ObservableCollection<Models.Product> Products
-        {
-            get
-            {
-                return _products;
-            }
-            set
-            {
-                if (_products != value)
-                {
-                    _products = value;
-                    OnPropertyChanged(nameof(Products));
-                    //UpdateFilteredCollections();
-                }
-            }
-        }
+        public ObservableCollection<Models.Product> Products { get; set; }
 
-        //public ObservableCollection<Product> FilteredProducts1
-        //{
-        //    get { return _filteredProducts1; }
-        //    private set
-        //    {
-        //        _filteredProducts1 = value;
-        //        OnPropertyChanged(nameof(FilteredProducts1));
-        //    }
-        //}
-
-        private void OnPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        private void UpdateBasketFilter()
-        {
+        public ObservableCollection<Models.Product> BasketProducts { get; set; }
 
 
-            ViewModel.FilteredProducts1 = new ObservableCollection<Product>(Products.Where(p => p.Reserved > 0));
-            ListViewBasket.ItemsSource = null;
-            ListViewBasket.ItemsSource = ViewModel.FilteredProducts1;
-            
-        }
 
 
 
@@ -109,46 +45,29 @@ namespace BusinessSystem
 
             Products = new repository.CsvRepository().ReadProductsFromFile();
 
-            //FilteredProducts1 = new ObservableCollection<Product>(Products.Where(p => p.Reserved > 0));
-
-            ViewModel = new MainPageViewModel();
-            ViewModel.FilteredProducts1 = new ObservableCollection<Product>(Products.Where(p => p.Reserved > 0));
+            BasketProducts = new ObservableCollection<Product>(Products.Where(p => p.Reserved > 0));
 
 
-            //Set up event handlers for collection changes
-            Products.CollectionChanged += Products_CollectionChanged;
 
             this.DataContext = this;
 
         }
 
-        private void UpdateFilteredCollections()
-        {
-            ViewModel.FilteredProducts1 = new ObservableCollection<Product>(Products.Where(p => p.Reserved > 0));
-        }
 
 
-        private async void Products_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-            {
-                UpdateFilteredCollections();
-            });
-        }
-
-        private void RefreshViews()
-        {
-            ValidateProductFromBasket();
-            ValidateProductToBasket();
-            UpdateBasketFilter();
-        }
+        //private void RefreshViews()
+        //{
+        //    ValidateProductFromBasket();
+        //    ValidateProductToBasket();
+        //    UpdateBasketFilter();
+        //}
 
         private void ListViewProducts_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             _selectedProduct = ((Models.Product)ListViewProducts.SelectedItem);
 
             ButtonProductFromBasket.IsEnabled = false;
-            
+
             ValidateProductToBasket();
         }
 
@@ -179,7 +98,7 @@ namespace BusinessSystem
         {
             ButtonProductFromBasket.IsEnabled = _selectedBasketProduct != null;
 
-            if (_selectedBasketProduct == null || _selectedBasketProduct.Stock <= 0 || _selectedBasketProduct.Reserved == 0 )
+            if (_selectedBasketProduct == null || _selectedBasketProduct.Stock <= 0 || _selectedBasketProduct.Reserved == 0)
             {
                 ButtonProductFromBasket.IsEnabled = false;
             }
@@ -194,17 +113,42 @@ namespace BusinessSystem
             _selectedProduct.Reserved += 1;
             ValidateProductFromBasket();
             ValidateProductToBasket();
-            RefreshViews();
+            //RefreshViews();
 
-            //Products.Remove(_selectedProduct);
+
+            //add _selectedProduct to BasketProducts if not exist
+            if (!BasketProducts.Contains(_selectedProduct))
+            {
+                BasketProducts.Add(_selectedProduct);
+            }
+            //else
+            //{
+            //    _selectedProduct.Reserved += 1;
+            //    //BasketProducts.Remove(_selectedProduct);
+            //    //BasketProducts.Add(_selectedProduct);
+            //}
         }
+
+
+
 
         private void ButtonProductFromBasket_OnClick(object sender, RoutedEventArgs e)
         {
-            _selectedProduct.Reserved -= 1;
+            _selectedBasketProduct.Reserved -= 1;
             ValidateProductFromBasket();
             ValidateProductToBasket();
-            RefreshViews();
+            // RefreshViews();
+            //remove _selectedProduct from BasketProducts if exist
+            if (BasketProducts.Contains(_selectedBasketProduct) && _selectedBasketProduct.Reserved == 0)
+            {
+                BasketProducts.Remove(_selectedBasketProduct);
+            }
+            //else
+            //{
+            //    _selectedBasketProduct.Reserved -= 1;
+            //     BasketProducts.Remove(_selectedBasketProduct);
+            //     BasketProducts.Add(_selectedBasketProduct);
+            // }
         }
 
         private void ButtonProductNew_OnClick(object sender, RoutedEventArgs e)
@@ -320,7 +264,7 @@ namespace BusinessSystem
                     TextBoxProductPlatform.Text = game.Platform;
                     break;
             }
-         
+
         }
 
 
@@ -382,7 +326,7 @@ namespace BusinessSystem
         /// </summary>
         private void EnableTextBoxesByProductAndMode(Product product, ProductMode mode)
         {
-            
+
             // enable selction and id for new product, existing product is not editable
             if (mode == ProductMode.New)
             {
@@ -394,7 +338,7 @@ namespace BusinessSystem
                 ComboBoxProductType.IsEnabled = false;
                 TextBoxProductId.IsEnabled = false;
             }
-            
+
             // enable all textboxes for new product
             TextBoxProductName.IsEnabled = true;
             TextBoxProductPrice.IsEnabled = true;
@@ -431,7 +375,7 @@ namespace BusinessSystem
                     break;
             }
 
-    
+
         }
 
         private void ButtonProductCancel_OnClick(object sender, RoutedEventArgs e)
@@ -447,6 +391,6 @@ namespace BusinessSystem
         {
             throw new NotImplementedException();
         }
-        
+
     }
 }
