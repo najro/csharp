@@ -29,9 +29,7 @@ namespace BusinessSystem
         Models.Product _selectedBasketProduct;
         Models.Product _selectedStorageProduct;
 
-        //public MainPageViewModel ViewModel { get; set; }
-
-
+        
         private ObservableCollection<Models.Product> _products;
 
 
@@ -45,8 +43,10 @@ namespace BusinessSystem
 
         public ObservableCollection<Models.Product> BasketProducts { get; set; }
 
-
-
+        public void SetBasketTotal()
+        {
+            TextBlockBasketTotal.Text =  $"Antalt produkter {BasketProducts.Sum(p => p.Reserved)}, totalt pris: {BasketProducts.Sum(p => p.Price * p.Reserved)}  kr";
+        }
 
 
         public MainPage()
@@ -64,7 +64,7 @@ namespace BusinessSystem
 
             BasketProducts = new ObservableCollection<Product>(Products.Where(p => p.Reserved > 0));
 
-
+            SetBasketTotal();
 
             this.DataContext = this;
 
@@ -132,20 +132,13 @@ namespace BusinessSystem
             _selectedProduct.Reserved += 1;
             ValidateProductFromBasket();
             ValidateProductToBasket();
-            //RefreshViews();
-
-
-            //add _selectedProduct to BasketProducts if not exist
+            
             if (!BasketProducts.Contains(_selectedProduct))
             {
                 BasketProducts.Add(_selectedProduct);
             }
-            //else
-            //{
-            //    _selectedProduct.Reserved += 1;
-            //    //BasketProducts.Remove(_selectedProduct);
-            //    //BasketProducts.Add(_selectedProduct);
-            //}
+
+            SetBasketTotal();
         }
 
 
@@ -156,18 +149,13 @@ namespace BusinessSystem
             _selectedBasketProduct.Reserved -= 1;
             ValidateProductFromBasket();
             ValidateProductToBasket();
-            // RefreshViews();
-            //remove _selectedProduct from BasketProducts if exist
+          
             if (BasketProducts.Contains(_selectedBasketProduct) && _selectedBasketProduct.Reserved == 0)
             {
                 BasketProducts.Remove(_selectedBasketProduct);
             }
-            //else
-            //{
-            //    _selectedBasketProduct.Reserved -= 1;
-            //     BasketProducts.Remove(_selectedBasketProduct);
-            //     BasketProducts.Add(_selectedBasketProduct);
-            // }
+
+            SetBasketTotal();
         }
 
         private void ButtonProductNew_OnClick(object sender, RoutedEventArgs e)
@@ -197,7 +185,7 @@ namespace BusinessSystem
                         break;
                     case Movie movie:
                         movie.Format = TextBoxProductFormat.Text;
-                        movie.PlayTime = TextBoxProductPlayTime.Text;
+                        movie.PlayTime = int.Parse(TextBoxProductPlayTime.Text);
                         break;
                     case Game game:
                         game.Platform = TextBoxProductPlatform.Text;
@@ -223,7 +211,7 @@ namespace BusinessSystem
                         break;
                     case Movie movie:
                         movie.Format = TextBoxProductFormat.Text;
-                        movie.PlayTime = TextBoxProductPlayTime.Text;
+                        movie.PlayTime = int.Parse(TextBoxProductPlayTime.Text);
                         break;
                     case Game game:
                         game.Platform = TextBoxProductPlatform.Text;
@@ -280,7 +268,7 @@ namespace BusinessSystem
 
                     ComboBoxProductType.IsEditable = false;
                     TextBoxProductFormat.Text = movie.Format;
-                    TextBoxProductPlayTime.Text = movie.PlayTime;
+                    TextBoxProductPlayTime.Text = movie.PlayTime.ToString();
                     break;
                 case Game game:
                     //ComboBoxProductType.SelectedIndex = 3;
@@ -433,6 +421,7 @@ namespace BusinessSystem
                     dialog.PrimaryButtonClick += async (s, args) =>
                     {
                         RemoveSelectedProductFromAllLists(_selectedStorageProduct);
+                        SetBasketTotal();
                     };
 
                     dialog.SecondaryButtonClick += (s, args) =>
@@ -481,7 +470,7 @@ namespace BusinessSystem
             }
             else
             {
-                var filteredProducts = Products.Where(p => p.Name.ToLower().Contains(searchText));
+                var filteredProducts = Products.Where(p => p.SearchString().Contains(searchText));
 
                 FilteredProducts.Clear();
 
@@ -516,6 +505,11 @@ namespace BusinessSystem
         private void CheckValidProductInput()
         {
             ButtonProductSave.IsEnabled = true;
+        }
+
+        private void ButtonBasketBuy_OnClick(object sender, RoutedEventArgs e)
+        {
+            throw new NotImplementedException();
         }
     }
 }

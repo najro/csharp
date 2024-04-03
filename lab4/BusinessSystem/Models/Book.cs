@@ -17,5 +17,10 @@ namespace BusinessSystem.Models
         {
             return $"Type: {Type}, {Name}, Pris: {Price}, Antal på lager : {Stock}, Reserverade : {Reserved}";
         }
+
+        public override string SearchString()
+        {
+            return $"${base.SearchString()} forfattare:{Author.ToLower()} schanger:{Genre.ToLower()} format:{Format.ToLower()} språk:{Language.ToLower()}";
+        }
     }
 }

@@ -101,6 +101,11 @@ namespace BusinessSystem.Models
             }
         }
 
+        public virtual string SearchString()
+        {
+            return $"id:{Id} type:{Type.ToLower()} namn:{Name.ToLower()} pris:{Price} antal:{Stock}";
+        }
+
         public override string ToString()
         {
             return $"{Id}, {Name}, Pris: {Price}, Antal på lager : {Stock}, Reserverade : {Reserved}";

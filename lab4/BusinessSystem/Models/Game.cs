@@ -1,6 +1,7 @@
 ﻿using System;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Media;
+using Windows.Globalization;
 
 namespace BusinessSystem.Models
 {
@@ -14,6 +15,11 @@ namespace BusinessSystem.Models
         public override string ToString()
         {
             return $"Type: {Type}, {Name}, Pris: {Price}, Antal på lager : {Stock}, Reserverade : {Reserved}";
+        }
+
+        public override string SearchString()
+        {
+            return $"${base.SearchString()} platform:{Platform.ToLower()}";
         }
 
     }

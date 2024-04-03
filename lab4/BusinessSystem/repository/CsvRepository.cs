@@ -59,7 +59,7 @@ namespace BusinessSystem.repository
                             Name = columns[2],
                             Price = decimal.Parse(columns[3]),
                             Format = columns[7],
-                            PlayTime = columns[9]
+                            PlayTime = string.IsNullOrWhiteSpace(columns[9]) ? 0 : int.Parse(columns[9])
                         };
 
                         products.Add(product);
