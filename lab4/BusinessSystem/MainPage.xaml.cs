@@ -11,12 +11,14 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using Windows.UI.Core;
 using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Media;
+using Windows.ApplicationModel.Core;
 
 
 namespace BusinessSystem
 {
 
-    
+
 
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
@@ -31,7 +33,7 @@ namespace BusinessSystem
 
 
         private ObservableCollection<Models.Product> _products;
-        
+
 
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -42,9 +44,9 @@ namespace BusinessSystem
 
 
         public ObservableCollection<Models.Product> BasketProducts { get; set; }
-        
 
-        
+
+
 
 
         public MainPage()
@@ -62,7 +64,7 @@ namespace BusinessSystem
 
             BasketProducts = new ObservableCollection<Product>(Products.Where(p => p.Reserved > 0));
 
- 
+
 
             this.DataContext = this;
 
@@ -79,16 +81,16 @@ namespace BusinessSystem
 
         private void ListViewProducts_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            _selectedProduct = ((Models.Product)ListViewProducts.SelectedItem);
+            _selectedProduct = ((Models.Product) ListViewProducts.SelectedItem);
 
             ButtonProductFromBasket.IsEnabled = false;
-            
+
             ValidateProductToBasket();
         }
 
         private void ListViewBasket_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            _selectedBasketProduct = ((Models.Product)ListViewBasket.SelectedItem);
+            _selectedBasketProduct = ((Models.Product) ListViewBasket.SelectedItem);
 
             ValidateProductFromBasket();
             ValidateProductToBasket();
@@ -99,7 +101,8 @@ namespace BusinessSystem
         {
             ButtonProductToBasket.IsEnabled = _selectedProduct != null;
 
-            if (_selectedProduct == null || _selectedProduct.Stock <= 0 || _selectedProduct.Reserved >= _selectedProduct.Stock)
+            if (_selectedProduct == null || _selectedProduct.Stock <= 0 ||
+                _selectedProduct.Reserved >= _selectedProduct.Stock)
             {
                 ButtonProductToBasket.IsEnabled = false;
             }
@@ -113,7 +116,8 @@ namespace BusinessSystem
         {
             ButtonProductFromBasket.IsEnabled = _selectedBasketProduct != null;
 
-            if (_selectedBasketProduct == null || _selectedBasketProduct.Stock <= 0 || _selectedBasketProduct.Reserved == 0 )
+            if (_selectedBasketProduct == null || _selectedBasketProduct.Stock <= 0 ||
+                _selectedBasketProduct.Reserved == 0)
             {
                 ButtonProductFromBasket.IsEnabled = false;
             }
@@ -152,18 +156,18 @@ namespace BusinessSystem
             _selectedBasketProduct.Reserved -= 1;
             ValidateProductFromBasket();
             ValidateProductToBasket();
-           // RefreshViews();
-           //remove _selectedProduct from BasketProducts if exist
-           if (BasketProducts.Contains(_selectedBasketProduct) && _selectedBasketProduct.Reserved == 0)
-           {
-               BasketProducts.Remove(_selectedBasketProduct);
-           }
-           //else
-           //{
-           //    _selectedBasketProduct.Reserved -= 1;
-           //     BasketProducts.Remove(_selectedBasketProduct);
-           //     BasketProducts.Add(_selectedBasketProduct);
-           // }
+            // RefreshViews();
+            //remove _selectedProduct from BasketProducts if exist
+            if (BasketProducts.Contains(_selectedBasketProduct) && _selectedBasketProduct.Reserved == 0)
+            {
+                BasketProducts.Remove(_selectedBasketProduct);
+            }
+            //else
+            //{
+            //    _selectedBasketProduct.Reserved -= 1;
+            //     BasketProducts.Remove(_selectedBasketProduct);
+            //     BasketProducts.Add(_selectedBasketProduct);
+            // }
         }
 
         private void ButtonProductNew_OnClick(object sender, RoutedEventArgs e)
@@ -202,7 +206,9 @@ namespace BusinessSystem
             }
             else
             {
-                var newProduct = GetProductTypeBySelectionName(((ComboBoxItem)ComboBoxProductType.SelectedValue)?.Content.ToString());
+                var newProduct =
+                    GetProductTypeBySelectionName(
+                        ((ComboBoxItem) ComboBoxProductType.SelectedValue)?.Content.ToString());
                 newProduct.Name = TextBoxProductName.Text;
                 newProduct.Price = Convert.ToDecimal(TextBoxProductPrice.Text);
                 newProduct.Stock = Convert.ToInt32(TextBoxProductStock.Text);
@@ -238,7 +244,7 @@ namespace BusinessSystem
 
         private void ListViewStorage_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            _selectedStorageProduct = ((Product)ListViewStorage.SelectedItem);
+            _selectedStorageProduct = ((Product) ListViewStorage.SelectedItem);
 
             ButtonProductNew.Visibility = Visibility.Collapsed;
             StackPanelProductEdit.Visibility = Visibility.Visible;
@@ -249,6 +255,9 @@ namespace BusinessSystem
 
         private void PopulateTextBoxesInputFormByProduct(Product product)
         {
+            if(product == null)
+                return;
+
             SetAllProductTextBoxesToEmpty();
 
             TextBoxProductId.Text = product.Id.ToString();
@@ -279,7 +288,7 @@ namespace BusinessSystem
                     TextBoxProductPlatform.Text = game.Platform;
                     break;
             }
-         
+
         }
 
 
@@ -290,8 +299,8 @@ namespace BusinessSystem
         /// </summary>
         private void ComboBoxProductType_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var comboBox = (ComboBox)sender;
-            var selectedValue = (ComboBoxItem)comboBox.SelectedValue;
+            var comboBox = (ComboBox) sender;
+            var selectedValue = (ComboBoxItem) comboBox.SelectedValue;
 
             var seletedProductType = GetProductTypeBySelectionName(selectedValue?.Content.ToString());
 
@@ -341,7 +350,7 @@ namespace BusinessSystem
         /// </summary>
         private void EnableTextBoxesByProductAndMode(Product product, ProductMode mode)
         {
-            
+
             // enable selction and id for new product, existing product is not editable
             if (mode == ProductMode.New)
             {
@@ -353,7 +362,7 @@ namespace BusinessSystem
                 ComboBoxProductType.IsEnabled = false;
                 TextBoxProductId.IsEnabled = false;
             }
-            
+
             // enable all textboxes for new product
             TextBoxProductName.IsEnabled = true;
             TextBoxProductPrice.IsEnabled = true;
@@ -390,7 +399,7 @@ namespace BusinessSystem
                     break;
             }
 
-    
+
         }
 
         private void ButtonProductCancel_OnClick(object sender, RoutedEventArgs e)
@@ -402,39 +411,61 @@ namespace BusinessSystem
 
         }
 
-        private void ButtonProductDelete_OnClick(object sender, RoutedEventArgs e)
+        private async void ButtonProductDelete_OnClick(object sender, RoutedEventArgs e)
         {
-            throw new NotImplementedException();
+            if (_selectedStorageProduct != null)
+            {
+                if (_selectedStorageProduct.Stock == 0)
+                {
+                    RemoveSelectedProductFromAllLists(_selectedStorageProduct);
+                }
+                else
+                {
+                    var dialog = new ContentDialog
+                    {
+                        Title = "Ta bort produkt",
+                        Content = "Det finns flera produkter på lager, är du säker på att du vill ta bort den?",
+                        PrimaryButtonText = "Ja",
+                        SecondaryButtonText = "Nej",
+                        CloseButtonText = "Avbryt"
+                    };
+
+                    dialog.PrimaryButtonClick += async (s, args) =>
+                    {
+                        RemoveSelectedProductFromAllLists(_selectedStorageProduct);
+                    };
+
+                    dialog.SecondaryButtonClick += (s, args) =>
+                    {
+                      // do nothing
+                    };
+
+                    await dialog.ShowAsync();
+
+                }
+               
+            }
         }
 
-        //private void TextBoxSearch_OnKeyUp(object sender, KeyRoutedEventArgs e)
-        //{
+        private void RemoveSelectedProductFromAllLists(Product product)
+        {
+            if (BasketProducts.Contains(product))
+            {
+                BasketProducts.Remove(product);
+            }
 
-        //    var searchText  = TextBoxSearch.Text.ToLower();
+            if (Products.Contains(product))
+            {
+                Products.Remove(product);
+            }
 
-        //    if (string.IsNullOrEmpty(searchText))
-        //    {
-        //        FilteredProducts.Clear();
-        //        foreach (var product in Products)
-        //        {
-        //            FilteredProducts.Add(product);
-        //        }
-        //    }
-        //    else
-        //    {
-        //        var filteredProducts = Products.Where(p => p.Name.ToLower().Contains(searchText));
+            if (FilteredProducts.Contains(product))
+            {
+                FilteredProducts.Remove(product);
+            }
+        }
 
-        //        FilteredProducts.Clear();
-
-        //        foreach (var product in filteredProducts)
-        //        {
-        //            FilteredProducts.Add(product);
-        //        }
-                
-        //    }
-
-
-        //}
+     
 
         private void TextBoxSearch_OnTextChanged(object sender, TextChangedEventArgs e)
         {
@@ -460,6 +491,31 @@ namespace BusinessSystem
                 }
 
             }
+        }
+
+        private void TextBoxProductId_OnKeyUp(object sender, KeyRoutedEventArgs e)
+        {
+            var textBox = sender as TextBox;
+            var textInput = textBox?.Text;
+
+
+            // verify that input is valid
+            if (!int.TryParse(textInput, out int inputValue) || (inputValue < 0 || inputValue >= int.MaxValue))
+            {
+                textBox.BorderBrush = new SolidColorBrush(Windows.UI.Colors.Red);
+            }
+            else
+            {
+                // valid value
+                textBox.BorderBrush = new SolidColorBrush(Windows.UI.Colors.Green);
+            }
+
+            CheckValidProductInput();
+        }
+
+        private void CheckValidProductInput()
+        {
+            ButtonProductSave.IsEnabled = true;
         }
     }
 }
