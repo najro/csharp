@@ -13,6 +13,7 @@ using Windows.UI.Core;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.ApplicationModel.Core;
+using BusinessSystem.Extensions;
 
 
 namespace BusinessSystem
@@ -482,34 +483,80 @@ namespace BusinessSystem
             }
         }
 
+
+        private void ButtonBasketBuy_OnClick(object sender, RoutedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void CheckValidProductInput()
+        {
+            ButtonProductSave.IsEnabled = false;
+
+
+            if (TextBoxProductId.IsValidProductId(TextBoxProductId.Text, Products.ToList()) &&
+                TextBoxProductName.IsValidProductName(TextBoxProductName.Name) &&
+                TextBoxProductPrice.IsValidProductPrice(TextBoxProductPrice.Text) &&
+                TextBoxProductStock.IsValidProductStock(TextBoxProductStock.Text) &&
+                TextBoxProductPlayTime.IsValidProductPlaytime(TextBoxProductPlayTime.Text))
+            {
+                ButtonProductSave.IsEnabled = true;
+            }
+        }
+
         private void TextBoxProductId_OnKeyUp(object sender, KeyRoutedEventArgs e)
         {
             var textBox = sender as TextBox;
             var textInput = textBox?.Text;
 
-
-            // verify that input is valid
-            if (!int.TryParse(textInput, out int inputValue) || (inputValue < 0 || inputValue >= int.MaxValue))
-            {
-                textBox.BorderBrush = new SolidColorBrush(Windows.UI.Colors.Red);
-            }
-            else
-            {
-                // valid value
-                textBox.BorderBrush = new SolidColorBrush(Windows.UI.Colors.Green);
-            }
+            textBox.DisplayValidationColor(textBox.IsValidProductId(textInput, Products.ToList()));
 
             CheckValidProductInput();
         }
 
-        private void CheckValidProductInput()
+    
+        
+       
+
+        private void TextBoxProductName_OnKeyUp(object sender, KeyRoutedEventArgs e)
         {
-            ButtonProductSave.IsEnabled = true;
+            var textBox = sender as TextBox;
+            var textInput = textBox?.Text;
+
+            textBox.DisplayValidationColor(textBox.IsValidProductName(textInput));
+
+            CheckValidProductInput();
         }
 
-        private void ButtonBasketBuy_OnClick(object sender, RoutedEventArgs e)
+        private void TextBoxProductPrice_OnKeyUp(object sender, KeyRoutedEventArgs e)
         {
-            throw new NotImplementedException();
+            var textBox = sender as TextBox;
+            var textInput = textBox?.Text;
+
+            textBox.DisplayValidationColor(textBox.IsValidProductPrice(textInput));
+
+            CheckValidProductInput();
+        }
+
+        private void TextBoxProductStock_OnKeyUp(object sender, KeyRoutedEventArgs e)
+        {
+            var textBox = sender as TextBox;
+            var textInput = textBox?.Text;
+
+            textBox.DisplayValidationColor(textBox.IsValidProductStock(textInput));
+
+            CheckValidProductInput();
+        }
+
+        private void TextBoxProductPlayTime_OnKeyUp(object sender, KeyRoutedEventArgs e)
+        {
+            var textBox = sender as TextBox;
+            var textInput = textBox?.Text;
+
+            textBox.DisplayValidationColor(textBox.IsValidProductPlaytime(textInput));
+
+            CheckValidProductInput();
+            
         }
     }
 }

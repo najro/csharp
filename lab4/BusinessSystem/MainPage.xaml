@@ -100,17 +100,17 @@
 
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Width="100" Text="Namn" Margin="5"/>
-                                <TextBox x:Name="TextBoxProductName" PlaceholderText="Namn" Width="200" Margin="5"/>
+                                <TextBox x:Name="TextBoxProductName" PlaceholderText="Namn" Width="200" Margin="5" KeyUp="TextBoxProductName_OnKeyUp"/>
                             </StackPanel>
 
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Width="100" Text="Pris" Margin="5"/>
-                                <TextBox x:Name="TextBoxProductPrice" PlaceholderText="Pris" Width="200" Margin="5"/>
+                                <TextBox x:Name="TextBoxProductPrice" PlaceholderText="Pris" Width="200" Margin="5" KeyUp="TextBoxProductPrice_OnKeyUp"/>
                             </StackPanel>
 
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Width="100" Text="Antal" Margin="5"/>
-                                <TextBox x:Name="TextBoxProductStock" PlaceholderText="Antal" Width="200" Margin="5"/>
+                                <TextBox x:Name="TextBoxProductStock" PlaceholderText="Antal" Width="200" Margin="5" KeyUp="TextBoxProductStock_OnKeyUp"/>
                             </StackPanel>
 
                            <StackPanel Orientation="Horizontal">
@@ -140,7 +140,7 @@
 
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Width="100" Text="Speltid" Margin="5"/>
-                                <TextBox x:Name="TextBoxProductPlayTime" PlaceholderText="Speltid" Width="200" Margin="5"/>
+                                <TextBox x:Name="TextBoxProductPlayTime" PlaceholderText="Speltid" Width="200" Margin="5" KeyUp="TextBoxProductPlayTime_OnKeyUp"/>
                             </StackPanel>
 
                             <StackPanel Orientation="Horizontal">
