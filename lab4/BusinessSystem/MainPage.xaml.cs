@@ -1,36 +1,25 @@
-﻿using System;
+﻿using BusinessSystem.Extensions;
 using BusinessSystem.Models;
+using BusinessSystem.Models.Enums;
+using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
-using Windows.Storage.Streams;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Data;
-using BusinessSystem.Models.Enums;
-using System.Collections.Generic;
-using System.ComponentModel;
-using Windows.UI.Core;
 using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.ApplicationModel.Core;
-using BusinessSystem.Extensions;
 
 
 namespace BusinessSystem
 {
 
-
-
-    /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
     public sealed partial class MainPage : Page, INotifyPropertyChanged
     {
-        Models.Product _selectedProduct;
-        Models.Product _selectedBasketProduct;
-        Models.Product _selectedStorageProduct;
+        Product _selectedProduct;
+        Product _selectedBasketProduct;
+        Product _selectedStorageProduct;
 
-        
+
         private ObservableCollection<Models.Product> _products;
 
 
@@ -44,9 +33,11 @@ namespace BusinessSystem
 
         public ObservableCollection<Models.Product> BasketProducts { get; set; }
 
-        public void SetBasketTotal()
+        public void ToggleBasketStatus()
         {
-            TextBlockBasketTotal.Text =  $"Antalt produkter {BasketProducts.Sum(p => p.Reserved)}, totalt pris: {BasketProducts.Sum(p => p.Price * p.Reserved)}  kr";
+            TextBlockBasketTotal.Text = $"Antal varor: {BasketProducts.Sum(p => p.Reserved)}\nTotalt pris: {BasketProducts.Sum(p => p.Price * p.Reserved)}  kr";
+            ButtonBasketClear.IsEnabled = BasketProducts.Count > 0;
+            ButtonBasketBuy.IsEnabled = BasketProducts.Count > 0;
         }
 
 
@@ -65,7 +56,7 @@ namespace BusinessSystem
 
             BasketProducts = new ObservableCollection<Product>(Products.Where(p => p.Reserved > 0));
 
-            SetBasketTotal();
+            ToggleBasketStatus();
 
             this.DataContext = this;
 
@@ -82,7 +73,7 @@ namespace BusinessSystem
 
         private void ListViewProducts_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            _selectedProduct = ((Models.Product) ListViewProducts.SelectedItem);
+            _selectedProduct = ((Models.Product)ListViewProducts.SelectedItem);
 
             ButtonProductFromBasket.IsEnabled = false;
 
@@ -91,7 +82,7 @@ namespace BusinessSystem
 
         private void ListViewBasket_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            _selectedBasketProduct = ((Models.Product) ListViewBasket.SelectedItem);
+            _selectedBasketProduct = ((Models.Product)ListViewBasket.SelectedItem);
 
             ValidateProductFromBasket();
             ValidateProductToBasket();
@@ -133,13 +124,13 @@ namespace BusinessSystem
             _selectedProduct.Reserved += 1;
             ValidateProductFromBasket();
             ValidateProductToBasket();
-            
+
             if (!BasketProducts.Contains(_selectedProduct))
             {
                 BasketProducts.Add(_selectedProduct);
             }
 
-            SetBasketTotal();
+            ToggleBasketStatus();
         }
 
 
@@ -150,19 +141,21 @@ namespace BusinessSystem
             _selectedBasketProduct.Reserved -= 1;
             ValidateProductFromBasket();
             ValidateProductToBasket();
-          
+
             if (BasketProducts.Contains(_selectedBasketProduct) && _selectedBasketProduct.Reserved == 0)
             {
                 BasketProducts.Remove(_selectedBasketProduct);
             }
 
-            SetBasketTotal();
+            ToggleBasketStatus();
         }
 
         private void ButtonProductNew_OnClick(object sender, RoutedEventArgs e)
         {
             ButtonProductNew.Visibility = Visibility.Collapsed;
             StackPanelProductEdit.Visibility = Visibility.Visible;
+            ButtonProductDelete.Visibility = Visibility.Collapsed;
+
             SetAllProductTextBoxesToEmpty();
             EnableTextBoxesByProductAndMode(new Product(), ProductMode.New);
         }
@@ -193,11 +186,11 @@ namespace BusinessSystem
                         break;
                 }
 
-                SetBasketTotal();
+                ToggleBasketStatus();
             }
             else
             {
-                var newProduct = GetProductTypeBySelectionName(((ComboBoxItem) ComboBoxProductType.SelectedValue)?.Content.ToString());
+                var newProduct = GetProductTypeBySelectionName(((ComboBoxItem)ComboBoxProductType.SelectedValue)?.Content.ToString());
                 newProduct.Id = Convert.ToInt32(TextBoxProductId.Text);
                 newProduct.Name = TextBoxProductName.Text;
                 newProduct.Price = Convert.ToDecimal(TextBoxProductPrice.Text);
@@ -224,7 +217,7 @@ namespace BusinessSystem
                 FilteredProducts.Add(newProduct);
             }
 
-           
+
 
 
             ButtonProductNew.Visibility = Visibility.Visible;
@@ -245,7 +238,7 @@ namespace BusinessSystem
 
         private void ListViewStorage_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            _selectedStorageProduct = ((Product) ListViewStorage.SelectedItem);
+            _selectedStorageProduct = ((Product)ListViewStorage.SelectedItem);
 
             // do nothing if no product is selected
             if (_selectedStorageProduct == null)
@@ -253,6 +246,7 @@ namespace BusinessSystem
 
             ButtonProductNew.Visibility = Visibility.Collapsed;
             StackPanelProductEdit.Visibility = Visibility.Visible;
+            ButtonProductDelete.Visibility = Visibility.Visible;
 
             EnableTextBoxesByProductAndMode(_selectedStorageProduct, ProductMode.Edit);
             PopulateTextBoxesInputFormByProduct(_selectedStorageProduct);
@@ -260,7 +254,7 @@ namespace BusinessSystem
 
         private void PopulateTextBoxesInputFormByProduct(Product product)
         {
-            if(product == null)
+            if (product == null)
                 return;
 
             SetAllProductTextBoxesToEmpty();
@@ -304,8 +298,8 @@ namespace BusinessSystem
         /// </summary>
         private void ComboBoxProductType_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var comboBox = (ComboBox) sender;
-            var selectedValue = (ComboBoxItem) comboBox.SelectedValue;
+            var comboBox = (ComboBox)sender;
+            var selectedValue = (ComboBoxItem)comboBox.SelectedValue;
 
             var seletedProductType = GetProductTypeBySelectionName(selectedValue?.Content.ToString());
 
@@ -439,18 +433,18 @@ namespace BusinessSystem
                     {
                         RemoveSelectedProductFromAllLists(_selectedStorageProduct);
                         _selectedStorageProduct = null;
-                        SetBasketTotal();
+                        ToggleBasketStatus();
                     };
 
                     dialog.SecondaryButtonClick += (s, args) =>
                     {
-                      // do nothing
+                        // do nothing
                     };
 
                     await dialog.ShowAsync();
 
                 }
-               
+
             }
         }
 
@@ -472,7 +466,7 @@ namespace BusinessSystem
             }
         }
 
-     
+
 
         private void TextBoxSearch_OnTextChanged(object sender, TextChangedEventArgs e)
         {
@@ -500,10 +494,34 @@ namespace BusinessSystem
             }
         }
 
+        private void ButtonBasketClear_OnClick(object sender, RoutedEventArgs e)
+        {
+            foreach (var product in BasketProducts)
+            {
+                product.Reserved = 0;
+            }
+
+            BasketProducts.Clear();
+            ToggleBasketStatus();
+        }
+
 
         private void ButtonBasketBuy_OnClick(object sender, RoutedEventArgs e)
         {
-            throw new NotImplementedException();
+            if(BasketProducts?.Count == 0 )
+                return;
+
+            foreach (var product in BasketProducts)
+            {
+                product.Stock -= product.Reserved;
+                product.Reserved = 0;
+            }
+
+            // store the basket products in a temporary list to avoid concurrent modification
+            var tempBasketProducts = new ObservableCollection<Product>(BasketProducts);
+
+            BasketProducts.Clear();
+            ToggleBasketStatus();
         }
 
         private void CheckValidProductInput()
@@ -511,7 +529,7 @@ namespace BusinessSystem
             ButtonProductSave.IsEnabled = false;
 
 
-            
+
 
 
             if (TextBoxProductId.IsValidProductId(TextBoxProductId.Text, Products.ToList(), _selectedStorageProduct) &&
@@ -534,9 +552,9 @@ namespace BusinessSystem
             CheckValidProductInput();
         }
 
-    
-        
-       
+
+
+
 
         private void TextBoxProductName_OnKeyUp(object sender, KeyRoutedEventArgs e)
         {
@@ -576,7 +594,7 @@ namespace BusinessSystem
             textBox.DisplayValidationColor(textBox.IsValidProductPlaytime(textInput));
 
             CheckValidProductInput();
-            
+
         }
     }
 }

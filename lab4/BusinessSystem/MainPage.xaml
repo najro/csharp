@@ -9,6 +9,8 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
 
+
+
     <Pivot Name="PivotMainView">
         <PivotItem Header="Butik" FontSize="20" >
             <Grid>
@@ -38,9 +40,12 @@
                     </ListView>
                     </StackPanel>
 
-                    <StackPanel Orientation="Vertical" Background="Silver" BorderBrush="Silver" BorderThickness="1 0 1 0" Padding="10,10,10,10" Margin="10,40,10,100">
-                        <Button x:Name="ButtonProductToBasket" IsEnabled="False" Content="Lägg i kundkorg" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Click="ButtonProductToBasket_OnClick"/>
-                        <Button x:Name="ButtonProductFromBasket" IsEnabled="False" Content="Ta bort från kundkorg" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Click="ButtonProductFromBasket_OnClick"/>
+                    <StackPanel Orientation="Vertical" Background="Silver" BorderBrush="Silver" BorderThickness="1 0 1 0" Padding="10,10,10,10" Margin="10,40,10,100" Width="250" >
+                        <Button x:Name="ButtonProductToBasket" IsEnabled="False" Content="Lägg i kundkorg" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Click="ButtonProductToBasket_OnClick" Width="200" />
+                        <Button x:Name="ButtonProductFromBasket" IsEnabled="False" Content="Ta bort från kundkorg" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Click="ButtonProductFromBasket_OnClick" Width="200" />
+                        <Button x:Name="ButtonBasketClear" IsEnabled="true" Content="Töm hela korgen" HorizontalAlignment="Left" Margin="10,40,0,0" VerticalAlignment="Top" Click="ButtonBasketClear_OnClick" Width="200" />
+                        <TextBlock Text="" Name="TextBlockBasketTotal" FontSize="16" Margin="10 20 0 10"/>
+                        <Button x:Name="ButtonBasketBuy" IsEnabled="False" Content="Köp" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Click="ButtonBasketBuy_OnClick"/>
                     </StackPanel>
 
 
@@ -63,8 +68,7 @@
                                 </DataTemplate>
                             </ListView.ItemTemplate>
                         </ListView>
-                        <TextBlock Text="" Name="TextBlockBasketTotal" FontSize="16" Margin="10 10 0 10"/>
-                        <Button x:Name="ButtonBasketBuy" IsEnabled="False" Content="Köp" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Click="ButtonBasketBuy_OnClick"/>
+                        
                     </StackPanel>
                 </StackPanel>
             </Grid>
@@ -95,7 +99,7 @@
                             </ListView.ItemTemplate>
                         </ListView>
                     </StackPanel>
-                    <StackPanel Orientation="Vertical" Background="White" BorderBrush="Black" BorderThickness="1"  Padding="10,10,10,10" Margin="20,0,0,20">
+                    <StackPanel Orientation="Vertical" Background="White" BorderBrush="Silver" BorderThickness="1 0 0 0"  Padding="10,10,10,10" Margin="20,0,0,20">
                         <Button x:Name="ButtonProductNew"  Content="Ny produkt" HorizontalAlignment="Left" Margin="0,10,0,10" Width="200" VerticalAlignment="Top" Click="ButtonProductNew_OnClick"/>
 
                             <StackPanel Orientation="Vertical" Name="StackPanelProductEdit" Visibility="Collapsed">
