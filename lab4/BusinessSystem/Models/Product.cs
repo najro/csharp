@@ -12,6 +12,7 @@ namespace BusinessSystem.Models
         {
             Stock = 5;
             Reserved = 0;
+            Available = CalculateAvailable();
         }
 
         public int Id { get; set; }
@@ -20,9 +21,22 @@ namespace BusinessSystem.Models
         // https://learn.microsoft.com/en-us/windows/uwp/app-resources/images-tailored-for-scale-theme-contrast
         public virtual ImageSource Image { get; set; } = new BitmapImage(new Uri("ms-appx:///Assets/product.png"));
 
-        public string Name { get; set; }
+        
+        string _name = "";
+        public string Name
+        {
+            get
+            {
+                return _name;
+            }
+            set
+            {
+                _name = value;
+                OnNotifyPropertyChanged();
+            }
+        }
 
-      
+
 
         decimal _price = 0;
         public decimal Price
@@ -53,6 +67,7 @@ namespace BusinessSystem.Models
                 _stock = value;
                 OnNotifyPropertyChanged();
 
+                Available = CalculateAvailable();
                 Description = ToString();
             }
         }
@@ -71,8 +86,29 @@ namespace BusinessSystem.Models
                 _reserved = value;
                 OnNotifyPropertyChanged();
 
+                Available = CalculateAvailable();
                 Description = ToString();
             }
+        }
+
+        int _available = 0;
+        public int Available
+        {
+            get
+            {
+                return _available;
+            }
+            set
+            {
+                _available = value;
+                OnNotifyPropertyChanged();
+                Description = ToString();
+            }
+        }
+
+        private int CalculateAvailable()
+        {
+            return Stock - Reserved;
         }
 
 
@@ -91,6 +127,9 @@ namespace BusinessSystem.Models
             }
         }
 
+
+
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected void OnNotifyPropertyChanged([CallerMemberName] string memberName = "")
@@ -103,7 +142,7 @@ namespace BusinessSystem.Models
 
         public virtual string SearchString()
         {
-            return $"id:{Id} type:{Type.ToLower()} namn:{Name.ToLower()} pris:{Price} antal:{Stock}";
+            return $"id:{Id} typ:{Type.ToLower()} namn:{Name.ToLower()} pris:{Price} antal:{Stock}";
         }
 
         public override string ToString()

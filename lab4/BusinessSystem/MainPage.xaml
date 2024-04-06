@@ -17,14 +17,20 @@
 
                     <StackPanel Orientation="Vertical">
                         <TextBlock Text="Produkter i butik" FontSize="16" Margin="0 20 0 10"/>
-                        <TextBox Name="TextBoxSearch"   TextChanged="TextBoxSearch_OnTextChanged"></TextBox>
-                        <ListView ItemsSource="{x:Bind FilteredProducts}" x:Name="ListViewProducts" HorizontalAlignment="Left" VerticalContentAlignment="Stretch"  Margin="0,10,0,0" VerticalAlignment="Top" Width="500" SelectionChanged="ListViewProducts_OnSelectionChanged">
+                        <TextBox Name="TextBoxSearch" PlaceholderText="Sök efter produkt"  TextChanged="TextBoxSearch_OnTextChanged"></TextBox>
+                        <TextBlock TextWrapping="Wrap" FontSize="16" HorizontalAlignment="Left" Width="200" Text="Du kan söka generellt på lite olika egenskaper. För exakt sök använd id:'söktekt', namn:'söktekt', typ:'video|musik|film', pris:'söktekt' eller antal:'söktekt', " Margin="0,0,0,5"/>
+                        <ListView ItemsSource="{x:Bind FilteredProducts}" x:Name="ListViewProducts" HorizontalAlignment="Left" VerticalContentAlignment="Stretch"  Margin="0,10,0,0" VerticalAlignment="Top" Width="500" Height="500" SelectionChanged="ListViewProducts_OnSelectionChanged">
                             <ListView.ItemTemplate >
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
                                         <StackPanel Orientation="Horizontal">
                                             <Image Source="{Binding Image}" Height="20" Width="20" Margin="0 0 10 0"/>
-                                            <TextBlock Text="{Binding Description}" FontSize="12"/>
+                                            <TextBlock Text="{Binding Name}" FontSize="12"/>
+                                            <TextBlock Text=", " FontSize="12"/>
+                                            <TextBlock Text="{Binding Price}" FontSize="12"/>
+                                            <TextBlock Text=" kr Tillgängliga:" FontSize="12"/>
+                                            <TextBlock Text="{Binding Available}" FontSize="12"/>
+                                            <TextBlock Text=" st" FontSize="12"/>
                                         </StackPanel>
                                     </StackPanel>
                                 </DataTemplate>
@@ -32,9 +38,9 @@
                     </ListView>
                     </StackPanel>
 
-                    <StackPanel Orientation="Vertical" Background="Beige" BorderBrush="Silver" BorderThickness="1 0 1 0" Padding="10,10,10,10" Margin="10,40,10,100">
-                        <Button x:Name="ButtonProductToBasket" IsEnabled="False" Content="Köp vald produkt" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Click="ButtonProductToBasket_OnClick"/>
-                        <Button x:Name="ButtonProductFromBasket" IsEnabled="False" Content="Ta bort vald produkt" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Click="ButtonProductFromBasket_OnClick"/>
+                    <StackPanel Orientation="Vertical" Background="Silver" BorderBrush="Silver" BorderThickness="1 0 1 0" Padding="10,10,10,10" Margin="10,40,10,100">
+                        <Button x:Name="ButtonProductToBasket" IsEnabled="False" Content="Lägg i kundkorg" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Click="ButtonProductToBasket_OnClick"/>
+                        <Button x:Name="ButtonProductFromBasket" IsEnabled="False" Content="Ta bort från kundkorg" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Click="ButtonProductFromBasket_OnClick"/>
                     </StackPanel>
 
 
@@ -46,8 +52,12 @@
                                     <StackPanel Orientation="Horizontal">
                                         <StackPanel Orientation="Horizontal">
                                             <Image Source="{Binding Image}" Height="20" Width="20" Margin="0 0 10 0"/>
-                                            <TextBlock Text="{Binding Description}" FontSize="12"/>
+                                            <TextBlock Text="{Binding Name}" FontSize="12"/>
+                                            <TextBlock Text=", " FontSize="12"/>
+                                            <TextBlock Text="{Binding Price}" FontSize="12"/>
+                                            <TextBlock Text=" kr stykk. Antal:" FontSize="12"/>
                                             <TextBlock Text="{Binding Reserved}" FontSize="12"/>
+                                            <TextBlock Text=" st" FontSize="12"/>
                                         </StackPanel>
                                     </StackPanel>
                                 </DataTemplate>
@@ -66,13 +76,19 @@
 
                     <StackPanel Orientation="Vertical">
                         <TextBlock Text="Produkter på lager" FontSize="16" Margin="0 20 0 0"/>
-                        <ListView ItemsSource="{x:Bind Products}" x:Name="ListViewStorage" HorizontalAlignment="Left" VerticalContentAlignment="Stretch"  Margin="0,10,0,0" VerticalAlignment="Top" Width="500" SelectionChanged="ListViewStorage_OnSelectionChanged">
+                        <ListView ItemsSource="{x:Bind Products}" x:Name="ListViewStorage" HorizontalAlignment="Left" VerticalContentAlignment="Stretch"  Margin="0,10,0,0" VerticalAlignment="Top" Width="500" Height="500" SelectionChanged="ListViewStorage_OnSelectionChanged">
                             <ListView.ItemTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal" Padding="0" Margin="0">
                                         <StackPanel Orientation="Horizontal">
                                             <Image Source="{Binding Image}" Height="20" Width="20" Margin="0 0 5 0"/>
-                                            <TextBlock Text="{Binding Description}" FontSize="12"/>
+                                            <TextBlock Text="{Binding Name}" FontSize="12"/>
+                                            <TextBlock Text=", " FontSize="12"/>
+                                            <TextBlock Text="{Binding Price}" FontSize="12"/>
+                                            <TextBlock Text=" kr Lagersaldo:" FontSize="12"/>
+                                            <TextBlock Text="{Binding Stock}" FontSize="12"/>
+                                            <TextBlock Text=", Reserverade:" FontSize="12"/>
+                                            <TextBlock Text="{Binding Reserved}" FontSize="12"/>
                                         </StackPanel>
                                     </StackPanel>
                                 </DataTemplate>
