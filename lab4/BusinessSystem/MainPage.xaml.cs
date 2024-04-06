@@ -192,12 +192,13 @@ namespace BusinessSystem
                         game.Platform = TextBoxProductPlatform.Text;
                         break;
                 }
+
+                SetBasketTotal();
             }
             else
             {
-                var newProduct =
-                    GetProductTypeBySelectionName(
-                        ((ComboBoxItem) ComboBoxProductType.SelectedValue)?.Content.ToString());
+                var newProduct = GetProductTypeBySelectionName(((ComboBoxItem) ComboBoxProductType.SelectedValue)?.Content.ToString());
+                newProduct.Id = Convert.ToInt32(TextBoxProductId.Text);
                 newProduct.Name = TextBoxProductName.Text;
                 newProduct.Price = Convert.ToDecimal(TextBoxProductPrice.Text);
                 newProduct.Stock = Convert.ToInt32(TextBoxProductStock.Text);
@@ -220,7 +221,18 @@ namespace BusinessSystem
                 }
 
                 Products.Add(newProduct);
+                FilteredProducts.Add(newProduct);
             }
+
+           
+
+
+            ButtonProductNew.Visibility = Visibility.Visible;
+            StackPanelProductEdit.Visibility = Visibility.Collapsed;
+
+            _selectedStorageProduct = null;
+            ListViewStorage.SelectedIndex = -1;
+
 
             //UpdateListViewProducts();
             //UpdateListViewStorage();
@@ -234,6 +246,10 @@ namespace BusinessSystem
         private void ListViewStorage_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             _selectedStorageProduct = ((Product) ListViewStorage.SelectedItem);
+
+            // do nothing if no product is selected
+            if (_selectedStorageProduct == null)
+                return;
 
             ButtonProductNew.Visibility = Visibility.Collapsed;
             StackPanelProductEdit.Visibility = Visibility.Visible;
@@ -422,6 +438,7 @@ namespace BusinessSystem
                     dialog.PrimaryButtonClick += async (s, args) =>
                     {
                         RemoveSelectedProductFromAllLists(_selectedStorageProduct);
+                        _selectedStorageProduct = null;
                         SetBasketTotal();
                     };
 
@@ -494,7 +511,10 @@ namespace BusinessSystem
             ButtonProductSave.IsEnabled = false;
 
 
-            if (TextBoxProductId.IsValidProductId(TextBoxProductId.Text, Products.ToList()) &&
+            
+
+
+            if (TextBoxProductId.IsValidProductId(TextBoxProductId.Text, Products.ToList(), _selectedStorageProduct) &&
                 TextBoxProductName.IsValidProductName(TextBoxProductName.Name) &&
                 TextBoxProductPrice.IsValidProductPrice(TextBoxProductPrice.Text) &&
                 TextBoxProductStock.IsValidProductStock(TextBoxProductStock.Text) &&
@@ -509,7 +529,7 @@ namespace BusinessSystem
             var textBox = sender as TextBox;
             var textInput = textBox?.Text;
 
-            textBox.DisplayValidationColor(textBox.IsValidProductId(textInput, Products.ToList()));
+            textBox.DisplayValidationColor(textBox.IsValidProductId(textInput, Products.ToList(), _selectedStorageProduct));
 
             CheckValidProductInput();
         }

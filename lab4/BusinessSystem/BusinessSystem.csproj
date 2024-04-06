@@ -125,6 +125,7 @@
     </Compile>
     <Compile Include="Models\Book.cs" />
     <Compile Include="Models\Enums\ProductMode.cs" />
+    <Compile Include="Models\Enums\UpdateMode.cs" />
     <Compile Include="Models\Game.cs" />
     <Compile Include="Models\Movie.cs" />
     <Compile Include="Models\Product.cs" />
