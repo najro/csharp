@@ -47,8 +47,6 @@ namespace BusinessSystem.repository
             }
         }
 
-
-
         public static bool CheckIfFileExists(string fileName)
         {
             try

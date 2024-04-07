@@ -127,6 +127,7 @@
     <Compile Include="Models\Enums\ProductMode.cs" />
     <Compile Include="Models\Game.cs" />
     <Compile Include="Models\Movie.cs" />
+    <Compile Include="Models\OrderItem.cs" />
     <Compile Include="Models\Product.cs" />
     <Compile Include="PrintReceiptPage.xaml.cs">
       <DependentUpon>PrintReceiptPage.xaml</DependentUpon>
