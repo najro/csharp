@@ -17,6 +17,10 @@ using Windows.UI.Xaml.Printing;
 namespace BusinessSystem
 {
 
+    /// <summary>
+    /// This is the main page of the business system app
+    /// Backend code :  (lab4 - alfoande100 / Örjan Andersson)
+    /// </summary>
     public sealed partial class MainPage : Page, INotifyPropertyChanged
     {
         Product _selectedProduct;
@@ -404,6 +408,12 @@ namespace BusinessSystem
 
         }
 
+
+        /// <summary>
+        /// Delete selected product from storage
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private async void ButtonProductDelete_OnClick(object sender, RoutedEventArgs e)
         {
             if (_selectedStorageProduct != null)
@@ -414,6 +424,7 @@ namespace BusinessSystem
                 }
                 else
                 {
+                    // https://docs.microsoft.com/en-us/windows/uwp/design/controls-and-patterns/dialogs-and-flyouts/dialogs
                     var dialog = new ContentDialog
                     {
                         Title = "Ta bort produkt",
@@ -441,6 +452,7 @@ namespace BusinessSystem
 
             }
         }
+
 
         private void RemoveSelectedProductFromAllLists(Product product)
         {
@@ -682,6 +694,11 @@ namespace BusinessSystem
         {
             new repository.CsvRepository().WriteProductsToDataFile(Products);
         }
-    }
 
+        public void OnAppExit()
+        {
+            // store the products in a csv file
+            new repository.CsvRepository().WriteProductsToDataFile(Products);
+        }
+    }
 }
