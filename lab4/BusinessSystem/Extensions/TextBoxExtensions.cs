@@ -1,8 +1,11 @@
 ﻿using BusinessSystem.Models;
 using BusinessSystem.Models.Enums;
 using System.Collections.Generic;
+using Windows.Graphics.Printing;
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Printing;
 
 namespace BusinessSystem.Extensions
 {
@@ -18,11 +21,14 @@ namespace BusinessSystem.Extensions
         /// <param name="isValid"></param>
         public static void DisplayValidationColor(this TextBox textBox, bool isValid)
         {
-            textBox.BorderBrush = isValid ? new SolidColorBrush(Windows.UI.Colors.Green) : new SolidColorBrush(Windows.UI.Colors.Red);
+            textBox.BorderBrush = isValid
+                ? new SolidColorBrush(Windows.UI.Colors.Green)
+                : new SolidColorBrush(Windows.UI.Colors.Red);
         }
 
 
-        public static bool IsValidProductId(this TextBox textBox, string textInput, List<Product> existingProducts, Product selectedProduct)
+        public static bool IsValidProductId(this TextBox textBox, string textInput, List<Product> existingProducts,
+            Product selectedProduct)
         {
             // verify that input is valid
             if (!int.TryParse(textInput, out int inputValue) || (inputValue < 0 || inputValue >= int.MaxValue))
@@ -33,9 +39,9 @@ namespace BusinessSystem.Extensions
             if (selectedProduct != null && selectedProduct.Id == inputValue)
             {
                 return true;
-            } 
+            }
 
-            if(existingProducts.Exists(p => p.Id == inputValue))
+            if (existingProducts.Exists(p => p.Id == inputValue))
             {
                 return false;
             }
@@ -83,7 +89,8 @@ namespace BusinessSystem.Extensions
         public static bool IsValidProductPlaytime(this TextBox textBox, string textInput)
         {
             // verify that input is valid
-            if (!string.IsNullOrWhiteSpace(textInput) && ( !double.TryParse(textInput, out double inputValue) || (inputValue <= 0 || inputValue >= double.MaxValue)))
+            if (!string.IsNullOrWhiteSpace(textInput) && (!double.TryParse(textInput, out double inputValue) ||
+                                                          (inputValue <= 0 || inputValue >= double.MaxValue)))
             {
                 return false;
             }
@@ -91,6 +98,5 @@ namespace BusinessSystem.Extensions
             return true;
 
         }
-
     }
 }

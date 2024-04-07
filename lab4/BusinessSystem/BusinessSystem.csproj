@@ -128,6 +128,9 @@
     <Compile Include="Models\Game.cs" />
     <Compile Include="Models\Movie.cs" />
     <Compile Include="Models\Product.cs" />
+    <Compile Include="PrintReceiptPage.xaml.cs">
+      <DependentUpon>PrintReceiptPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="repository\CsvRepository.cs" />
   </ItemGroup>
@@ -159,6 +162,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="PrintReceiptPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
@@ -166,7 +173,7 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="repository\products.csv">
+    <None Include="repository\products_initial_data.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

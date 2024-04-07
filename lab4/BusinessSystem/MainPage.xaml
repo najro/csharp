@@ -101,8 +101,8 @@
                     </StackPanel>
                     <StackPanel Orientation="Vertical" Background="White" BorderBrush="Silver" BorderThickness="1 0 0 0"  Padding="10,10,10,10" Margin="20,0,0,20">
                         <Button x:Name="ButtonProductNew"  Content="Ny produkt" HorizontalAlignment="Left" Margin="0,10,0,10" Width="200" VerticalAlignment="Top" Click="ButtonProductNew_OnClick"/>
-
-                            <StackPanel Orientation="Vertical" Name="StackPanelProductEdit" Visibility="Collapsed">
+                        <Button x:Name="ButtonProductsSave"  Content="Lagra alla produkter" HorizontalAlignment="Left" Margin="0,10,0,10" Width="200" VerticalAlignment="Top" Click="ButtonProductsSave_OnClick"/>
+                        <StackPanel Orientation="Vertical" Name="StackPanelProductEdit" Visibility="Collapsed">
                                 <StackPanel Orientation="Horizontal">
                                 <TextBlock Width="100" Text="Produkttyp" Margin="5"/>
                                     <ComboBox x:Name="ComboBoxProductType" PlaceholderText="Välg typ" Margin="5" SelectionChanged="ComboBoxProductType_OnSelectionChanged">

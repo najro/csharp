@@ -4,10 +4,14 @@ using BusinessSystem.Models.Enums;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
+using Windows.Graphics.Printing;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Printing;
 
 
 namespace BusinessSystem
@@ -20,18 +24,16 @@ namespace BusinessSystem
         Product _selectedStorageProduct;
 
 
-        private ObservableCollection<Models.Product> _products;
-
-
-
+        
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public ObservableCollection<Models.Product> Products { get; set; }
+        public ObservableCollection<Product> Products { get; set; }
 
-        public ObservableCollection<Models.Product> FilteredProducts { get; set; }
+        public ObservableCollection<Product> FilteredProducts { get; set; }
 
 
-        public ObservableCollection<Models.Product> BasketProducts { get; set; }
+        public ObservableCollection<Product> BasketProducts { get; set; }
+
 
         public void ToggleBasketStatus()
         {
@@ -45,7 +47,8 @@ namespace BusinessSystem
         {
             this.InitializeComponent();
 
-            Products = new repository.CsvRepository().ReadProductsFromFile();
+
+            Products = new repository.CsvRepository().ReadProductsFromDataFile();
 
             FilteredProducts = new ObservableCollection<Product>();
 
@@ -61,15 +64,6 @@ namespace BusinessSystem
             this.DataContext = this;
 
         }
-
-
-
-        //private void RefreshViews()
-        //{
-        //    ValidateProductFromBasket();
-        //    ValidateProductToBasket();
-        //    UpdateBasketFilter();
-        //}
 
         private void ListViewProducts_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -506,9 +500,9 @@ namespace BusinessSystem
         }
 
 
-        private void ButtonBasketBuy_OnClick(object sender, RoutedEventArgs e)
+        private async void ButtonBasketBuy_OnClick(object sender, RoutedEventArgs e)
         {
-            if(BasketProducts?.Count == 0 )
+            if (BasketProducts?.Count == 0)
                 return;
 
             foreach (var product in BasketProducts)
@@ -527,10 +521,6 @@ namespace BusinessSystem
         private void CheckValidProductInput()
         {
             ButtonProductSave.IsEnabled = false;
-
-
-
-
 
             if (TextBoxProductId.IsValidProductId(TextBoxProductId.Text, Products.ToList(), _selectedStorageProduct) &&
                 TextBoxProductName.IsValidProductName(TextBoxProductName.Name) &&
@@ -551,9 +541,6 @@ namespace BusinessSystem
 
             CheckValidProductInput();
         }
-
-
-
 
 
         private void TextBoxProductName_OnKeyUp(object sender, KeyRoutedEventArgs e)
@@ -596,5 +583,105 @@ namespace BusinessSystem
             CheckValidProductInput();
 
         }
+
+        private async void ButtonBasketPrint_OnClick(object sender, RoutedEventArgs e)
+        {
+            await PrintReceite("Print this magic stuff");
+        }
+
+
+        #region PrintInfo
+        // Code borrowed and adjuset from follwing sources:
+        // https://stackoverflow.com/questions/36207708/print-multiple-pages-from-a-uwa
+        // https://learn.microsoft.com/en-us/windows/uwp/devices-sensors/print-from-your-app
+
+
+        private PrintDocument printDocument;
+        private IPrintDocumentSource printDocumentSource;
+        private PrintReceiptPage printPage = null;
+
+        public async Task PrintReceite(string reciete)
+        {
+            // add recite to print page
+            printPage = new PrintReceiptPage();
+
+            //printPage.TextContentBlock() = reciete;
+            //printPage.TextContentBlock. = new TextBlock { Text = reciete, FontSize = 24, TextWrapping = TextWrapping.WrapWholeWords };
+
+
+            printDocument = new PrintDocument();
+            printDocumentSource = printDocument.DocumentSource;
+            printDocument.GetPreviewPage += GetPrintPreviewPage;
+
+            printDocument.AddPage(printPage);
+            printDocument.AddPagesComplete();
+
+            PrintManager printMan = PrintManager.GetForCurrentView();
+            printMan.PrintTaskRequested += PrintTaskRequested;
+
+            await PrintManager.ShowPrintUIAsync();
+        }
+
+
+        private void GetPrintPreviewPage(object sender, GetPreviewPageEventArgs e)
+        {
+            printDocument.SetPreviewPage(1, printPage);
+            printDocument.SetPreviewPageCount(1, PreviewPageCountType.Final);
+        }
+
+        void PrintTaskRequested(PrintManager sender, PrintTaskRequestedEventArgs e)
+        {
+            //PrintTask printTask = null;
+            //printTask = e.Request.CreatePrintTask("Receipe Print Job", sourceRequested =>
+            //{
+            //    printTask.Completed += PrintTask_Completed;
+            //    sourceRequested.SetSource(printDocumentSource);
+            //});
+            PrintTask printTask = null;
+
+            // Create a PrintTask and handle print task request
+            printTask = e.Request.CreatePrintTask("Receipt Print Job", sourceRequested =>
+            {
+                // Set the print document source
+                sourceRequested.SetSource(printDocumentSource);
+
+                // Handle completed event
+                printTask.Completed += (s, args) =>
+                {
+                    // Check if there were any errors
+                    if (args.Completion == PrintTaskCompletion.Failed)
+                    {
+                        // Handle error
+                        Debug.WriteLine("Print task failed.");
+                    }
+                    else
+                    {
+                        // Print task completed successfully
+                        Debug.WriteLine("Print task completed.");
+                    }
+                };
+            });
+
+
+        }
+
+        private async void PrintTask_Completed(PrintTask sender, PrintTaskCompletedEventArgs args)
+        {
+
+
+            await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+            {
+                PrintManager printMan = PrintManager.GetForCurrentView();
+                printMan.PrintTaskRequested -= PrintTaskRequested;
+            });
+        }
+        #endregion
+
+
+        private void ButtonProductsSave_OnClick(object sender, RoutedEventArgs e)
+        {
+            new repository.CsvRepository().WriteProductsToDataFile(Products);
+        }
     }
+
 }
