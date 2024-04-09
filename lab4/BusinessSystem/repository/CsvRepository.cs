@@ -105,9 +105,8 @@ namespace BusinessSystem.repository
         {
             var products = new ObservableCollection<Product>();
 
-
-            StorageFolder localFolder = ApplicationData.Current.LocalFolder;
-            StorageFile file = localFolder.GetFileAsync(ProductsDataCsv).AsTask().Result;
+            var localFolder = ApplicationData.Current.LocalFolder;
+            var file = localFolder.GetFileAsync(ProductsDataCsv).AsTask().Result;
 
             var lines = File.ReadAllLines(file.Path);
 
