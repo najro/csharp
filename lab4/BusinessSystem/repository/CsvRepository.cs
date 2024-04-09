@@ -1,5 +1,6 @@
 ﻿using BusinessSystem.Models;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using Windows.Storage;
@@ -12,7 +13,7 @@ namespace BusinessSystem.repository
 
         private const string ProductsInitialDataCsv = @"\repository\products_initial_data.csv";
         const string ProductsDataCsv = "products_data.csv";
-        const string ReceiptDataCsv = "receipts_data.csv";
+        const string OrderDataCsv = "order_data.csv";
 
         public CsvRepository()
         {
@@ -104,7 +105,6 @@ namespace BusinessSystem.repository
         public ObservableCollection<Product> ReadProductsFromDataFile()
         {
             var products = new ObservableCollection<Product>();
-
             var localFolder = ApplicationData.Current.LocalFolder;
             var file = localFolder.GetFileAsync(ProductsDataCsv).AsTask().Result;
 
@@ -188,6 +188,36 @@ namespace BusinessSystem.repository
 
             }
             return products;
+        }
+
+
+
+      
+        public void WriteOrderItemsToDataFile(List<OrderItem> products)
+        {
+
+            var localFolder = ApplicationData.Current.LocalFolder;
+            var file = localFolder.CreateFileAsync(OrderDataCsv, CreationCollisionOption.OpenIfExists).AsTask().GetAwaiter().GetResult();
+
+
+            using (StreamWriter writer = new StreamWriter(file.OpenStreamForWriteAsync().GetAwaiter().GetResult()))
+            {
+
+                // Check if file contains data
+                if (writer.BaseStream.Length == 0)
+                {
+                    // Write the header only if the file is empty
+                    writer.WriteLine("OrderId,OrderDate,ProductId,Name,Type,Quantity");
+                }
+
+                // Move the file pointer to the end of the file to append data
+                writer.BaseStream.Seek(0, SeekOrigin.End);
+
+                foreach (var item in products)
+                {
+                    writer.WriteLine($"{item.OrderId.ToString()}, {item.OrderDate.ToString("yyyy-MM-dd HH:mm:ss")}, {item.ProductId},{item.Name},{item.Type},{item.Quantity}");
+                }
+            }
         }
     }
 }

@@ -2,6 +2,7 @@
 using BusinessSystem.Models;
 using BusinessSystem.Models.Enums;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -12,6 +13,7 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Printing;
+using BusinessSystem.repository;
 
 
 namespace BusinessSystem
@@ -517,6 +519,31 @@ namespace BusinessSystem
             if (BasketProducts?.Count == 0)
                 return;
 
+
+            var orderList = new List<OrderItem>();
+
+            Guid productBuyGuid = Guid.NewGuid();
+            DateTime currentBuyDate = DateTime.Now;
+
+            foreach (var product in BasketProducts)
+            {
+                var item = new OrderItem()
+                {
+                    ProductId = product.Id,
+                    Name = product.Name,
+                    Type = product.Type,
+                    Price = product.Price,
+                    Quantity = product.Reserved,
+                    OrderDate = currentBuyDate,
+                    OrderId = productBuyGuid
+                };
+                
+                orderList.Add(item);
+            }
+
+            new CsvRepository().WriteOrderItemsToDataFile(orderList);
+
+
             foreach (var product in BasketProducts)
             {
                 product.Stock -= product.Reserved;
@@ -525,6 +552,15 @@ namespace BusinessSystem
 
             // store the basket products in a temporary list to avoid concurrent modification
             var tempBasketProducts = new ObservableCollection<Product>(BasketProducts);
+
+
+            
+
+
+
+
+
+
 
             BasketProducts.Clear();
             ToggleBasketStatus();
