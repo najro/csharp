@@ -15,6 +15,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Printing;
 using BusinessSystem.repository;
 using Windows.UI.Xaml.Navigation;
+using Windows.Storage;
 
 
 namespace BusinessSystem
@@ -42,15 +43,6 @@ namespace BusinessSystem
         public ObservableCollection<Product> BasketProducts { get; set; }
 
 
-
-        public void ToggleBasketStatus()
-        {
-            TextBlockBasketTotal.Text = $"Antal varor: {BasketProducts.Sum(p => p.Reserved)}\nTotalt pris: {BasketProducts.Sum(p => p.Price * p.Reserved)}  kr";
-            ButtonBasketClear.IsEnabled = BasketProducts.Count > 0;
-            ButtonBasketBuy.IsEnabled = BasketProducts.Count > 0;
-        }
-
-
         public MainPage()
         {
             this.InitializeComponent();
@@ -69,8 +61,17 @@ namespace BusinessSystem
 
             ToggleBasketStatus();
 
+            TextBlockDataFiles.Text = $"Datafiler blir lagrade här:\n{ApplicationData.Current.LocalFolder.Path}" ;
+
             this.DataContext = this;
 
+        }
+
+        public void ToggleBasketStatus()
+        {
+            TextBlockBasketTotal.Text = $"Antal varor: {BasketProducts.Sum(p => p.Reserved)}\nTotalt pris: {BasketProducts.Sum(p => p.Price * p.Reserved)}  kr";
+            ButtonBasketClear.IsEnabled = BasketProducts.Count > 0;
+            ButtonBasketBuy.IsEnabled = BasketProducts.Count > 0;
         }
 
         private void ListViewProducts_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -677,8 +678,8 @@ namespace BusinessSystem
 
 
         // used for printing receipt
-        protected PrintDocument printDocument;
-        protected IPrintDocumentSource printDocumentSource;
+        PrintDocument printDocument;
+        IPrintDocumentSource printDocumentSource;
         List<Page> pages = new List<Page>();
         PrintReceiptPage printReceiptPage = new PrintReceiptPage();
 
@@ -723,7 +724,7 @@ namespace BusinessSystem
             base.OnNavigatedTo(e);
             RegisterForPrinting();
         }
-
+     
      
         protected override void OnNavigatedFrom(NavigationEventArgs e)
         {

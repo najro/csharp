@@ -6,13 +6,13 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Width="1000" Height="500">
 
 
 
 
     <Pivot Name="PivotMainView">
-        <PivotItem Header="Butik" FontSize="20" >
+        <PivotItem Header="Butik" FontSize="20">
             <Grid>
 
                 <StackPanel Orientation="Horizontal">
@@ -181,6 +181,15 @@
 
 
             </Grid>
+        </PivotItem>
+        <PivotItem Header="Statistik">
+
+        </PivotItem>
+        <PivotItem Header="Info">
+            <StackPanel Orientation="Vertical">
+                <TextBlock Text="Utvecklat av Örjan Andersson (alfoande100)" FontSize="12" Margin="0 20 0 20"/>
+                <TextBlock Name="TextBlockDataFiles"  FontSize="12" Margin="0 20 0 0"/>
+            </StackPanel>
         </PivotItem>
     </Pivot>
 
