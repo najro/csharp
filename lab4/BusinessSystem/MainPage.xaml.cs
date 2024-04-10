@@ -13,10 +13,11 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Printing;
-using BusinessSystem.repository;
+using BusinessSystem.Repositories;
 using Windows.UI.Xaml.Navigation;
 using Windows.Storage;
 using System.Text;
+using BusinessSystem.Helpers;
 
 
 namespace BusinessSystem
@@ -32,8 +33,6 @@ namespace BusinessSystem
         Product _selectedBasketProduct;
         Product _selectedStorageProduct;
 
-
-        
         public event PropertyChangedEventHandler PropertyChanged;
 
         public ObservableCollection<Product> Products { get; set; }
@@ -49,7 +48,7 @@ namespace BusinessSystem
             this.InitializeComponent();
 
 
-            Products = new repository.CsvRepository().ReadProductsFromDataFile();
+            Products = new ObservableCollection<Product>(new Repositories.ProductsRepository().GetProducts());
 
             FilteredProducts = new ObservableCollection<Product>();
 
@@ -62,7 +61,7 @@ namespace BusinessSystem
 
             ToggleBasketStatus();
 
-            TextBlockDataFiles.Text = $"Datafiler blir lagrade här:\n{ApplicationData.Current.LocalFolder.Path}" ;
+            TextBlockDataFiles.Text = $"Datafiler blir lagrade här:\n{ApplicationData.Current.LocalFolder.Path}";
 
             this.DataContext = this;
 
@@ -125,6 +124,9 @@ namespace BusinessSystem
             }
         }
 
+
+
+
         private void ButtonProductToBasket_OnClick(object sender, RoutedEventArgs e)
         {
             _selectedProduct.Reserved += 1;
@@ -161,6 +163,7 @@ namespace BusinessSystem
             ButtonProductNew.Visibility = Visibility.Collapsed;
             StackPanelProductEdit.Visibility = Visibility.Visible;
             ButtonProductDelete.Visibility = Visibility.Collapsed;
+            ButtonProductReturn.Visibility = Visibility.Collapsed;
 
             SetAllProductTextBoxesToEmpty();
             EnableTextBoxesByProductAndMode(new Product(), ProductMode.New);
@@ -223,20 +226,11 @@ namespace BusinessSystem
                 FilteredProducts.Add(newProduct);
             }
 
-
-
-
             ButtonProductNew.Visibility = Visibility.Visible;
             StackPanelProductEdit.Visibility = Visibility.Collapsed;
 
             _selectedStorageProduct = null;
             ListViewStorage.SelectedIndex = -1;
-
-
-            //UpdateListViewProducts();
-            //UpdateListViewStorage();
-            //RefreshViews();
-
 
         }
 
@@ -253,6 +247,7 @@ namespace BusinessSystem
             ButtonProductNew.Visibility = Visibility.Collapsed;
             StackPanelProductEdit.Visibility = Visibility.Visible;
             ButtonProductDelete.Visibility = Visibility.Visible;
+            ButtonProductReturn.Visibility = Visibility.Visible;
 
             EnableTextBoxesByProductAndMode(_selectedStorageProduct, ProductMode.Edit);
             PopulateTextBoxesInputFormByProduct(_selectedStorageProduct);
@@ -550,74 +545,58 @@ namespace BusinessSystem
                 return;
 
 
-            var orderList = new List<OrderItem>();
 
-            Guid productBuyGuid = Guid.NewGuid();
-            DateTime currentBuyDate = DateTime.Now;
-
-            foreach (var product in BasketProducts)
+            // https://docs.microsoft.com/en-us/windows/uwp/design/controls-and-patterns/dialogs-and-flyouts/dialogs
+            var dialog = new ContentDialog
             {
-                var item = new OrderItem()
-                {
-                    ProductId = product.Id,
-                    Name = product.Name,
-                    Type = product.Type,
-                    Price = product.Price,
-                    Quantity = product.Reserved,
-                    OrderDate = currentBuyDate,
-                    OrderId = productBuyGuid
-                };
-                
-                orderList.Add(item);
-            }
+                Title = "Köp",
+                Content = "Är kunden klar och skall betala sina varor",
+                PrimaryButtonText = "Ja",
+                SecondaryButtonText = "Nej",
+                CloseButtonText = "Avbryt"
+            };
 
-            new CsvRepository().WriteOrderItemsToDataFile(orderList);
-
-
-            foreach (var product in BasketProducts)
+            dialog.PrimaryButtonClick += async (s, args) =>
             {
-                product.Stock -= product.Reserved;
-                product.Reserved = 0;
-            }
 
 
-
-
-            // Build reciete
-
-
-
-            // store the basket products in a temporary list to avoid concurrent modification
-            var tempBasketProducts = new ObservableCollection<Product>(BasketProducts);
-
-            if(tempBasketProducts.Count > 0)
-            {
-                lastestReceiptInfo = BuildRecieteFromProducts(tempBasketProducts.ToList());
+                // Build reciete
+                lastestReceiptInfo = BuildRecieptPrint(BasketProducts.ToList());
                 ButtonBasketPrint.IsEnabled = true;
-            }
 
-            BasketProducts.Clear();
-            ToggleBasketStatus();
+
+                /// Save the order to file
+                var orderList = new List<OrderItem>();
+                orderList = OrderItemHelper.BuildOrderItemsFromProducts(BasketProducts.ToList(), new Guid(), DateTime.Now);
+              
+                new Repositories.OrderRepository().WriteOrderItemsToDataFile(orderList);
+
+
+                /// Clear the basket and update the stock
+                foreach (var product in BasketProducts)
+                {
+                    product.Stock -= product.Reserved;
+                    product.Reserved = 0;
+                }
+
+                BasketProducts.Clear();
+                ToggleBasketStatus();
+            };
+
+            dialog.SecondaryButtonClick += (s, args) =>
+            {
+                // do nothing
+            };
+
+            await dialog.ShowAsync();
+
+
+
+         
 
         }
 
-        //Implement a reciept printout for the basket
-        private string BuildRecieteFromProducts(List<Product> products)
-        {
-            var reciept = new StringBuilder();
-           
-            reciept.AppendLine("-------------------------------");
-            reciept.AppendLine("Vara | Pris | Antal");
-            reciept.AppendLine("-------------------------------");
-            reciept.AppendLine( products.Select(p => $"{p.Name} | {p.Price} | {p.Reserved}").Aggregate((a, b) => a + "\n" + b));
-            reciept.AppendLine("-------------------------------");
-            reciept.AppendLine($"Total pris: {products.Sum(p => p.Price * p.Reserved)} kr");
-            reciept.AppendLine("-------------------------------");
-            reciept.AppendLine();
-            reciept.AppendLine("Tack för att du handlade hos oss!");
-            reciept.AppendLine();
-            return reciept.ToString();    
-        }
+      
 
         private void CheckValidProductInput()
         {
@@ -685,81 +664,6 @@ namespace BusinessSystem
 
         }
 
-        private async void ButtonBasketPrint_OnClick(object sender, RoutedEventArgs e)
-        {
-            printReceiptPage = new PrintReceiptPage();
-            printReceiptPage.SetRecieptInfo(lastestReceiptInfo);
-            pages.Clear();
-            pages.Add(printReceiptPage);
-            await PrintManager.ShowPrintUIAsync();
-        }
-
-
-        #region PrintInfo
-        // Code borrowed and adjuset from follwing sources:
-        // https://stackoverflow.com/questions/36207708/print-multiple-pages-from-a-uwa
-        // https://learn.microsoft.com/en-us/windows/uwp/devices-sensors/print-from-your-app
-
-
-        // used for printing receipt
-        PrintDocument printDocument;
-        IPrintDocumentSource printDocumentSource;
-        List<Page> pages = new List<Page>();
-        PrintReceiptPage printReceiptPage = new PrintReceiptPage();
-        string lastestReceiptInfo = "";
-
-        public void RegisterForPrinting()
-        {
-            printDocument = new PrintDocument();
-            printDocumentSource = printDocument.DocumentSource;
-            pages.Add(printReceiptPage);
-            printDocument.GetPreviewPage += GetPrintPreviewPage;
-            printDocument.AddPages += AddPrintPages;
-            PrintManager printMan = PrintManager.GetForCurrentView();
-            printMan.PrintTaskRequested += PrintTaskRequested;
-        }
-        private void AddPrintPages(object sender, AddPagesEventArgs e)
-        {
-            foreach (var page in pages)
-            {
-                printDocument.AddPage(page);
-            }
-            printDocument.AddPagesComplete();
-        }
-        private void GetPrintPreviewPage(object sender, GetPreviewPageEventArgs e)
-        {
-            printDocument.SetPreviewPage(1, printReceiptPage);
-            printDocument.SetPreviewPageCount(pages.Count, PreviewPageCountType.Final);
-        }
-
-        void PrintTaskRequested(PrintManager sender, PrintTaskRequestedEventArgs e)
-        {
-            PrintTask printTask = null;
-            printTask = e.Request.CreatePrintTask("Receipt Print Job", sourceRequested =>
-            {
-                //printTask.Completed += PrintTask_Completed;
-                sourceRequested.SetSource(printDocumentSource);
-            });
-        }
-
-        
-     
-        protected override void OnNavigatedTo(NavigationEventArgs e)
-        {
-            base.OnNavigatedTo(e);
-            RegisterForPrinting();
-        }
-     
-     
-        protected override void OnNavigatedFrom(NavigationEventArgs e)
-        {
-            base.OnNavigatedFrom(e);
-            PrintManager printMan = PrintManager.GetForCurrentView();
-            printMan.PrintTaskRequested -= PrintTaskRequested;
-        }
-        #endregion
-
-
         private async void ButtonProductReturn_OnClick(object sender, RoutedEventArgs e)
         {
             if (_selectedStorageProduct != null)
@@ -789,12 +693,147 @@ namespace BusinessSystem
             }
         }
 
+
+        #region Printer Handling
+        /// <summary>
+        /// Print the receipt for the last purchase
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void ButtonBasketPrint_OnClick(object sender, RoutedEventArgs e)
+        {
+            printReceiptPage = new PrintReceiptPage(); // custom print page
+            printReceiptPage.SetRecieptInfo(lastestReceiptInfo); // set the receipt info
+
+            pages.Clear();
+            pages.Add(printReceiptPage);
+            await PrintManager.ShowPrintUIAsync(); // show the print dialog
+        }
+
+        /// <summary>
+        /// Build the receipt print for the last purchase
+        /// </summary>
+        /// <param name="products"></param>
+        /// <returns></returns>
+        private string BuildRecieptPrint(List<Product> products)
+        {
+            var reciept = new StringBuilder();
+
+            reciept.AppendLine("-------------------------------");
+            reciept.AppendLine("Vara | Pris | Antal");
+            reciept.AppendLine("-------------------------------");
+
+            foreach (var product in products)
+            {
+                reciept.AppendLine($"{product.Name} | {product.Price} kr | {product.Reserved} stycken");
+            }
+            reciept.AppendLine("-------------------------------");
+            reciept.AppendLine($"Total pris: {products.Sum(p => p.Price * p.Reserved)} kr");
+            reciept.AppendLine("-------------------------------");
+            reciept.AppendLine();
+            reciept.AppendLine("Tack för att du handlade hos oss!");
+            return reciept.ToString();
+        }
+
+        // Code borrowed and adjuset from follwing sources:
+        // https://stackoverflow.com/questions/36207708/print-multiple-pages-from-a-uwa
+        // https://learn.microsoft.com/en-us/windows/uwp/devices-sensors/print-from-your-app
+
+
+        // used for printing receipt
+        PrintDocument printDocument;
+        IPrintDocumentSource printDocumentSource;
+        List<Page> pages = new List<Page>();
+        PrintReceiptPage printReceiptPage = new PrintReceiptPage();
+        string lastestReceiptInfo = "";
+
+
+        /// <summary>
+        ///  Register the print manager for the current view and add the print task requested event handler
+        /// </summary>
+        public void RegisterForPrinting()
+        {
+            printDocument = new PrintDocument();
+            printDocumentSource = printDocument.DocumentSource;
+            pages.Add(printReceiptPage);
+            printDocument.GetPreviewPage += GetPrintPreviewPage;
+            printDocument.AddPages += AddPrintPages;
+            PrintManager printMan = PrintManager.GetForCurrentView();
+            printMan.PrintTaskRequested += PrintTaskRequested;
+        }
+
+        /// <summary>
+        /// Add the print pages to the print document
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void AddPrintPages(object sender, AddPagesEventArgs e)
+        {
+            foreach (var page in pages)
+            {
+                printDocument.AddPage(page);
+            }
+            printDocument.AddPagesComplete();
+        }
+
+        /// <summary>
+        /// Set the print preview page
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void GetPrintPreviewPage(object sender, GetPreviewPageEventArgs e)
+        {
+            printDocument.SetPreviewPage(1, printReceiptPage);
+            printDocument.SetPreviewPageCount(pages.Count, PreviewPageCountType.Final);
+        }
+
+        /// <summary>
+        /// Set the print task requested event handler
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void PrintTaskRequested(PrintManager sender, PrintTaskRequestedEventArgs e)
+        {
+            PrintTask printTask = null;
+            printTask = e.Request.CreatePrintTask("Receipt Print Job", sourceRequested =>
+            {
+                sourceRequested.SetSource(printDocumentSource);
+            });
+        }
+        #endregion
+
+        #region Application events
+
+        /// <summary>
+        /// event handler for app exit
+        /// </summary>
         public void OnAppExit()
         {
             // store the products in a csv file
-            new repository.CsvRepository().WriteProductsToDataFile(Products);
+            new Repositories.ProductsRepository().WriteProductsToDataFile(Products.ToList());
+        }
+        /// <summary>
+        /// Executed when the page is navigated to. COnfigure the print manager
+        /// </summary>
+        /// <param name="e"></param>
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            base.OnNavigatedTo(e);
+            RegisterForPrinting();
         }
 
-       
+        /// <summary>
+        /// Executed when the page is navigated from. Unregister the print manager
+        /// </summary>
+        /// <param name="e"></param>
+        protected override void OnNavigatedFrom(NavigationEventArgs e)
+        {
+            base.OnNavigatedFrom(e);
+            PrintManager printMan = PrintManager.GetForCurrentView();
+            printMan.PrintTaskRequested -= PrintTaskRequested;
+        }
+
+        #endregion
+
     }
 }

@@ -1,54 +1,58 @@
 ﻿using BusinessSystem.Models;
+using BusinessSystem.Models.Constants;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using Windows.Storage;
 
-namespace BusinessSystem.repository
+namespace BusinessSystem.Repositories
 {
-    public class CsvRepository
+    public class ProductsRepository
     {
         StorageFolder localFolder = ApplicationData.Current.LocalFolder;
-
-        private const string ProductsInitialDataCsv = @"\repository\products_initial_data.csv";
+        private const string ProductsInitialDataCsv = @"\Repositories\data\products_initial_data.csv";
         const string ProductsDataCsv = "products_data.csv";
-        const string OrderDataCsv = "order_data.csv";
 
-        public CsvRepository()
+        public ProductsRepository()
         {
-
-            // if not product data exist in local folder, then copy initial data to local folder
+            // if no product data exist in 'local folder', then copy initial data to 'local folder'
             if (!CheckIfFileExists(ProductsDataCsv))
             {
                 CopyInitialProductDataToLocalFolder();
-
             }
         }
 
-        public static bool CopyInitialProductDataToLocalFolder()
+        #region Helper methods
+
+        private bool CopyInitialProductDataToLocalFolder()
         {
             try
             {
+                // Get the file from the installed location
                 var initialDataCsvFileSource = Windows.ApplicationModel.Package.Current.InstalledLocation.Path + ProductsInitialDataCsv;
 
                 var sourceFile = StorageFile.GetFileFromPathAsync(initialDataCsvFileSource).AsTask().GetAwaiter().GetResult();
 
-                var localFolder = ApplicationData.Current.LocalFolder;
 
+                // Copy the file to the local folder
+                // docs: https://docs.microsoft.com/en-us/uwp/api/windows.storage.storagefile.copyasync
                 sourceFile.CopyAsync(localFolder, ProductsDataCsv, NameCollisionOption.ReplaceExisting).AsTask().GetAwaiter().GetResult();
 
-                Console.WriteLine($"File copied successfully to LocalFolder with name: {ProductsDataCsv}");
+
+
+                Debug.WriteLine($"File copied successfully to LocalFolder with name: {ProductsDataCsv}");
+
                 return true;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error copying file: {ex.Message}");
+                Debug.WriteLine($"Error copying file: {ex.Message}");
                 return false;
             }
         }
 
-        public static bool CheckIfFileExists(string fileName)
+        private bool CheckIfFileExists(string fileName)
         {
             try
             {
@@ -63,19 +67,21 @@ namespace BusinessSystem.repository
             catch (Exception ex)
             {
                 // Handle other exceptions
-                Console.WriteLine($"Error checking file existence: {ex.Message}");
+                Debug.WriteLine($"Error checking file existence: {ex.Message}");
                 return false;
             }
         }
+        #endregion
 
 
-        // store observable collection of products to csv file
-        public void WriteProductsToDataFile(ObservableCollection<Product> products)
+        /// <summary>
+        /// Write products to local data file (csv file)
+        /// </summary>
+        /// <param name="products"></param>
+        public void WriteProductsToDataFile(List<Product> products)
         {
-
             StorageFolder localFolder = ApplicationData.Current.LocalFolder;
             StorageFile file = localFolder.CreateFileAsync(ProductsDataCsv, CreationCollisionOption.ReplaceExisting).AsTask().GetAwaiter().GetResult();
-
 
             using (StreamWriter writer = new StreamWriter(file.OpenStreamForWriteAsync().GetAwaiter().GetResult()))
             {
@@ -86,25 +92,29 @@ namespace BusinessSystem.repository
                     switch (product)
                     {
                         case Book book:
-                            writer.WriteLine($"Book,{book.Id},{book.Name},{book.Price},{book.Author},,,{book.Format},{book.Language},,{book.Stock}");
+                            writer.WriteLine($"{Constants.ProductTypes.Book},{book.Id},{book.Name},{book.Price},{book.Author},,,{book.Format},{book.Language},,{book.Stock}");
                             break;
                         case Movie movie:
-                            writer.WriteLine($"Movie,{movie.Id},{movie.Name},{movie.Price},,,,{movie.Format},,{movie.PlayTime},{movie.Stock}");
+                            writer.WriteLine($"{Constants.ProductTypes.Movie},{movie.Id},{movie.Name},{movie.Price},,,,{movie.Format},,{movie.PlayTime},{movie.Stock}");
                             break;
                         case Game game:
-                            writer.WriteLine($"Game,{game.Id},{game.Name},{game.Price},,,{game.Platform},,,,{game.Stock}");
+                            writer.WriteLine($"{Constants.ProductTypes.Game},{game.Id},{game.Name},{game.Price},,,{game.Platform},,,,{game.Stock}");
                             break;
                         case Product basicProduct:
-                            writer.WriteLine($"Product,{basicProduct.Id},{basicProduct.Name},{basicProduct.Price},,,,,,,{basicProduct.Stock}");
+                            writer.WriteLine($"{Constants.ProductTypes.Product},{basicProduct.Id},{basicProduct.Name},{basicProduct.Price},,,,,,,{basicProduct.Stock}");
                             break;
                     }
                 }
             }
         }
 
-        public ObservableCollection<Product> ReadProductsFromDataFile()
+        /// <summary>
+        /// Get products from local data file (csv file)
+        /// </summary>
+        /// <returns></returns>
+        public List<Product> GetProducts()
         {
-            var products = new ObservableCollection<Product>();
+            var products = new List<Product>();
             var localFolder = ApplicationData.Current.LocalFolder;
             var file = localFolder.GetFileAsync(ProductsDataCsv).AsTask().Result;
 
@@ -122,10 +132,9 @@ namespace BusinessSystem.repository
 
                 var columns = line.Split(',');
 
-
                 switch (columns[0])
                 {
-                    case "Book":
+                    case Constants.ProductTypes.Book:
                         {
                             var product = new Book
                             {
@@ -142,7 +151,7 @@ namespace BusinessSystem.repository
                             products.Add(product);
                             break;
                         }
-                    case "Movie":
+                    case Constants.ProductTypes.Movie:
                         {
                             var product = new Movie
                             {
@@ -156,7 +165,7 @@ namespace BusinessSystem.repository
                             products.Add(product);
                             break;
                         }
-                    case "Game":
+                    case Constants.ProductTypes.Game:
                         {
                             var product = new Game
                             {
@@ -170,7 +179,7 @@ namespace BusinessSystem.repository
                             products.Add(product);
                             break;
                         }
-                    case "Product":
+                    case Constants.ProductTypes.Product:
                         {
                             var product = new Product
                             {
@@ -184,41 +193,8 @@ namespace BusinessSystem.repository
                             break;
                         }
                 }
-
-
             }
             return products;
         }
-
-
-
-      
-        public void WriteOrderItemsToDataFile(List<OrderItem> products)
-        {
-
-            var localFolder = ApplicationData.Current.LocalFolder;
-            var file = localFolder.CreateFileAsync(OrderDataCsv, CreationCollisionOption.OpenIfExists).AsTask().GetAwaiter().GetResult();
-
-
-            using (StreamWriter writer = new StreamWriter(file.OpenStreamForWriteAsync().GetAwaiter().GetResult()))
-            {
-
-                // Check if file contains data
-                if (writer.BaseStream.Length == 0)
-                {
-                    // Write the header only if the file is empty
-                    writer.WriteLine("OrderId,OrderDate,ProductId,Name,Type,Quantity");
-                }
-
-                // Move the file pointer to the end of the file to append data
-                writer.BaseStream.Seek(0, SeekOrigin.End);
-
-                foreach (var item in products)
-                {
-                    writer.WriteLine($"{item.OrderId.ToString()}, {item.OrderDate.ToString("yyyy-MM-dd HH:mm:ss")}, {item.ProductId},{item.Name},{item.Type},{item.Quantity}");
-                }
-            }
-        }
     }
 }
-

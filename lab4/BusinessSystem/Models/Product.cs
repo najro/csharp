@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BusinessSystem.Extensions;
+using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Windows.UI.Xaml.Media;
@@ -35,8 +36,6 @@ namespace BusinessSystem.Models
                 OnNotifyPropertyChanged();
             }
         }
-
-
 
         decimal _price = 0;
         public decimal Price
@@ -142,7 +141,7 @@ namespace BusinessSystem.Models
 
         public virtual string SearchString()
         {
-            return $"id:{Id} typ:{Type.ToLower()} namn:{Name.ToLower()} pris:{Price} antal:{Stock}";
+            return $"id:{Id} typ:{this.GetTypeNameTranslation().ToLower()} namn:{Name.ToLower()} pris:{Price} antal:{Stock}";
         }
 
         public override string ToString()

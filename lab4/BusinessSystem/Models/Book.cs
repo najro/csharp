@@ -20,7 +20,7 @@ namespace BusinessSystem.Models
 
         public override string SearchString()
         {
-            return $"${base.SearchString()} forfattare:{Author.ToLower()} schanger:{Genre.ToLower()} format:{Format.ToLower()} språk:{Language.ToLower()}";
+            return $"${base.SearchString()} forfattare:{Author.ToLower()} genre:{Genre.ToLower()} format:{Format.ToLower()} språk:{Language.ToLower()}";
         }
     }
 }

@@ -1,11 +1,7 @@
 ﻿using BusinessSystem.Models;
-using BusinessSystem.Models.Enums;
 using System.Collections.Generic;
-using Windows.Graphics.Printing;
-using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Printing;
 
 namespace BusinessSystem.Extensions
 {
@@ -26,7 +22,14 @@ namespace BusinessSystem.Extensions
                 : new SolidColorBrush(Windows.UI.Colors.Red);
         }
 
-
+        /// <summary>
+        /// Check if input is valid for product id
+        /// </summary>
+        /// <param name="textBox"></param>
+        /// <param name="textInput"></param>
+        /// <param name="existingProducts"></param>
+        /// <param name="selectedProduct"></param>
+        /// <returns></returns>
         public static bool IsValidProductId(this TextBox textBox, string textInput, List<Product> existingProducts,
             Product selectedProduct)
         {
@@ -50,6 +53,12 @@ namespace BusinessSystem.Extensions
 
         }
 
+        /// <summary>
+        /// Check if input is valid for product name
+        /// </summary>
+        /// <param name="textBox"></param>
+        /// <param name="textInput"></param>
+        /// <returns></returns>
         public static bool IsValidProductName(this TextBox textBox, string textInput)
         {
             // verify that input is valid
@@ -62,6 +71,12 @@ namespace BusinessSystem.Extensions
 
         }
 
+        /// <summary>
+        /// Check if input is valid for product price
+        /// </summary>
+        /// <param name="textBox"></param>
+        /// <param name="textInput"></param>
+        /// <returns></returns>
         public static bool IsValidProductPrice(this TextBox textBox, string textInput)
         {
             // verify that input is valid
@@ -74,6 +89,12 @@ namespace BusinessSystem.Extensions
 
         }
 
+        /// <summary>
+        /// Check if input is valid for product stock
+        /// </summary>
+        /// <param name="textBox"></param>
+        /// <param name="textInput"></param>
+        /// <returns></returns>
         public static bool IsValidProductStock(this TextBox textBox, string textInput)
         {
             // verify that input is valid
@@ -86,6 +107,12 @@ namespace BusinessSystem.Extensions
 
         }
 
+        /// <summary>
+        /// Check if input is valid for product playtime
+        /// </summary>
+        /// <param name="textBox"></param>
+        /// <param name="textInput"></param>
+        /// <returns></returns>
         public static bool IsValidProductPlaytime(this TextBox textBox, string textInput)
         {
             // verify that input is valid

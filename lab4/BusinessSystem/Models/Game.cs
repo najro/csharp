@@ -19,7 +19,7 @@ namespace BusinessSystem.Models
 
         public override string SearchString()
         {
-            return $"${base.SearchString()} platform:{Platform.ToLower()}";
+            return $"${base.SearchString()} plattform:{Platform.ToLower()}";
         }
 
     }

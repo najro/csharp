@@ -28,7 +28,7 @@
                 <StackPanel Orientation="Vertical" Margin="10,20,10,30" Grid.Column="0" HorizontalAlignment="Center">
                     <TextBlock Text="Produkter i butik" FontSize="14" Margin="0 0 0 10"/>
                     <TextBox Name="TextBoxSearch" PlaceholderText="Sök efter produkt" FontSize="12"  TextChanged="TextBoxSearch_OnTextChanged"></TextBox>
-                    <TextBlock TextWrapping="Wrap" FontSize="12" HorizontalAlignment="Left" Text="För exakt sök använd id:'söktext', namn:'söktext', typ:'video|musik|film', pris:'söktext' eller antal:'söktext'" Margin="0,0,0,0"/>
+                    <TextBlock TextWrapping="Wrap" FontSize="12" HorizontalAlignment="Left" Text="För exakt sök använd id:'söktext', namn:'söktext', typ:'bok|spel|film|produkt', pris:'söktext' eller antal:'söktext'" Margin="0,0,0,0"/>
                     <ListView ItemsSource="{x:Bind FilteredProducts}" x:Name="ListViewProducts" HorizontalAlignment="Left" VerticalContentAlignment="Stretch" Margin="0,30,0,0" Padding="0,0,0,0" VerticalAlignment="Top" SelectionChanged="ListViewProducts_OnSelectionChanged"  Height="500" MinWidth="400">
                         <ListView.ItemTemplate >
                             <DataTemplate>
