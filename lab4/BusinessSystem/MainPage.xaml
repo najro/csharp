@@ -6,7 +6,8 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    MinWidth="750">
 
 
 
@@ -24,171 +25,165 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-              
-
-                    <StackPanel Orientation="Vertical" Margin="10,20,10,50" Grid.Column="0" HorizontalAlignment="Center">
-                        <TextBlock Text="Produkter i butik" FontSize="14" Margin="0 20 0 10"/>
-                        <TextBox Name="TextBoxSearch" PlaceholderText="Sök efter produkt" FontSize="12"  TextChanged="TextBoxSearch_OnTextChanged"></TextBox>
-                        <TextBlock TextWrapping="Wrap" FontSize="12" HorizontalAlignment="Left" Text="För exakt sök använd id:'söktext', namn:'söktext', typ:'video|musik|film', pris:'söktext' eller antal:'söktext'" Margin="0,0,0,0"/>
-                        <ListView ItemsSource="{x:Bind FilteredProducts}" x:Name="ListViewProducts" HorizontalAlignment="Left" VerticalContentAlignment="Stretch" Margin="0,30,0,0" Padding="0,0,0,0" VerticalAlignment="Top" SelectionChanged="ListViewProducts_OnSelectionChanged"  Height="500">
-                            <ListView.ItemTemplate >
-                                <DataTemplate>
+                <StackPanel Orientation="Vertical" Margin="10,20,10,30" Grid.Column="0" HorizontalAlignment="Center">
+                    <TextBlock Text="Produkter i butik" FontSize="14" Margin="0 0 0 10"/>
+                    <TextBox Name="TextBoxSearch" PlaceholderText="Sök efter produkt" FontSize="12"  TextChanged="TextBoxSearch_OnTextChanged"></TextBox>
+                    <TextBlock TextWrapping="Wrap" FontSize="12" HorizontalAlignment="Left" Text="För exakt sök använd id:'söktext', namn:'söktext', typ:'video|musik|film', pris:'söktext' eller antal:'söktext'" Margin="0,0,0,0"/>
+                    <ListView ItemsSource="{x:Bind FilteredProducts}" x:Name="ListViewProducts" HorizontalAlignment="Left" VerticalContentAlignment="Stretch" Margin="0,30,0,0" Padding="0,0,0,0" VerticalAlignment="Top" SelectionChanged="ListViewProducts_OnSelectionChanged"  Height="500" MinWidth="400">
+                        <ListView.ItemTemplate >
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
                                     <StackPanel Orientation="Horizontal">
-                                        <StackPanel Orientation="Horizontal">
-                                            <Image Source="{Binding Image}" Height="20" Width="20" Margin="0 0 10 0"/>
-                                            <TextBlock Text="{Binding Name}" FontSize="12"/>
-                                            <TextBlock Text=", " FontSize="12"/>
-                                            <TextBlock Text="{Binding Price}" FontSize="12"/>
-                                            <TextBlock Text=" kr Tillgängliga:" FontSize="12"/>
-                                            <TextBlock Text="{Binding Available}" FontSize="12"/>
-                                            <TextBlock Text=" st" FontSize="12"/>
-                                        </StackPanel>
+                                        <Image Source="{Binding Image}" Height="20" Width="20" Margin="0 0 10 0"/>
+                                        <TextBlock Text="{Binding Name}" FontSize="12"/>
+                                        <TextBlock Text=", " FontSize="12"/>
+                                        <TextBlock Text="{Binding Price}" FontSize="12"/>
+                                        <TextBlock Text=" kr Tillgängliga:" FontSize="12"/>
+                                        <TextBlock Text="{Binding Available}" FontSize="12"/>
+                                        <TextBlock Text=" st" FontSize="12"/>
                                     </StackPanel>
-                                </DataTemplate>
-                            </ListView.ItemTemplate>
-                        </ListView>
-                    </StackPanel>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </StackPanel>
 
-                    <StackPanel Orientation="Vertical" Background="White" Height="400" BorderBrush="Silver" BorderThickness="1 1 1 1" Padding="10,10,10,10" Margin="20,150,20,100" Width="205" Grid.Column="1">
-                        <Button x:Name="ButtonProductToBasket" IsEnabled="False" Content="Lägg i kundkorg" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Click="ButtonProductToBasket_OnClick" Width="180" />
-                        <Button x:Name="ButtonProductFromBasket" IsEnabled="False" Content="Ta bort från kundkorg" HorizontalAlignment="Left" Margin="0,10,0,0" VerticalAlignment="Top" Click="ButtonProductFromBasket_OnClick" Width="180" />
-                        <Button x:Name="ButtonBasketClear" IsEnabled="true" Content="Töm kundkorgen" HorizontalAlignment="Left" Margin="0,40,0,0" VerticalAlignment="Top" Click="ButtonBasketClear_OnClick" Width="180" />
-                        <Button x:Name="ButtonBasketBuy" IsEnabled="False" Content="Köp" HorizontalAlignment="Left" Margin="0,10,0,0" VerticalAlignment="Top" Click="ButtonBasketBuy_OnClick" Width="189"/>
-                        <TextBlock Text="" Name="TextBlockBasketTotal" FontSize="16" Margin="10 20 0 10" />
-                        <Button Name="ButtonPrint" Content="Skriv ut" Click="ButtonBasketPrint_OnClick"></Button>
-                    </StackPanel>
+                <StackPanel Orientation="Vertical" Background="White" Height="400" BorderBrush="Silver" BorderThickness="1 1 1 1" Padding="10,10,10,10" Margin="20,150,20,100" Width="205" Grid.Column="1">
+                    <Button x:Name="ButtonProductToBasket" IsEnabled="False" Content="Lägg i kundkorg" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Click="ButtonProductToBasket_OnClick" Width="180" />
+                    <Button x:Name="ButtonProductFromBasket" IsEnabled="False" Content="Ta bort från kundkorg" HorizontalAlignment="Left" Margin="0,10,0,0" VerticalAlignment="Top" Click="ButtonProductFromBasket_OnClick" Width="180" />
+                    <Button x:Name="ButtonBasketClear" IsEnabled="true" Content="Töm kundkorgen" HorizontalAlignment="Left" Margin="0,40,0,0" VerticalAlignment="Top" Click="ButtonBasketClear_OnClick" Width="180" />
+                    <Button x:Name="ButtonBasketBuy" IsEnabled="False" Content="Köp" HorizontalAlignment="Left" Margin="0,10,0,0" VerticalAlignment="Top" Click="ButtonBasketBuy_OnClick" Width="189"/>
+                    <TextBlock Text="" Name="TextBlockBasketTotal" FontSize="14" Margin="0 20 0 10" />
+                    <Button Name="ButtonPrint" Content="Skriv ut" Click="ButtonBasketPrint_OnClick"></Button>
+                </StackPanel>
 
-
-                    <StackPanel Orientation="Vertical" HorizontalAlignment="Left" Margin="0,100,10,50"  Grid.Column="2">
-                        <TextBlock Text="Kundkorg" FontSize="16" Margin="10 40 0 10"/>
-                        <ListView ItemsSource="{x:Bind BasketProducts}"  x:Name="ListViewBasket"  HorizontalAlignment="Left"  VerticalContentAlignment="Stretch" Margin="0,10,0,0" VerticalAlignment="Top"  SelectionChanged="ListViewBasket_OnSelectionChanged" Height="400">
-                            <ListView.ItemTemplate >
-                                <DataTemplate>
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Left" Margin="0,100,10,50"  Grid.Column="2">
+                    <TextBlock Text="Kundkorg" FontSize="16" Margin="10 40 0 10"/>
+                    <ListView ItemsSource="{x:Bind BasketProducts}"  x:Name="ListViewBasket"  HorizontalAlignment="Left"  VerticalContentAlignment="Stretch" Margin="0,10,0,0" VerticalAlignment="Top"  SelectionChanged="ListViewBasket_OnSelectionChanged" Height="400" MinWidth="400">
+                        <ListView.ItemTemplate >
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
                                     <StackPanel Orientation="Horizontal">
-                                        <StackPanel Orientation="Horizontal">
-                                            <Image Source="{Binding Image}" Height="20" Width="20" Margin="0 0 10 0"/>
-                                            <TextBlock Text="{Binding Name}" FontSize="12"/>
-                                            <TextBlock Text=", " FontSize="12"/>
-                                            <TextBlock Text="{Binding Price}" FontSize="12"/>
-                                            <TextBlock Text=" kr stykk. Antal:" FontSize="12"/>
-                                            <TextBlock Text="{Binding Reserved}" FontSize="12"/>
-                                            <TextBlock Text=" st" FontSize="12"/>
-                                        </StackPanel>
+                                        <Image Source="{Binding Image}" Height="20" Width="20" Margin="0 0 10 0"/>
+                                        <TextBlock Text="{Binding Name}" FontSize="12"/>
+                                        <TextBlock Text=", " FontSize="12"/>
+                                        <TextBlock Text="{Binding Price}" FontSize="12"/>
+                                        <TextBlock Text=" kr stykk. Antal:" FontSize="12"/>
+                                        <TextBlock Text="{Binding Reserved}" FontSize="12"/>
+                                        <TextBlock Text=" st" FontSize="12"/>
                                     </StackPanel>
-                                </DataTemplate>
-                            </ListView.ItemTemplate>
-                        </ListView>
-                        
-                    </StackPanel>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </StackPanel>
                 
             </Grid>
         </PivotItem>
         <PivotItem Header="Lager">
             <Grid>
-                <StackPanel Orientation="Horizontal" Margin="0,0,0,0">
 
-
-                    <StackPanel Orientation="Vertical">
-                        <TextBlock Text="Produkter på lager" FontSize="16" Margin="0 20 0 0"/>
-                        <ListView ItemsSource="{x:Bind Products}" x:Name="ListViewStorage" HorizontalAlignment="Left" VerticalContentAlignment="Stretch"  Margin="0,10,0,0" VerticalAlignment="Top" Width="500" Height="500" SelectionChanged="ListViewStorage_OnSelectionChanged">
-                            <ListView.ItemTemplate>
-                                <DataTemplate>
-                                    <StackPanel Orientation="Horizontal" Padding="0" Margin="0">
-                                        <StackPanel Orientation="Horizontal">
-                                            <Image Source="{Binding Image}" Height="20" Width="20" Margin="0 0 5 0"/>
-                                            <TextBlock Text="{Binding Name}" FontSize="12"/>
-                                            <TextBlock Text=", " FontSize="12"/>
-                                            <TextBlock Text="{Binding Price}" FontSize="12"/>
-                                            <TextBlock Text=" kr Lagersaldo:" FontSize="12"/>
-                                            <TextBlock Text="{Binding Stock}" FontSize="12"/>
-                                            <TextBlock Text=", Reserverade:" FontSize="12"/>
-                                            <TextBlock Text="{Binding Reserved}" FontSize="12"/>
-                                        </StackPanel>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                
+  
+                <StackPanel Orientation="Vertical" Grid.Column="0">
+                    <TextBlock Text="Produkter på lager" FontSize="14" Margin="0 20 0 0"/>
+                    <ListView ItemsSource="{x:Bind Products}" x:Name="ListViewStorage" HorizontalAlignment="Left" VerticalContentAlignment="Stretch"  Margin="0,20,0,0" VerticalAlignment="Top" MinWidth="400" Height="500" SelectionChanged="ListViewStorage_OnSelectionChanged">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" Padding="0" Margin="0">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image Source="{Binding Image}" Height="20" Width="20" Margin="0 0 5 0"/>
+                                        <TextBlock Text="{Binding Name}" FontSize="12"/>
+                                        <TextBlock Text=", " FontSize="12"/>
+                                        <TextBlock Text="{Binding Price}" FontSize="12"/>
+                                        <TextBlock Text=" kr Lagersaldo:" FontSize="12"/>
+                                        <TextBlock Text="{Binding Stock}" FontSize="12"/>
+                                        <TextBlock Text=", Reserverade:" FontSize="12"/>
+                                        <TextBlock Text="{Binding Reserved}" FontSize="12"/>
                                     </StackPanel>
-                                </DataTemplate>
-                            </ListView.ItemTemplate>
-                        </ListView>
-                    </StackPanel>
-                    <StackPanel Orientation="Vertical" Background="White" BorderBrush="Silver" BorderThickness="1 0 0 0"  Padding="10,10,10,10" Margin="20,0,0,20">
-                        <Button x:Name="ButtonProductNew"  Content="Ny produkt" HorizontalAlignment="Left" Margin="0,10,0,10" Width="200" VerticalAlignment="Top" Click="ButtonProductNew_OnClick"/>
-                        <StackPanel Orientation="Vertical" Name="StackPanelProductEdit" Visibility="Collapsed">
-                                <StackPanel Orientation="Horizontal">
-                                <TextBlock Width="100" Text="Produkttyp" Margin="5"/>
-                                    <ComboBox x:Name="ComboBoxProductType" PlaceholderText="Välg typ" Margin="5" SelectionChanged="ComboBoxProductType_OnSelectionChanged">
-                                    <ComboBoxItem Content="Produkt"/>
-                                    <ComboBoxItem Content="Bok"/>
-                                    <ComboBoxItem Content="Film"/>
-                                    <ComboBoxItem Content="Spel"/>
-                                </ComboBox>
-                            </StackPanel>
-
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Width="100" Text="Produkt ID" Margin="5"/>
-                                <TextBox x:Name="TextBoxProductId" PlaceholderText="Product ID" Width="200" Margin="5" KeyUp="TextBoxProductId_OnKeyUp"/>
-                            </StackPanel>
-
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Width="100" Text="Namn" Margin="5"/>
-                                <TextBox x:Name="TextBoxProductName" PlaceholderText="Namn" Width="200" Margin="5" KeyUp="TextBoxProductName_OnKeyUp"/>
-                            </StackPanel>
-
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Width="100" Text="Pris" Margin="5"/>
-                                <TextBox x:Name="TextBoxProductPrice" PlaceholderText="Pris" Width="200" Margin="5" KeyUp="TextBoxProductPrice_OnKeyUp"/>
-                            </StackPanel>
-
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Width="100" Text="Antal" Margin="5"/>
-                                <TextBox x:Name="TextBoxProductStock" PlaceholderText="Antal" Width="200" Margin="5" KeyUp="TextBoxProductStock_OnKeyUp"/>
-                            </StackPanel>
-
-                           <StackPanel Orientation="Horizontal">
-                                <TextBlock Width="100" Text="Författare" Margin="5"/>
-                                <TextBox x:Name="TextBoxProductAuthor" PlaceholderText="Författare" Width="200" Margin="5"/>
-                           </StackPanel>
-
-                            <StackPanel Orientation="Horizontal" Name="StackPanelGenre">
-                                <TextBlock Width="100" Text="Genre" Margin="5"/>
-                                <TextBox x:Name="TextBoxProductGenre" PlaceholderText="Genre" Width="200" Margin="5"/>
-                            </StackPanel>
-
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Width="100" Text="Format" Margin="5"/>
-                                <TextBox x:Name="TextBoxProductFormat" PlaceholderText="Format" Width="200" Margin="5"/>
-                            </StackPanel>
-
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Width="100" Text="Språk" Margin="5"/>
-                                <TextBox x:Name="TextBoxProductLanguage" PlaceholderText="Språk" Width="200" Margin="5"/>
-                            </StackPanel>
-
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Width="100" Text="Plattform" Margin="5"/>
-                                <TextBox x:Name="TextBoxProductPlatform" PlaceholderText="Plattform" Width="200" Margin="5"/>
-                            </StackPanel>
-
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Width="100" Text="Speltid" Margin="5"/>
-                                <TextBox x:Name="TextBoxProductPlayTime" PlaceholderText="Speltid" Width="200" Margin="5" KeyUp="TextBoxProductPlayTime_OnKeyUp"/>
-                            </StackPanel>
-
-                            <StackPanel Orientation="Horizontal">
-                               
-                                <Button x:Name="ButtonProductSave"  Content="Lagra produkt" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Click="ButtonProductSave_OnClick"/>
-                                <Button x:Name="ButtonProductCancel" Content="Avbryt" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Click="ButtonProductCancel_OnClick"/>
-                                <Button x:Name="ButtonProductDelete" Content="Ta bort" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Click="ButtonProductDelete_OnClick"/>
-                                <Button x:Name="ButtonProductReturn"  Content="Retur" HorizontalAlignment="Left" Margin="10,10,0,10" Width="200" VerticalAlignment="Top" Click="ButtonProductReturn_OnClick"/>
-                            </StackPanel>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </StackPanel>
+                <StackPanel  Grid.Column="1" Orientation="Vertical" Background="White" BorderBrush="Silver" BorderThickness="1 1 1 1"  Padding="10,10,10,10" Margin="10,25,0,20">
+                    <Button x:Name="ButtonProductNew"  Content="Ny produkt" HorizontalAlignment="Left" Margin="0,10,0,10" Width="200" VerticalAlignment="Top" Click="ButtonProductNew_OnClick"  FontSize="12"/>
+                    <StackPanel Orientation="Vertical" Name="StackPanelProductEdit" Visibility="Collapsed">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Width="100" Text="Produkttyp" Margin="5" FontSize="12"/>
+                            <ComboBox x:Name="ComboBoxProductType" PlaceholderText="Välg typ" Margin="5" SelectionChanged="ComboBoxProductType_OnSelectionChanged" FontSize="12">
+                                <ComboBoxItem Content="Produkt"/>
+                                <ComboBoxItem Content="Bok"/>
+                                <ComboBoxItem Content="Film"/>
+                                <ComboBoxItem Content="Spel"/>
+                            </ComboBox>
                         </StackPanel>
 
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Width="100" Text="Produkt ID" Margin="5" FontSize="12"/>
+                            <TextBox x:Name="TextBoxProductId" PlaceholderText="Product ID" Width="200" Margin="5" KeyUp="TextBoxProductId_OnKeyUp" FontSize="12"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Width="100" Text="Namn" Margin="5" FontSize="12"/>
+                            <TextBox x:Name="TextBoxProductName" PlaceholderText="Namn" Width="200" Margin="5" KeyUp="TextBoxProductName_OnKeyUp" FontSize="12"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Width="100" Text="Pris" Margin="5" FontSize="12"/>
+                            <TextBox x:Name="TextBoxProductPrice" PlaceholderText="Pris" Width="200" Margin="5" KeyUp="TextBoxProductPrice_OnKeyUp" FontSize="12"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Width="100" Text="Antal" Margin="5" FontSize="12"/>
+                            <TextBox x:Name="TextBoxProductStock" PlaceholderText="Antal" Width="200" Margin="5" KeyUp="TextBoxProductStock_OnKeyUp" FontSize="12"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Width="100" Text="Författare" Margin="5" FontSize="12"/>
+                            <TextBox x:Name="TextBoxProductAuthor" PlaceholderText="Författare" Width="200" Margin="5" FontSize="12"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Name="StackPanelGenre">
+                            <TextBlock Width="100" Text="Genre" Margin="5" FontSize="12"/>
+                            <TextBox x:Name="TextBoxProductGenre" PlaceholderText="Genre" Width="200" Margin="5" FontSize="12"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Width="100" Text="Format" Margin="5" FontSize="12"/>
+                            <TextBox x:Name="TextBoxProductFormat" PlaceholderText="Format" Width="200" Margin="5" FontSize="12"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Width="100" Text="Språk" Margin="5" FontSize="12"/>
+                            <TextBox x:Name="TextBoxProductLanguage" PlaceholderText="Språk" Width="200" Margin="5" FontSize="12"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Width="100" Text="Plattform" Margin="5" FontSize="12"/>
+                            <TextBox x:Name="TextBoxProductPlatform" PlaceholderText="Plattform" Width="200" Margin="5" FontSize="12" />
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Width="100" Text="Speltid" Margin="5" FontSize="12"/>
+                            <TextBox x:Name="TextBoxProductPlayTime" PlaceholderText="Speltid" Width="200" Margin="5" KeyUp="TextBoxProductPlayTime_OnKeyUp" FontSize="12"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal">
+                            <Button x:Name="ButtonProductSave"  Content="Lagra produkt" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Click="ButtonProductSave_OnClick" FontSize="12"/>
+                            <Button x:Name="ButtonProductCancel" Content="Avbryt" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Click="ButtonProductCancel_OnClick" FontSize="12"/>
+                            <Button x:Name="ButtonProductDelete" Content="Ta bort" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Click="ButtonProductDelete_OnClick" FontSize="12"/>
+                            <Button x:Name="ButtonProductReturn"  Content="Retur" HorizontalAlignment="Left" Margin="10,10,0,10" Width="200" VerticalAlignment="Top" Click="ButtonProductReturn_OnClick" FontSize="12"/>
+                        </StackPanel>
                     </StackPanel>
-
-                   
-
-
                 </StackPanel>
-
-
             </Grid>
         </PivotItem>
         <PivotItem Header="Statistik">
