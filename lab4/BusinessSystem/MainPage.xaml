@@ -54,13 +54,13 @@
                     <Button x:Name="ButtonBasketClear" IsEnabled="true" Content="Töm kundkorgen" HorizontalAlignment="Left" Margin="0,40,0,0" VerticalAlignment="Top" Click="ButtonBasketClear_OnClick" Width="180" />
                     <Button x:Name="ButtonBasketBuy" IsEnabled="False" Content="Köp" HorizontalAlignment="Left" Margin="0,10,0,0" VerticalAlignment="Top" Click="ButtonBasketBuy_OnClick" Width="189"/>
                     <TextBlock Text="" Name="TextBlockBasketTotal" FontSize="14" Margin="0 20 0 10" />
-                    <Button Name="ButtonPrint" Content="Skriv ut" Click="ButtonBasketPrint_OnClick"></Button>
+                    <Button Name="ButtonBasketPrint" Content="Skriv ut senaste kvitto" IsEnabled="False" Click="ButtonBasketPrint_OnClick"></Button>
                 </StackPanel>
 
                 <StackPanel Orientation="Vertical" HorizontalAlignment="Left" Margin="0,100,10,50"  Grid.Column="2">
                     <TextBlock Text="Kundkorg" FontSize="16" Margin="10 40 0 10"/>
-                    <ListView ItemsSource="{x:Bind BasketProducts}"  x:Name="ListViewBasket"  HorizontalAlignment="Left"  VerticalContentAlignment="Stretch" Margin="0,10,0,0" VerticalAlignment="Top"  SelectionChanged="ListViewBasket_OnSelectionChanged" Height="400" MinWidth="400">
-                        <ListView.ItemTemplate >
+                    <ListView ItemsSource="{x:Bind BasketProducts}"  x:Name="ListViewBasket"  HorizontalAlignment="Left"  VerticalContentAlignment="Stretch" Margin="0,10,0,0" VerticalAlignment="Top"  SelectionChanged="ListViewBasket_OnSelectionChanged"  Height="400" MinWidth="400">
+                        <ListView.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
                                     <StackPanel Orientation="Horizontal">

@@ -16,6 +16,7 @@ using Windows.UI.Xaml.Printing;
 using BusinessSystem.repository;
 using Windows.UI.Xaml.Navigation;
 using Windows.Storage;
+using System.Text;
 
 
 namespace BusinessSystem
@@ -90,6 +91,8 @@ namespace BusinessSystem
             ValidateProductFromBasket();
             ValidateProductToBasket();
         }
+
+
 
 
         private void ValidateProductToBasket()
@@ -577,20 +580,43 @@ namespace BusinessSystem
                 product.Reserved = 0;
             }
 
+
+
+
+            // Build reciete
+
+
+
             // store the basket products in a temporary list to avoid concurrent modification
             var tempBasketProducts = new ObservableCollection<Product>(BasketProducts);
 
-
-            
-
-
-
-
-
-
+            if(tempBasketProducts.Count > 0)
+            {
+                lastestReceiptInfo = BuildRecieteFromProducts(tempBasketProducts.ToList());
+                ButtonBasketPrint.IsEnabled = true;
+            }
 
             BasketProducts.Clear();
             ToggleBasketStatus();
+
+        }
+
+        //Implement a reciept printout for the basket
+        private string BuildRecieteFromProducts(List<Product> products)
+        {
+            var reciept = new StringBuilder();
+           
+            reciept.AppendLine("-------------------------------");
+            reciept.AppendLine("Vara | Pris | Antal");
+            reciept.AppendLine("-------------------------------");
+            reciept.AppendLine( products.Select(p => $"{p.Name} | {p.Price} | {p.Reserved}").Aggregate((a, b) => a + "\n" + b));
+            reciept.AppendLine("-------------------------------");
+            reciept.AppendLine($"Total pris: {products.Sum(p => p.Price * p.Reserved)} kr");
+            reciept.AppendLine("-------------------------------");
+            reciept.AppendLine();
+            reciept.AppendLine("Tack för att du handlade hos oss!");
+            reciept.AppendLine();
+            return reciept.ToString();    
         }
 
         private void CheckValidProductInput()
@@ -661,10 +687,8 @@ namespace BusinessSystem
 
         private async void ButtonBasketPrint_OnClick(object sender, RoutedEventArgs e)
         {
-            string someCoolTExt = "This is some cool text";
-
             printReceiptPage = new PrintReceiptPage();
-            printReceiptPage.SetRecieptInfo(someCoolTExt);
+            printReceiptPage.SetRecieptInfo(lastestReceiptInfo);
             pages.Clear();
             pages.Add(printReceiptPage);
             await PrintManager.ShowPrintUIAsync();
@@ -682,6 +706,7 @@ namespace BusinessSystem
         IPrintDocumentSource printDocumentSource;
         List<Page> pages = new List<Page>();
         PrintReceiptPage printReceiptPage = new PrintReceiptPage();
+        string lastestReceiptInfo = "";
 
         public void RegisterForPrinting()
         {
@@ -769,5 +794,7 @@ namespace BusinessSystem
             // store the products in a csv file
             new repository.CsvRepository().WriteProductsToDataFile(Products);
         }
+
+       
     }
 }
