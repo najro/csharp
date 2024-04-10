@@ -14,6 +14,7 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Printing;
 using BusinessSystem.repository;
+using Windows.UI.Xaml.Navigation;
 
 
 namespace BusinessSystem
@@ -39,6 +40,7 @@ namespace BusinessSystem
 
 
         public ObservableCollection<Product> BasketProducts { get; set; }
+
 
 
         public void ToggleBasketStatus()
@@ -658,7 +660,13 @@ namespace BusinessSystem
 
         private async void ButtonBasketPrint_OnClick(object sender, RoutedEventArgs e)
         {
-            await PrintReceite("Print this magic stuff");
+            string someCoolTExt = "This is some cool text";
+
+            printReceiptPage = new PrintReceiptPage();
+            printReceiptPage.SetRecieptInfo(someCoolTExt);
+            pages.Clear();
+            pages.Add(printReceiptPage);
+            await PrintManager.ShowPrintUIAsync();
         }
 
 
@@ -668,84 +676,60 @@ namespace BusinessSystem
         // https://learn.microsoft.com/en-us/windows/uwp/devices-sensors/print-from-your-app
 
 
-        private PrintDocument printDocument;
-        private IPrintDocumentSource printDocumentSource;
-        private PrintReceiptPage printPage = null;
+        // used for printing receipt
+        protected PrintDocument printDocument;
+        protected IPrintDocumentSource printDocumentSource;
+        List<Page> pages = new List<Page>();
+        PrintReceiptPage printReceiptPage = new PrintReceiptPage();
 
-        public async Task PrintReceite(string reciete)
+        public void RegisterForPrinting()
         {
-            // add recite to print page
-            printPage = new PrintReceiptPage();
-
-            //printPage.TextContentBlock() = reciete;
-            //printPage.TextContentBlock. = new TextBlock { Text = reciete, FontSize = 24, TextWrapping = TextWrapping.WrapWholeWords };
-
-
             printDocument = new PrintDocument();
             printDocumentSource = printDocument.DocumentSource;
+            pages.Add(printReceiptPage);
             printDocument.GetPreviewPage += GetPrintPreviewPage;
-
-            printDocument.AddPage(printPage);
-            printDocument.AddPagesComplete();
-
+            printDocument.AddPages += AddPrintPages;
             PrintManager printMan = PrintManager.GetForCurrentView();
             printMan.PrintTaskRequested += PrintTaskRequested;
-
-            await PrintManager.ShowPrintUIAsync();
         }
-
-
+        private void AddPrintPages(object sender, AddPagesEventArgs e)
+        {
+            foreach (var page in pages)
+            {
+                printDocument.AddPage(page);
+            }
+            printDocument.AddPagesComplete();
+        }
         private void GetPrintPreviewPage(object sender, GetPreviewPageEventArgs e)
         {
-            printDocument.SetPreviewPage(1, printPage);
-            printDocument.SetPreviewPageCount(1, PreviewPageCountType.Final);
+            printDocument.SetPreviewPage(1, printReceiptPage);
+            printDocument.SetPreviewPageCount(pages.Count, PreviewPageCountType.Final);
         }
 
         void PrintTaskRequested(PrintManager sender, PrintTaskRequestedEventArgs e)
         {
-            //PrintTask printTask = null;
-            //printTask = e.Request.CreatePrintTask("Receipe Print Job", sourceRequested =>
-            //{
-            //    printTask.Completed += PrintTask_Completed;
-            //    sourceRequested.SetSource(printDocumentSource);
-            //});
             PrintTask printTask = null;
-
-            // Create a PrintTask and handle print task request
             printTask = e.Request.CreatePrintTask("Receipt Print Job", sourceRequested =>
             {
-                // Set the print document source
+                //printTask.Completed += PrintTask_Completed;
                 sourceRequested.SetSource(printDocumentSource);
-
-                // Handle completed event
-                printTask.Completed += (s, args) =>
-                {
-                    // Check if there were any errors
-                    if (args.Completion == PrintTaskCompletion.Failed)
-                    {
-                        // Handle error
-                        Debug.WriteLine("Print task failed.");
-                    }
-                    else
-                    {
-                        // Print task completed successfully
-                        Debug.WriteLine("Print task completed.");
-                    }
-                };
             });
-
-
         }
 
-        private async void PrintTask_Completed(PrintTask sender, PrintTaskCompletedEventArgs args)
+        
+     
+        protected override void OnNavigatedTo(NavigationEventArgs e)
         {
+            base.OnNavigatedTo(e);
+            RegisterForPrinting();
+        }
 
-
-            await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-            {
-                PrintManager printMan = PrintManager.GetForCurrentView();
-                printMan.PrintTaskRequested -= PrintTaskRequested;
-            });
+     
+        protected override void OnNavigatedFrom(NavigationEventArgs e)
+        {
+            base.OnNavigatedFrom(e);
+            PrintManager printMan = PrintManager.GetForCurrentView();
+            printMan.PrintTaskRequested -= PrintTaskRequested;
         }
         #endregion
 

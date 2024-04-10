@@ -14,7 +14,11 @@ namespace BusinessSystem
         public PrintReceiptPage()
         {
             this.InitializeComponent();
-            TextContentBlock = TextContent;
+        }
+
+        public void SetRecieptInfo(string text)
+        {
+            ReceiptInfo.Text = text;
         }
     }
 }
