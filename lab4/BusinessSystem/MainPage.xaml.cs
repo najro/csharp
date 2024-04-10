@@ -502,15 +502,39 @@ namespace BusinessSystem
             }
         }
 
-        private void ButtonBasketClear_OnClick(object sender, RoutedEventArgs e)
+        private async void ButtonBasketClear_OnClick(object sender, RoutedEventArgs e)
         {
-            foreach (var product in BasketProducts)
-            {
-                product.Reserved = 0;
-            }
 
-            BasketProducts.Clear();
-            ToggleBasketStatus();
+            // https://docs.microsoft.com/en-us/windows/uwp/design/controls-and-patterns/dialogs-and-flyouts/dialogs
+            var dialog = new ContentDialog
+            {
+                Title = "Töm korg",
+                Content = "Önskar du tömma alla produkter i korgen?",
+                PrimaryButtonText = "Ja",
+                SecondaryButtonText = "Nej",
+                CloseButtonText = "Avbryt"
+            };
+
+            dialog.PrimaryButtonClick += async (s, args) =>
+            {
+                foreach (var product in BasketProducts)
+                {
+                    product.Reserved = 0;
+                }
+
+                BasketProducts.Clear();
+                ToggleBasketStatus();
+            };
+
+            dialog.SecondaryButtonClick += (s, args) =>
+            {
+                // do nothing
+            };
+
+            await dialog.ShowAsync();
+
+
+          
         }
 
 
@@ -726,9 +750,33 @@ namespace BusinessSystem
         #endregion
 
 
-        private void ButtonProductsSave_OnClick(object sender, RoutedEventArgs e)
+        private async void ButtonProductReturn_OnClick(object sender, RoutedEventArgs e)
         {
-            new repository.CsvRepository().WriteProductsToDataFile(Products);
+            if (_selectedStorageProduct != null)
+            {
+                // https://docs.microsoft.com/en-us/windows/uwp/design/controls-and-patterns/dialogs-and-flyouts/dialogs
+                var dialog = new ContentDialog
+                {
+                    Title = $"Retur av produkt: {_selectedStorageProduct.Name}",
+                    Content = "Vill du lämna tillbaka en produkt",
+                    PrimaryButtonText = "Ja",
+                    SecondaryButtonText = "Nej",
+                    CloseButtonText = "Avbryt"
+                };
+
+                dialog.PrimaryButtonClick += async (s, args) =>
+                {
+                    _selectedStorageProduct.Stock += 1;
+                    TextBoxProductStock.Text = _selectedStorageProduct.Stock.ToString();
+                };
+
+                dialog.SecondaryButtonClick += (s, args) =>
+                {
+                    // do nothing
+                };
+
+                await dialog.ShowAsync();
+            }
         }
 
         public void OnAppExit()
