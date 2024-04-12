@@ -24,7 +24,8 @@ namespace BusinessSystem.Helpers
                 if (YearAndMounthPrefix != currentYearAndMonthPrefix)
                 {
                     YearAndMounthPrefix = currentYearAndMonthPrefix;
-                    output.Append($"{YearAndMounthPrefix}\n");
+                    output.Append($"\n{YearAndMounthPrefix}\n");
+                    output.Append("------------------------------------------------------\n");
                 }
 
                 output.Append($"{report.Name}, Antal: {report.Quantity}\n");
@@ -53,8 +54,7 @@ namespace BusinessSystem.Helpers
                     Month = x.Key.Month,
                     Name = x.Key.Name,
                     Quantity = x.Sum(y => y.Quantity)
-                })
-                .Take(10); // take the top 10 most sold products
+                });
 
             foreach (var top10MostSoldProduct in top10MostSoldProducts)
             {
@@ -89,6 +89,7 @@ namespace BusinessSystem.Helpers
                 {
                     YearAndMounthPrefix = currentYearAndMonthPrefix;
                     output.Append($"{YearAndMounthPrefix}\n");
+                    output.Append("-----------------------------------\n");
                 }
 
                 output.Append($"Total försäljning: {report.TotalSales}\n");
@@ -134,7 +135,7 @@ namespace BusinessSystem.Helpers
 
 
 
-    
+
 
         // Get the friendly name of the month
         private static string GetMonthFriendlyName(int month)

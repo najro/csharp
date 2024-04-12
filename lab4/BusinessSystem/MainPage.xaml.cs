@@ -29,17 +29,19 @@ namespace BusinessSystem
     /// </summary>
     public sealed partial class MainPage : Page, INotifyPropertyChanged
     {
-        Product _selectedProduct;
+        Product _selectedProduct; 
         Product _selectedBasketProduct;
         Product _selectedStorageProduct;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
+        // storage for the products that is available in total
         public ObservableCollection<Product> Products { get; set; }
 
+        // storage for the products that is filtered thas is visible for the user to buy in shop
         public ObservableCollection<Product> FilteredProducts { get; set; }
 
-
+        // storage for the products that is currently in the basket
         public ObservableCollection<Product> BasketProducts { get; set; }
 
 
@@ -47,9 +49,10 @@ namespace BusinessSystem
         {
             this.InitializeComponent();
 
-
+            // read all products from file
             Products = new ObservableCollection<Product>(new Repositories.ProductsRepository().GetProducts());
 
+            // set the filtered products for user to buy
             FilteredProducts = new ObservableCollection<Product>();
 
             foreach (var product in Products)
@@ -57,16 +60,25 @@ namespace BusinessSystem
                 FilteredProducts.Add(product);
             }
 
+            // set the basket products
             BasketProducts = new ObservableCollection<Product>(Products.Where(p => p.Reserved > 0));
 
+            // set the basket status
             ToggleBasketStatus();
 
-            TextBlockDataFiles.Text = $"Datafiler blir lagrade här:\n{ApplicationData.Current.LocalFolder.Path}";
+            // set info in pivot for info about data files
+            TextBoxDataFiles.Text = $"Datafiler blir lagrade här:\n{ApplicationData.Current.LocalFolder.Path}";
 
             this.DataContext = this;
 
         }
 
+
+        #region Pivot Butik
+                    
+        /// <summary>
+        /// toggle the basket status
+        /// </summary>
         public void ToggleBasketStatus()
         {
             TextBlockBasketTotal.Text = $"Antal varor: {BasketProducts.Sum(p => p.Reserved)}\nTotalt pris: {BasketProducts.Sum(p => p.Price * p.Reserved)}  kr";
@@ -74,6 +86,11 @@ namespace BusinessSystem
             ButtonBasketBuy.IsEnabled = BasketProducts.Count > 0;
         }
 
+        /// <summary>
+        /// Event handler when the casheer selects a product in the listview of aviailable products in store
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ListViewProducts_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             _selectedProduct = ((Models.Product)ListViewProducts.SelectedItem);
@@ -83,6 +100,11 @@ namespace BusinessSystem
             ValidateProductToBasket();
         }
 
+        /// <summary>
+        /// Event handler when the casheer selects a product in the listview of products in the basket
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ListViewBasket_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             _selectedBasketProduct = ((Models.Product)ListViewBasket.SelectedItem);
@@ -91,9 +113,10 @@ namespace BusinessSystem
             ValidateProductToBasket();
         }
 
-
-
-
+        
+        /// <summary>
+        /// Validate the button for adding a product to the basket
+        /// </summary>
         private void ValidateProductToBasket()
         {
             ButtonProductToBasket.IsEnabled = _selectedProduct != null;
@@ -109,6 +132,10 @@ namespace BusinessSystem
             }
         }
 
+
+        /// <summary>
+        /// Validate the button for removing a product from the basket
+        /// </summary>
         private void ValidateProductFromBasket()
         {
             ButtonProductFromBasket.IsEnabled = _selectedBasketProduct != null;
@@ -124,9 +151,11 @@ namespace BusinessSystem
             }
         }
 
-
-
-
+        /// <summary>
+        /// Add a product to the basket
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ButtonProductToBasket_OnClick(object sender, RoutedEventArgs e)
         {
             _selectedProduct.Reserved += 1;
@@ -141,9 +170,11 @@ namespace BusinessSystem
             ToggleBasketStatus();
         }
 
-
-
-
+        /// <summary>
+        /// Remove a product from the basket
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ButtonProductFromBasket_OnClick(object sender, RoutedEventArgs e)
         {
             _selectedBasketProduct.Reserved -= 1;
@@ -157,6 +188,8 @@ namespace BusinessSystem
 
             ToggleBasketStatus();
         }
+
+        #endregion
 
         private void ButtonProductNew_OnClick(object sender, RoutedEventArgs e)
         {
@@ -693,6 +726,35 @@ namespace BusinessSystem
             }
         }
 
+        #region Report Pivot
+
+        /// <summary>
+        /// Event handler for the button to get the report data
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ButtonGetReportData_Click(object sender, RoutedEventArgs e)
+        {
+            var orderItems = new OrderRepository().GetOrders();
+
+            if (ComboBoxReportType.SelectedIndex == 0)
+            {
+                TextBlockReportHeader.Text = "Top-10-lista per år och månad";
+                TextBoxReportResult.Text = ReportItemHelper.GetTop10MostSoldProductsPerYearAndMonthReport(orderItems);
+            }
+            else if (ComboBoxReportType.SelectedIndex == 1)
+            {
+                TextBlockReportHeader.Text = "Total försäljning per år och månad";
+                TextBoxReportResult.Text = ReportItemHelper.GetTotalSalesPerYearAndMonthReport(orderItems);
+            }
+            else
+            {
+                TextBlockReportHeader.Text = "Ingen rapportdata är vald";
+                TextBoxReportResult.Text = "";
+            }
+        }
+
+        #endregion
 
         #region Printer Handling
         /// <summary>
@@ -834,28 +896,5 @@ namespace BusinessSystem
         }
 
         #endregion
-
-    
-
-        private void ButtonGetReportData_Click(object sender, RoutedEventArgs e)
-        {
-            var orderItems = new OrderRepository().GetOrders();
-
-            if (ComboBoxReportType.SelectedIndex == 0)
-            {
-                TextBoxReportHeader.Text = "Top-10-list per år och månad";
-                TextBoxReportResult.Text = ReportItemHelper.GetTop10MostSoldProductsPerYearAndMonthReport(orderItems);
-            }
-            else if (ComboBoxReportType.SelectedIndex == 1)
-            {
-                TextBoxReportHeader.Text = "Total försäljning per år och månad";
-                TextBoxReportResult.Text = ReportItemHelper.GetTotalSalesPerYearAndMonthReport(orderItems);
-            }
-            else
-            {
-                TextBoxReportHeader.Text = "Ingen rapportdata är vald";
-                TextBoxReportResult.Text = "";
-            }
-        }
     }
 }
