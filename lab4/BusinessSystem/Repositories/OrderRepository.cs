@@ -50,7 +50,7 @@ namespace BusinessSystem.Repositories
             return orderItems;
         }
 
-        private List<OrderItem> ReadOrderItemsFromDataFile()
+        public List<OrderItem> GetOrders()
         {
             var orderItems = new List<OrderItem>();
             var localFolder = ApplicationData.Current.LocalFolder;

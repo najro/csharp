@@ -430,8 +430,8 @@ namespace BusinessSystem
                     // https://docs.microsoft.com/en-us/windows/uwp/design/controls-and-patterns/dialogs-and-flyouts/dialogs
                     var dialog = new ContentDialog
                     {
-                        Title = "Ta bort produkt",
-                        Content = "Det finns flera produkter på lager, är du säker på att du vill ta bort den?",
+                        Title = $"Ta bort produkt: {_selectedStorageProduct.Name}",
+                        Content = "Det finns flera produkter på lager, är du säker på att du vill ta bort denna?",
                         PrimaryButtonText = "Ja",
                         SecondaryButtonText = "Nej",
                         CloseButtonText = "Avbryt"
@@ -835,5 +835,27 @@ namespace BusinessSystem
 
         #endregion
 
+    
+
+        private void ButtonGetReportData_Click(object sender, RoutedEventArgs e)
+        {
+            var orderItems = new OrderRepository().GetOrders();
+
+            if (ComboBoxReportType.SelectedIndex == 0)
+            {
+                TextBoxReportHeader.Text = "Top-10-list per år och månad";
+                TextBoxReportResult.Text = ReportItemHelper.GetTop10MostSoldProductsPerYearAndMonthReport(orderItems);
+            }
+            else if (ComboBoxReportType.SelectedIndex == 1)
+            {
+                TextBoxReportHeader.Text = "Total försäljning per år och månad";
+                TextBoxReportResult.Text = ReportItemHelper.GetTotalSalesPerYearAndMonthReport(orderItems);
+            }
+            else
+            {
+                TextBoxReportHeader.Text = "Ingen rapportdata är vald";
+                TextBoxReportResult.Text = "";
+            }
+        }
     }
 }
