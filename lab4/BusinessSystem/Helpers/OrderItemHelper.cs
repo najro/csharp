@@ -25,7 +25,8 @@ namespace BusinessSystem.Helpers
                     ProductId = product.Id,
                     Name = product.Name,
                     Type = product.GetType().Name,
-                    Quantity = product.Stock
+                    Quantity = product.Reserved,
+                    Price = product.Price
                 };
 
                 orderItems.Add(orderItem);

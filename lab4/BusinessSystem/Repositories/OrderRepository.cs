@@ -2,7 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
+using System.Text;
 using Windows.Storage;
 
 namespace BusinessSystem.Repositories
@@ -41,7 +43,8 @@ namespace BusinessSystem.Repositories
                     ProductId = int.Parse(columns[2]),
                     Name = columns[3],
                     Type = columns[4],
-                    Quantity = int.Parse(columns[5])
+                    Quantity = int.Parse(columns[5]),
+                    Price = decimal.Parse(columns[6])
                 };
 
                 orderItems.Add(orderItem);
@@ -53,19 +56,19 @@ namespace BusinessSystem.Repositories
         public List<OrderItem> GetOrders()
         {
             var orderItems = new List<OrderItem>();
+
+            if(!CheckIfFileExists(OrderDataCsv))
+            {
+                return orderItems;
+            }
+
             var localFolder = ApplicationData.Current.LocalFolder;
             var file = localFolder.GetFileAsync(OrderDataCsv).AsTask().Result;
 
-            var lines = File.ReadAllLines(file.Path);
+            var lines = File.ReadAllLines(file.Path, Encoding.UTF8);
 
             return BuildOrderItemsFromCsv(lines);
         }
-
-
-
-
-
-
 
 
         public void WriteOrderItemsToDataFile(List<OrderItem> products)
@@ -76,14 +79,14 @@ namespace BusinessSystem.Repositories
             var file = localFolder.CreateFileAsync(OrderDataCsv, CreationCollisionOption.OpenIfExists).AsTask().GetAwaiter().GetResult();
 
 
-            using (StreamWriter writer = new StreamWriter(file.OpenStreamForWriteAsync().GetAwaiter().GetResult()))
+            using (StreamWriter writer = new StreamWriter(file.OpenStreamForWriteAsync().GetAwaiter().GetResult(), System.Text.Encoding.UTF8))
             {
 
                 // Check if file contains data
                 if (writer.BaseStream.Length == 0)
                 {
                     // Write the header only if the file is empty
-                    writer.WriteLine("OrderId,OrderDate,ProductId,Name,Type,Quantity");
+                    writer.WriteLine("OrderId,OrderDate,ProductId,Name,Type,Quantity,Price");
                 }
 
                 // Move the file pointer to the end of the file to append data
@@ -91,8 +94,28 @@ namespace BusinessSystem.Repositories
 
                 foreach (var item in products)
                 {
-                    writer.WriteLine($"{item.OrderId.ToString()}, {item.OrderDate.ToString("yyyy-MM-dd HH:mm:ss")}, {item.ProductId},{item.Name},{item.Type},{item.Quantity}");
+                    writer.WriteLine($"{item.OrderId.ToString()}, {item.OrderDate.ToString("yyyy-MM-dd HH:mm:ss")}, {item.ProductId},{item.Name},{item.Type},{item.Quantity},{item.Price}");
                 }
+            }
+        }
+
+        private bool CheckIfFileExists(string fileName)
+        {
+            try
+            {
+                StorageFolder localFolder = ApplicationData.Current.LocalFolder;
+                StorageFile file = localFolder.GetFileAsync(fileName).AsTask().GetAwaiter().GetResult();
+                return true; // File exists
+            }
+            catch (FileNotFoundException)
+            {
+                return false; // File does not exist
+            }
+            catch (Exception ex)
+            {
+                // Handle other exceptions
+                Debug.WriteLine($"Error checking file existence: {ex.Message}");
+                return false;
             }
         }
     }

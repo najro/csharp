@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Text;
 using Windows.Storage;
 
 namespace BusinessSystem.Repositories
@@ -83,7 +84,7 @@ namespace BusinessSystem.Repositories
             StorageFolder localFolder = ApplicationData.Current.LocalFolder;
             StorageFile file = localFolder.CreateFileAsync(ProductsDataCsv, CreationCollisionOption.ReplaceExisting).AsTask().GetAwaiter().GetResult();
 
-            using (StreamWriter writer = new StreamWriter(file.OpenStreamForWriteAsync().GetAwaiter().GetResult()))
+            using (StreamWriter writer = new StreamWriter(file.OpenStreamForWriteAsync().GetAwaiter().GetResult(), System.Text.Encoding.UTF8))
             {
                 writer.WriteLine("Type,Id,Name,Price,Author,Platform,Genre,Format,Language,PlayTime,Stock");
 
@@ -118,7 +119,7 @@ namespace BusinessSystem.Repositories
             var localFolder = ApplicationData.Current.LocalFolder;
             var file = localFolder.GetFileAsync(ProductsDataCsv).AsTask().Result;
 
-            var lines = File.ReadAllLines(file.Path);
+            var lines = File.ReadAllLines(file.Path, Encoding.UTF8);
 
             var firstElementSkipped = false;
 

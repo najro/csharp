@@ -25,13 +25,11 @@ namespace BusinessSystem
     /// This is the main page of the business system app
     /// Backend code :  (lab4 - alfoande100 / Örjan Andersson)
     /// </summary>
-    public sealed partial class MainPage : Page, INotifyPropertyChanged
+    public sealed partial class MainPage : Page
     {
         Product _selectedProduct;
         Product _selectedBasketProduct;
         Product _selectedStorageProduct;
-
-        public event PropertyChangedEventHandler PropertyChanged;
 
         // storage for the products that is available in total
         public ObservableCollection<Product> Products { get; set; }
@@ -219,7 +217,7 @@ namespace BusinessSystem
 
                 /// Save the order to file
                 var orderList = new List<OrderItem>();
-                orderList = OrderItemHelper.BuildOrderItemsFromProducts(BasketProducts.ToList(), new Guid(), DateTime.Now);
+                orderList = OrderItemHelper.BuildOrderItemsFromProducts(BasketProducts.ToList(), Guid.NewGuid(), DateTime.Now);
 
                 new Repositories.OrderRepository().WriteOrderItemsToDataFile(orderList);
 
@@ -810,7 +808,7 @@ namespace BusinessSystem
             }
             else if (ComboBoxReportType.SelectedIndex == 1)
             {
-                TextBlockReportHeader.Text = "Total försäljning per år och månad";
+                TextBlockReportHeader.Text = "Total försäljning av produkter per år och månad";
                 TextBoxReportResult.Text = ReportItemHelper.GetTotalSalesPerYearAndMonthReport(orderItems);
             }
             else

@@ -35,7 +35,7 @@ namespace BusinessSystem.Helpers
             return output.ToString();
         }
 
-        // Get the top 10 most sold products per year and month
+        // Get sold products per year and month
         private static List<ReportItem> GetTop10MostSoldProductsPerYearAndMonth(List<OrderItem> orderItems)
         {
             var reports = new List<ReportItem>();
@@ -45,9 +45,9 @@ namespace BusinessSystem.Helpers
                 return reports;
             }
 
-            var top10MostSoldProducts = orderItems
+            // order this by year, month and name
+            var soldProducts = orderItems
                 .GroupBy(x => new { x.OrderDate.Year, x.OrderDate.Month, x.Name })
-                .OrderByDescending(x => x.Sum(y => y.Quantity))
                 .Select(x => new
                 {
                     Year = x.Key.Year,
@@ -56,14 +56,36 @@ namespace BusinessSystem.Helpers
                     Quantity = x.Sum(y => y.Quantity)
                 });
 
-            foreach (var top10MostSoldProduct in top10MostSoldProducts)
+    
+            var products = soldProducts.ToList();
+
+            // order this by year, month and quantity
+            var sortedProducts = products
+                .OrderByDescending(x => x.Year)
+                .ThenByDescending(x => x.Month)
+                .ThenByDescending(x => x.Quantity)
+                .ToList();
+
+
+            // take the top 10 for each year and month
+            var top10SoldProducts = sortedProducts
+                .GroupBy(x => new { x.Year, x.Month })
+                .SelectMany(x => x.Take(10));
+
+
+            // order this by year, month and quantity
+            var sortedTop10 = top10SoldProducts.ToList()
+                .OrderByDescending(x => x.Year).ThenByDescending(x => x.Month).ThenByDescending(x => x.Quantity).ToList();
+
+            // create a report item for each sold product per year and month
+            foreach (var soldProduct in sortedTop10)
             {
                 var report = new ReportItem
                 {
-                    Year = top10MostSoldProduct.Year,
-                    Month = top10MostSoldProduct.Month,
-                    Name = top10MostSoldProduct.Name,
-                    Quantity = top10MostSoldProduct.Quantity
+                    Year = soldProduct.Year,
+                    Month = soldProduct.Month,
+                    Name = soldProduct.Name,
+                    Quantity = soldProduct.Quantity
                 };
 
                 reports.Add(report);
@@ -88,7 +110,7 @@ namespace BusinessSystem.Helpers
                 if (YearAndMounthPrefix != currentYearAndMonthPrefix)
                 {
                     YearAndMounthPrefix = currentYearAndMonthPrefix;
-                    output.Append($"{YearAndMounthPrefix}\n");
+                    output.Append($"\n{YearAndMounthPrefix}\n");
                     output.Append("-----------------------------------\n");
                 }
 
@@ -115,10 +137,17 @@ namespace BusinessSystem.Helpers
                 {
                     Year = x.Key.Year,
                     Month = x.Key.Month,
-                    TotalSales = x.Sum(y => y.Price * y.Quantity)
+                    TotalSales = x.Sum(y => y.Quantity)
                 });
 
-            foreach (var totalSales in totalSalesPerYearAndMonth)
+            var sortedTotalSales = totalSalesPerYearAndMonth
+                .OrderByDescending(x => x.Year)
+                .ThenByDescending(x => x.Month)
+                .ToList();
+
+           
+
+            foreach (var totalSales in sortedTotalSales)
             {
                 var report = new ReportItem
                 {
