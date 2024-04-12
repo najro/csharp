@@ -65,6 +65,8 @@ namespace BusinessSystem
             // set info in pivot for info about data files
             TextBoxDataFiles.Text = $"Datafiler blir lagrade här:\n{ApplicationData.Current.LocalFolder.Path}";
 
+           
+
             this.DataContext = this;
 
         }

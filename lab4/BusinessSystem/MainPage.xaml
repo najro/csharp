@@ -12,7 +12,7 @@
 
 
 
-    <Pivot Name="PivotMainView">
+    <Pivot Name="PivotMainView" BorderThickness="0" FocusVisualMargin="0">
         <PivotItem Header="Butik" FontSize="20">
             <Grid>
 

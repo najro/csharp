@@ -94,7 +94,7 @@ namespace BusinessSystem.Repositories
 
                 foreach (var item in products)
                 {
-                    writer.WriteLine($"{item.OrderId.ToString()}, {item.OrderDate.ToString("yyyy-MM-dd HH:mm:ss")}, {item.ProductId},{item.Name},{item.Type},{item.Quantity},{item.Price}");
+                    writer.WriteLine($"{item.OrderId.ToString()},{item.OrderDate.ToString("yyyy-MM-dd HH:mm:ss")},{item.ProductId},{item.Name},{item.Type},{item.Quantity},{item.Price}");
                 }
             }
         }
