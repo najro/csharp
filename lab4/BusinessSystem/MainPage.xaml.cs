@@ -1,35 +1,33 @@
 ﻿using BusinessSystem.Extensions;
+using BusinessSystem.Helpers;
 using BusinessSystem.Models;
+using BusinessSystem.Models.Constants;
 using BusinessSystem.Models.Enums;
+using BusinessSystem.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
+using System.Text;
 using Windows.Graphics.Printing;
+using Windows.Storage;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Printing;
-using BusinessSystem.Repositories;
 using Windows.UI.Xaml.Navigation;
-using Windows.Storage;
-using System.Text;
-using BusinessSystem.Helpers;
+using Windows.UI.Xaml.Printing;
 
 
 namespace BusinessSystem
 {
-
     /// <summary>
     /// This is the main page of the business system app
     /// Backend code :  (lab4 - alfoande100 / Örjan Andersson)
     /// </summary>
     public sealed partial class MainPage : Page, INotifyPropertyChanged
     {
-        Product _selectedProduct; 
+        Product _selectedProduct;
         Product _selectedBasketProduct;
         Product _selectedStorageProduct;
 
@@ -75,7 +73,7 @@ namespace BusinessSystem
 
 
         #region Pivot Butik
-                    
+
         /// <summary>
         /// toggle the basket status
         /// </summary>
@@ -113,7 +111,7 @@ namespace BusinessSystem
             ValidateProductToBasket();
         }
 
-        
+
         /// <summary>
         /// Validate the button for adding a product to the basket
         /// </summary>
@@ -189,8 +187,141 @@ namespace BusinessSystem
             ToggleBasketStatus();
         }
 
+
+        /// <summary>
+        /// Buy the products in the basket
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void ButtonBasketBuy_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (BasketProducts?.Count == 0)
+                return;
+
+            // https://docs.microsoft.com/en-us/windows/uwp/design/controls-and-patterns/dialogs-and-flyouts/dialogs
+            var dialog = new ContentDialog
+            {
+                Title = "Köp",
+                Content = "Är kunden klar och skall betala sina varor",
+                PrimaryButtonText = "Ja",
+                SecondaryButtonText = "Nej",
+                CloseButtonText = "Avbryt"
+            };
+
+            dialog.PrimaryButtonClick += async (s, args) =>
+            {
+
+
+                // Build reciete
+                lastestReceiptInfo = BuildRecieptPrint(BasketProducts.ToList());
+                ButtonBasketPrint.IsEnabled = true;
+
+
+                /// Save the order to file
+                var orderList = new List<OrderItem>();
+                orderList = OrderItemHelper.BuildOrderItemsFromProducts(BasketProducts.ToList(), new Guid(), DateTime.Now);
+
+                new Repositories.OrderRepository().WriteOrderItemsToDataFile(orderList);
+
+
+                /// Clear the basket and update the stock
+                foreach (var product in BasketProducts)
+                {
+                    product.Stock -= product.Reserved;
+                    product.Reserved = 0;
+                }
+
+                BasketProducts.Clear();
+                ToggleBasketStatus();
+            };
+
+            dialog.SecondaryButtonClick += (s, args) =>
+            {
+                // do nothing
+            };
+
+            await dialog.ShowAsync();
+        }
+
+        /// <summary>
+        /// Event handler for the search text box
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void TextBoxSearch_OnTextChanged(object sender, TextChangedEventArgs e)
+        {
+            var searchText = TextBoxSearch.Text.ToLower();
+
+            if (string.IsNullOrEmpty(searchText))
+            {
+                FilteredProducts.Clear();
+                foreach (var product in Products)
+                {
+                    FilteredProducts.Add(product);
+                }
+            }
+            else
+            {
+                var filteredProducts = Products.Where(p => p.SearchString().Contains(searchText));
+
+                FilteredProducts.Clear();
+
+                foreach (var product in filteredProducts)
+                {
+                    FilteredProducts.Add(product);
+                }
+
+            }
+        }
+
+        /// <summary>
+        /// Event handler for the clear basket button
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void ButtonBasketClear_OnClick(object sender, RoutedEventArgs e)
+        {
+
+            // https://docs.microsoft.com/en-us/windows/uwp/design/controls-and-patterns/dialogs-and-flyouts/dialogs
+            var dialog = new ContentDialog
+            {
+                Title = "Töm korg",
+                Content = "Önskar du tömma alla produkter i korgen?",
+                PrimaryButtonText = "Ja",
+                SecondaryButtonText = "Nej",
+                CloseButtonText = "Avbryt"
+            };
+
+            dialog.PrimaryButtonClick += async (s, args) =>
+            {
+                foreach (var product in BasketProducts)
+                {
+                    product.Reserved = 0;
+                }
+
+                BasketProducts.Clear();
+                ToggleBasketStatus();
+            };
+
+            dialog.SecondaryButtonClick += (s, args) =>
+            {
+                // do nothing
+            };
+
+            await dialog.ShowAsync();
+
+        }
+
+
         #endregion
 
+        #region Lager
+
+        /// <summary>
+        /// Add a new product to the storage
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ButtonProductNew_OnClick(object sender, RoutedEventArgs e)
         {
             ButtonProductNew.Visibility = Visibility.Collapsed;
@@ -202,6 +333,11 @@ namespace BusinessSystem
             EnableTextBoxesByProductAndMode(new Product(), ProductMode.New);
         }
 
+        /// <summary>
+        /// Save the product to the storage
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ButtonProductSave_OnClick(object sender, RoutedEventArgs e)
         {
 
@@ -267,8 +403,11 @@ namespace BusinessSystem
 
         }
 
-
-
+        /// <summary>
+        /// Event handler for the selection of a product in the storage
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ListViewStorage_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             _selectedStorageProduct = ((Product)ListViewStorage.SelectedItem);
@@ -286,6 +425,10 @@ namespace BusinessSystem
             PopulateTextBoxesInputFormByProduct(_selectedStorageProduct);
         }
 
+        /// <summary>
+        /// Add text information into the input form based on selected product
+        /// </summary>
+        /// <param name="product"></param>
         private void PopulateTextBoxesInputFormByProduct(Product product)
         {
             if (product == null)
@@ -324,9 +467,6 @@ namespace BusinessSystem
 
         }
 
-
-
-
         /// <summary>
         /// Only acctive when a new product is created. Handle the selection of product input based on selected product type
         /// </summary>
@@ -341,19 +481,25 @@ namespace BusinessSystem
             EnableTextBoxesByProductAndMode(seletedProductType, ProductMode.New);
         }
 
+        /// <summary>
+        /// Get the product type based on the selected value
+        /// </summary>
+        /// <param name="selectedValue"></param>
+        /// <returns></returns>
+
         private static Product GetProductTypeBySelectionName(string selectedValue)
         {
             var seletedProductType = new Product();
 
-            if (selectedValue == "Bok")
+            if (selectedValue == Constants.ProuctTypesTranslaton.Produkt)
             {
                 seletedProductType = new Book();
             }
-            else if (selectedValue == "Film")
+            else if (selectedValue == Constants.ProuctTypesTranslaton.Movie)
             {
                 seletedProductType = new Movie();
             }
-            else if (selectedValue == "Spel")
+            else if (selectedValue == Constants.ProuctTypesTranslaton.Game)
             {
                 seletedProductType = new Game();
             }
@@ -435,6 +581,11 @@ namespace BusinessSystem
 
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ButtonProductCancel_OnClick(object sender, RoutedEventArgs e)
         {
             _selectedStorageProduct = null;
@@ -443,7 +594,6 @@ namespace BusinessSystem
             StackPanelProductEdit.Visibility = Visibility.Collapsed;
 
         }
-
 
         /// <summary>
         /// Delete selected product from storage
@@ -489,7 +639,10 @@ namespace BusinessSystem
             }
         }
 
-
+        /// <summary>
+        /// Remove selected product from all lists
+        /// </summary>
+        /// <param name="product"></param>
         private void RemoveSelectedProductFromAllLists(Product product)
         {
             if (BasketProducts.Contains(product))
@@ -508,129 +661,9 @@ namespace BusinessSystem
             }
         }
 
-
-
-        private void TextBoxSearch_OnTextChanged(object sender, TextChangedEventArgs e)
-        {
-            var searchText = TextBoxSearch.Text.ToLower();
-
-            if (string.IsNullOrEmpty(searchText))
-            {
-                FilteredProducts.Clear();
-                foreach (var product in Products)
-                {
-                    FilteredProducts.Add(product);
-                }
-            }
-            else
-            {
-                var filteredProducts = Products.Where(p => p.SearchString().Contains(searchText));
-
-                FilteredProducts.Clear();
-
-                foreach (var product in filteredProducts)
-                {
-                    FilteredProducts.Add(product);
-                }
-
-            }
-        }
-
-        private async void ButtonBasketClear_OnClick(object sender, RoutedEventArgs e)
-        {
-
-            // https://docs.microsoft.com/en-us/windows/uwp/design/controls-and-patterns/dialogs-and-flyouts/dialogs
-            var dialog = new ContentDialog
-            {
-                Title = "Töm korg",
-                Content = "Önskar du tömma alla produkter i korgen?",
-                PrimaryButtonText = "Ja",
-                SecondaryButtonText = "Nej",
-                CloseButtonText = "Avbryt"
-            };
-
-            dialog.PrimaryButtonClick += async (s, args) =>
-            {
-                foreach (var product in BasketProducts)
-                {
-                    product.Reserved = 0;
-                }
-
-                BasketProducts.Clear();
-                ToggleBasketStatus();
-            };
-
-            dialog.SecondaryButtonClick += (s, args) =>
-            {
-                // do nothing
-            };
-
-            await dialog.ShowAsync();
-
-
-          
-        }
-
-
-        private async void ButtonBasketBuy_OnClick(object sender, RoutedEventArgs e)
-        {
-            if (BasketProducts?.Count == 0)
-                return;
-
-
-
-            // https://docs.microsoft.com/en-us/windows/uwp/design/controls-and-patterns/dialogs-and-flyouts/dialogs
-            var dialog = new ContentDialog
-            {
-                Title = "Köp",
-                Content = "Är kunden klar och skall betala sina varor",
-                PrimaryButtonText = "Ja",
-                SecondaryButtonText = "Nej",
-                CloseButtonText = "Avbryt"
-            };
-
-            dialog.PrimaryButtonClick += async (s, args) =>
-            {
-
-
-                // Build reciete
-                lastestReceiptInfo = BuildRecieptPrint(BasketProducts.ToList());
-                ButtonBasketPrint.IsEnabled = true;
-
-
-                /// Save the order to file
-                var orderList = new List<OrderItem>();
-                orderList = OrderItemHelper.BuildOrderItemsFromProducts(BasketProducts.ToList(), new Guid(), DateTime.Now);
-              
-                new Repositories.OrderRepository().WriteOrderItemsToDataFile(orderList);
-
-
-                /// Clear the basket and update the stock
-                foreach (var product in BasketProducts)
-                {
-                    product.Stock -= product.Reserved;
-                    product.Reserved = 0;
-                }
-
-                BasketProducts.Clear();
-                ToggleBasketStatus();
-            };
-
-            dialog.SecondaryButtonClick += (s, args) =>
-            {
-                // do nothing
-            };
-
-            await dialog.ShowAsync();
-
-
-
-         
-
-        }
-
-      
-
+        /// <summary>
+        /// Check the input for the product
+        /// </summary>
         private void CheckValidProductInput()
         {
             ButtonProductSave.IsEnabled = false;
@@ -645,6 +678,11 @@ namespace BusinessSystem
             }
         }
 
+        /// <summary>
+        /// Check the input for product id
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void TextBoxProductId_OnKeyUp(object sender, KeyRoutedEventArgs e)
         {
             var textBox = sender as TextBox;
@@ -655,7 +693,11 @@ namespace BusinessSystem
             CheckValidProductInput();
         }
 
-
+        /// <summary>
+        /// Check the input for product name
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void TextBoxProductName_OnKeyUp(object sender, KeyRoutedEventArgs e)
         {
             var textBox = sender as TextBox;
@@ -666,6 +708,12 @@ namespace BusinessSystem
             CheckValidProductInput();
         }
 
+
+        /// <summary>
+        /// CHekc the input for product price
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void TextBoxProductPrice_OnKeyUp(object sender, KeyRoutedEventArgs e)
         {
             var textBox = sender as TextBox;
@@ -676,6 +724,11 @@ namespace BusinessSystem
             CheckValidProductInput();
         }
 
+        /// <summary>
+        /// Check the input for product stock
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void TextBoxProductStock_OnKeyUp(object sender, KeyRoutedEventArgs e)
         {
             var textBox = sender as TextBox;
@@ -686,6 +739,11 @@ namespace BusinessSystem
             CheckValidProductInput();
         }
 
+        /// <summary>
+        /// Check the input for product playtime
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void TextBoxProductPlayTime_OnKeyUp(object sender, KeyRoutedEventArgs e)
         {
             var textBox = sender as TextBox;
@@ -697,6 +755,12 @@ namespace BusinessSystem
 
         }
 
+
+        /// <summary>
+        /// Return a product
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private async void ButtonProductReturn_OnClick(object sender, RoutedEventArgs e)
         {
             if (_selectedStorageProduct != null)
@@ -725,6 +789,8 @@ namespace BusinessSystem
                 await dialog.ShowAsync();
             }
         }
+
+        #endregion
 
         #region Report Pivot
 
