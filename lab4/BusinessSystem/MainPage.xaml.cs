@@ -361,7 +361,7 @@ namespace BusinessSystem
                         break;
                     case Game game:
                         game.Platform = TextBoxProductPlatform.Text;
-                        break;
+                        break;                    
                 }
 
                 ToggleBasketStatus();
@@ -491,7 +491,7 @@ namespace BusinessSystem
         {
             var seletedProductType = new Product();
 
-            if (selectedValue == Constants.ProuctTypesTranslaton.Produkt)
+            if (selectedValue == Constants.ProuctTypesTranslaton.Book)
             {
                 seletedProductType = new Book();
             }
@@ -576,6 +576,7 @@ namespace BusinessSystem
                     //ComboBoxProductType.SelectedIndex = 3;
                     TextBoxProductPlatform.IsEnabled = true;
                     break;
+                  
             }
 
 
