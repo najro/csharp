@@ -34,7 +34,7 @@ namespace BusinessSystem.Extensions
             Product selectedProduct)
         {
             // verify that input is valid
-            if (!int.TryParse(textInput, out int inputValue) || (inputValue < 0 || inputValue >= int.MaxValue))
+            if (!int.TryParse(textInput, out int inputValue) || (inputValue <= 0 || inputValue >= int.MaxValue))
             {
                 return false;
             }

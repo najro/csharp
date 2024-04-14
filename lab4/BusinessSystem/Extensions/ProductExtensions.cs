@@ -3,7 +3,7 @@ using BusinessSystem.Models.Constants;
 
 namespace BusinessSystem.Extensions
 {
-    public static class ProductExtension
+    public static class ProductExtensions
     {
         public static string GetTypeNameTranslation(this Product typeName)
         {
