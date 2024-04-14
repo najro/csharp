@@ -128,7 +128,7 @@ namespace BusinessSystem.Models
 
 
 
-
+        // https://learn.microsoft.com/en-us/dotnet/desktop/wpf/data/how-to-implement-property-change-notification?view=netframeworkdesktop-4.8
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected void OnNotifyPropertyChanged([CallerMemberName] string memberName = "")

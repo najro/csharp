@@ -1,7 +1,6 @@
 ﻿using BusinessSystem.Models;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
@@ -9,7 +8,12 @@ using Windows.Storage;
 
 namespace BusinessSystem.Repositories
 {
-    internal class OrderRepository
+    /// <summary>
+    /// Read and write orders to local data file (csv file)
+    /// https://learn.microsoft.com/en-us/uwp/api/windows.storage.storagefolder?view=winrt-22621
+    /// https://learn.microsoft.com/en-us/dotnet/api/system.io.file.readalllines?view=net-8.0
+    /// </summary>
+    public class OrderRepository
     {
         StorageFolder localFolder = ApplicationData.Current.LocalFolder;
         const string OrderDataCsv = "order_data.csv";
@@ -38,7 +42,7 @@ namespace BusinessSystem.Repositories
 
                 var orderItem = new OrderItem
                 {
-                   // OrderId = int.Parse(columns[0]),
+                    // OrderId = int.Parse(columns[0]),
                     OrderDate = DateTime.Parse(columns[1]),
                     ProductId = int.Parse(columns[2]),
                     Name = columns[3],
@@ -57,7 +61,7 @@ namespace BusinessSystem.Repositories
         {
             var orderItems = new List<OrderItem>();
 
-            if(!CheckIfFileExists(OrderDataCsv))
+            if (!CheckIfFileExists(OrderDataCsv))
             {
                 return orderItems;
             }

@@ -9,6 +9,11 @@ using Windows.Storage;
 
 namespace BusinessSystem.Repositories
 {
+    /// <summary>
+    ///  Read and write products to local data file (csv file)
+    /// https://learn.microsoft.com/en-us/uwp/api/windows.storage.storagefolder?view=winrt-22621
+    /// https://learn.microsoft.com/en-us/dotnet/api/system.io.file.readalllines?view=net-8.0
+    /// </summary>
     public class ProductsRepository
     {
         StorageFolder localFolder = ApplicationData.Current.LocalFolder;
