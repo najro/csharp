@@ -141,7 +141,7 @@ namespace BusinessSystem.Repositories
                             {
                                 Id = int.Parse(columns[1]),
                                 Name = columns[2],
-                                Price = decimal.Parse(columns[3]),
+                                Price = int.Parse(columns[3]),
                                 Author = columns[4],
                                 Genre = columns[6],
                                 Format = columns[7],
@@ -158,7 +158,7 @@ namespace BusinessSystem.Repositories
                             {
                                 Id = int.Parse(columns[1]),
                                 Name = columns[2],
-                                Price = decimal.Parse(columns[3]),
+                                Price = int.Parse(columns[3]),
                                 Format = columns[7],
                                 PlayTime = string.IsNullOrWhiteSpace(columns[9]) ? 0 : int.Parse(columns[9]),
                                 Stock = string.IsNullOrWhiteSpace(columns[10]) ? 0 : int.Parse(columns[10])
@@ -173,7 +173,7 @@ namespace BusinessSystem.Repositories
                             {
                                 Id = int.Parse(columns[1]),
                                 Name = columns[2],
-                                Price = decimal.Parse(columns[3]),
+                                Price = int.Parse(columns[3]),
                                 Platform = columns[5],
                                 Stock = string.IsNullOrWhiteSpace(columns[10]) ? 0 : int.Parse(columns[10])
                             };
@@ -187,7 +187,7 @@ namespace BusinessSystem.Repositories
                             {
                                 Id = int.Parse(columns[1]),
                                 Name = columns[2],
-                                Price = decimal.Parse(columns[3]),
+                                Price = int.Parse(columns[3]),
                                 Stock = string.IsNullOrWhiteSpace(columns[10]) ? 0 : int.Parse(columns[10])
                             };
 

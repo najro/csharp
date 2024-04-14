@@ -122,6 +122,7 @@
                                 <ComboBoxItem Content="Film"/>
                                 <ComboBoxItem Content="Spel"/>
                             </ComboBox>
+                            <TextBlock Name="TextBoxProductType" Width="100" Text="hello" Margin="5" FontSize="12"/>
                         </StackPanel>
 
                         <StackPanel Orientation="Horizontal">
@@ -170,7 +171,7 @@
                         </StackPanel>
 
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Width="100" Text="Speltid" Margin="5" FontSize="12"/>
+                            <TextBlock Width="100" Text="Speltid (min)" Margin="5" FontSize="12"/>
                             <TextBox x:Name="TextBoxProductPlayTime" PlaceholderText="Speltid" Width="200" Margin="5" KeyUp="TextBoxProductPlayTime_OnKeyUp" FontSize="12" />
                         </StackPanel>
 

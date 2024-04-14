@@ -37,8 +37,8 @@ namespace BusinessSystem.Models
             }
         }
 
-        decimal _price = 0;
-        public decimal Price
+        int _price = 0;
+        public int Price
         {
             get
             {

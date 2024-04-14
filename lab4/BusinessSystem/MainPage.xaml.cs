@@ -344,7 +344,7 @@ namespace BusinessSystem
             if (_selectedStorageProduct != null)
             {
                 _selectedStorageProduct.Name = TextBoxProductName.Text;
-                _selectedStorageProduct.Price = Convert.ToDecimal(TextBoxProductPrice.Text);
+                _selectedStorageProduct.Price = Convert.ToInt32(TextBoxProductPrice.Text);
                 _selectedStorageProduct.Stock = Convert.ToInt32(TextBoxProductStock.Text);
 
                 switch (_selectedStorageProduct)
@@ -371,7 +371,7 @@ namespace BusinessSystem
                 var newProduct = GetProductTypeBySelectionName(((ComboBoxItem)ComboBoxProductType.SelectedValue)?.Content.ToString());
                 newProduct.Id = Convert.ToInt32(TextBoxProductId.Text);
                 newProduct.Name = TextBoxProductName.Text;
-                newProduct.Price = Convert.ToDecimal(TextBoxProductPrice.Text);
+                newProduct.Price = Convert.ToInt32(TextBoxProductPrice.Text);
                 newProduct.Stock = Convert.ToInt32(TextBoxProductStock.Text);
 
                 switch (newProduct)
@@ -440,27 +440,24 @@ namespace BusinessSystem
             TextBoxProductName.Text = product.Name;
             TextBoxProductPrice.Text = product.Price.ToString();
             TextBoxProductStock.Text = product.Stock.ToString();
-
+            
+            
+            ComboBoxProductType.Visibility = Visibility.Collapsed;
+            ComboBoxProductType.IsEditable = false;
+            
             switch (product)
             {
-                case Book book:
-                    //ComboBoxProductType.SelectedIndex = 1;
-                    ComboBoxProductType.IsEditable = false;
+                case Book book:                    
                     TextBoxProductAuthor.Text = book.Author;
                     TextBoxProductGenre.Text = book.Genre;
                     TextBoxProductFormat.Text = book.Format;
                     TextBoxProductLanguage.Text = book.Language;
                     break;
-                case Movie movie:
-                    //ComboBoxProductType.SelectedIndex = 2;
-
-                    ComboBoxProductType.IsEditable = false;
+                case Movie movie:                    
                     TextBoxProductFormat.Text = movie.Format;
                     TextBoxProductPlayTime.Text = movie.PlayTime.ToString();
                     break;
-                case Game game:
-                    //ComboBoxProductType.SelectedIndex = 3;
-                    ComboBoxProductType.IsEditable = false;
+                case Game game:                    
                     TextBoxProductPlatform.Text = game.Platform;
                     break;
             }
@@ -535,9 +532,12 @@ namespace BusinessSystem
             {
                 ComboBoxProductType.IsEnabled = true;
                 TextBoxProductId.IsEnabled = true;
+                ComboBoxProductType.Visibility = Visibility.Visible;
+                TextBoxProductType.Text = "";
             }
             else
             {
+                TextBoxProductType.Text = product.GetTypeNameTranslation();
                 ComboBoxProductType.IsEnabled = false;
                 TextBoxProductId.IsEnabled = false;
             }
@@ -778,8 +778,13 @@ namespace BusinessSystem
 
                 dialog.PrimaryButtonClick += async (s, args) =>
                 {
-                    _selectedStorageProduct.Stock += 1;
-                    TextBoxProductStock.Text = _selectedStorageProduct.Stock.ToString();
+
+                    if (_selectedStorageProduct.Stock + 1 <= Int32.MaxValue)
+                    {
+                        _selectedStorageProduct.Stock += 1;
+                        TextBoxProductStock.Text = _selectedStorageProduct.Stock.ToString();
+                    }
+
                 };
 
                 dialog.SecondaryButtonClick += (s, args) =>
@@ -858,6 +863,7 @@ namespace BusinessSystem
             }
             reciept.AppendLine("-------------------------------");
             reciept.AppendLine($"Total pris: {products.Sum(p => p.Price * p.Reserved)} kr");
+            reciept.AppendLine($"Total antal varor: {products.Sum(p => p.Reserved)} stycken");
             reciept.AppendLine("-------------------------------");
             reciept.AppendLine();
             reciept.AppendLine("Tack för att du handlade hos oss!");

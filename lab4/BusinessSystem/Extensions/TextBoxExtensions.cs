@@ -80,7 +80,7 @@ namespace BusinessSystem.Extensions
         public static bool IsValidProductPrice(this TextBox textBox, string textInput)
         {
             // verify that input is valid
-            if (!double.TryParse(textInput, out double inputValue) || (inputValue < 0 || inputValue >= double.MaxValue))
+            if (!int.TryParse(textInput, out int inputValue) || (inputValue < 0 || inputValue >= int.MaxValue))
             {
                 return false;
             }
@@ -97,8 +97,11 @@ namespace BusinessSystem.Extensions
         /// <returns></returns>
         public static bool IsValidProductStock(this TextBox textBox, string textInput)
         {
+
+
+
             // verify that input is valid
-            if (!double.TryParse(textInput, out double inputValue) || (inputValue < 0 || inputValue >= double.MaxValue))
+            if (!int.TryParse(textInput, out int inputValue) || (inputValue < 0 || inputValue >= int.MaxValue))
             {
                 return false;
             }
@@ -116,8 +119,8 @@ namespace BusinessSystem.Extensions
         public static bool IsValidProductPlaytime(this TextBox textBox, string textInput)
         {
             // verify that input is valid
-            if (!string.IsNullOrWhiteSpace(textInput) && (!double.TryParse(textInput, out double inputValue) ||
-                                                          (inputValue <= 0 || inputValue >= double.MaxValue)))
+            if (!string.IsNullOrWhiteSpace(textInput) && (!int.TryParse(textInput, out int inputValue) ||
+                                                          (inputValue <= 0 || inputValue >= int.MaxValue)))
             {
                 return false;
             }
