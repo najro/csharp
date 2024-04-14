@@ -119,7 +119,7 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Extensions\ProductExtension.cs" />
+    <Compile Include="Extensions\ProductExtensions.cs" />
     <Compile Include="Extensions\TextBoxExtensions.cs" />
     <Compile Include="Helpers\OrderItemHelper.cs" />
     <Compile Include="Helpers\ReportItemHelper.cs" />

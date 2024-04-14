@@ -160,7 +160,8 @@ namespace BusinessSystem.Repositories
                                 Name = columns[2],
                                 Price = decimal.Parse(columns[3]),
                                 Format = columns[7],
-                                PlayTime = string.IsNullOrWhiteSpace(columns[9]) ? 0 : int.Parse(columns[9])
+                                PlayTime = string.IsNullOrWhiteSpace(columns[9]) ? 0 : int.Parse(columns[9]),
+                                Stock = string.IsNullOrWhiteSpace(columns[10]) ? 0 : int.Parse(columns[10])
                             };
 
                             products.Add(product);
