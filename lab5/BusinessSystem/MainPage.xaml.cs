@@ -10,13 +10,16 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Windows.Graphics.Printing;
 using Windows.Storage;
+using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Navigation;
 using Windows.UI.Xaml.Printing;
+using BusinessSystem.Services.RemoteStorageService;
 
 
 namespace BusinessSystem
@@ -325,9 +328,13 @@ namespace BusinessSystem
         private void ButtonProductNew_OnClick(object sender, RoutedEventArgs e)
         {
             ButtonProductNew.Visibility = Visibility.Collapsed;
+            ButtonProductUpdate.Visibility = Visibility.Collapsed;
+            TextBlockProductUpdateStatus.Visibility = Visibility.Collapsed;
+
             StackPanelProductEdit.Visibility = Visibility.Visible;
             ButtonProductDelete.Visibility = Visibility.Collapsed;
             ButtonProductReturn.Visibility = Visibility.Collapsed;
+            ButtonProductSave.IsEnabled = false;
 
             SetAllProductTextBoxesToEmpty();
             EnableTextBoxesByProductAndMode(new Product(), ProductMode.New);
@@ -344,7 +351,7 @@ namespace BusinessSystem
             if (_selectedStorageProduct != null)
             {
                 _selectedStorageProduct.Name = TextBoxProductName.Text;
-                _selectedStorageProduct.Price = Convert.ToInt32(TextBoxProductPrice.Text);
+                _selectedStorageProduct.Price = Convert.ToDecimal(TextBoxProductPrice.Text);
                 _selectedStorageProduct.Stock = Convert.ToInt32(TextBoxProductStock.Text);
 
                 switch (_selectedStorageProduct)
@@ -371,7 +378,7 @@ namespace BusinessSystem
                 var newProduct = GetProductTypeBySelectionName(((ComboBoxItem)ComboBoxProductType.SelectedValue)?.Content.ToString());
                 newProduct.Id = Convert.ToInt32(TextBoxProductId.Text);
                 newProduct.Name = TextBoxProductName.Text;
-                newProduct.Price = Convert.ToInt32(TextBoxProductPrice.Text);
+                newProduct.Price = Convert.ToDecimal(TextBoxProductPrice.Text);
                 newProduct.Stock = Convert.ToInt32(TextBoxProductStock.Text);
 
                 switch (newProduct)
@@ -396,6 +403,8 @@ namespace BusinessSystem
             }
 
             ButtonProductNew.Visibility = Visibility.Visible;
+            ButtonProductUpdate.Visibility = Visibility.Visible;
+            TextBlockProductUpdateStatus.Visibility = Visibility.Visible;
             StackPanelProductEdit.Visibility = Visibility.Collapsed;
 
             _selectedStorageProduct = null;
@@ -417,6 +426,8 @@ namespace BusinessSystem
                 return;
 
             ButtonProductNew.Visibility = Visibility.Collapsed;
+            ButtonProductUpdate.Visibility = Visibility.Collapsed;
+            TextBlockProductUpdateStatus.Visibility = Visibility.Collapsed;
             StackPanelProductEdit.Visibility = Visibility.Visible;
             ButtonProductDelete.Visibility = Visibility.Visible;
             ButtonProductReturn.Visibility = Visibility.Visible;
@@ -592,6 +603,8 @@ namespace BusinessSystem
             _selectedStorageProduct = null;
 
             ButtonProductNew.Visibility = Visibility.Visible;
+            ButtonProductUpdate.Visibility = Visibility.Visible;
+            TextBlockProductUpdateStatus.Visibility = Visibility.Visible;
             StackPanelProductEdit.Visibility = Visibility.Collapsed;
 
         }
@@ -969,5 +982,40 @@ namespace BusinessSystem
         }
 
         #endregion
+
+        private async void ButtonProductUpdate_OnClick(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                // This line will not block the UI thread.
+                var result = await Task.Run(() => new StorageService().GetProductsAsync());
+
+
+                var storageDictory =  result.ToDictionary(p => p.Id, p => p);
+
+
+                foreach (var product in Products)
+                {
+                    if (!storageDictory.ContainsKey(product.Id))
+                    {
+                        continue;
+                    }
+                    var storageProduct = storageDictory[product.Id];
+                    product.Stock = storageProduct.Stock;
+                    product.Price = storageProduct.Price;
+
+                    if (product.Reserved > product.Stock)
+                    {
+                        product.Reserved = product.Stock;
+                    }
+                }
+
+                TextBlockProductUpdateStatus.Text = $"Produkterna uppdaterade från lagret\n{DateTime.Now.ToString("yyyy.MM.dd hh:mm:ss")}";
+            }
+            catch (Exception ex)
+            {
+                TextBlockProductUpdateStatus.Text = "Ett fel uppstod vid uppdatering av produkterna";
+            }
+        }
     }
 }
