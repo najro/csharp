@@ -107,8 +107,8 @@ namespace BusinessSystem.Repositories
         {
             try
             {
-                StorageFolder localFolder = ApplicationData.Current.LocalFolder;
-                StorageFile file = localFolder.GetFileAsync(fileName).AsTask().GetAwaiter().GetResult();
+                var localFolder = ApplicationData.Current.LocalFolder;
+                var file = localFolder.GetFileAsync(fileName).AsTask().GetAwaiter().GetResult();
                 return true; // File exists
             }
             catch (FileNotFoundException)
