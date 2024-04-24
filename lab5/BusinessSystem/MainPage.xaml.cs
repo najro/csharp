@@ -43,6 +43,23 @@ namespace BusinessSystem
         // storage for the products that is currently in the basket
         public ObservableCollection<Product> BasketProducts { get; set; }
 
+        DispatcherTimer _timerUpdateProducts;
+
+
+        // https://learn.microsoft.com/en-us/uwp/api/windows.ui.xaml.dispatchertimer?view=winrt-22621
+        public void SetupTimerForProductsUpdate()
+        {
+            _timerUpdateProducts = new DispatcherTimer();
+
+            _timerUpdateProducts.Interval = new TimeSpan(0, 1, 0);
+
+            _timerUpdateProducts.Tick += async (s, e) =>
+            {
+                UpdateProductsFromRemoteStorage();
+            };
+
+            _timerUpdateProducts.Start();
+        }
 
         public MainPage()
         {
@@ -68,7 +85,10 @@ namespace BusinessSystem
             // set info in pivot for info about data files
             TextBoxDataFiles.Text = $"Datafiler blir lagrade här:\n{ApplicationData.Current.LocalFolder.Path}";
 
-           
+
+
+            UpdateProductsFromRemoteStorage();
+            SetupTimerForProductsUpdate();
 
             this.DataContext = this;
 
@@ -232,7 +252,20 @@ namespace BusinessSystem
                 {
                     product.Stock -= product.Reserved;
                     product.Reserved = 0;
+
+                    // update the stock in the remote storage
+                    try
+                    {
+                        await new StorageService().UpdateProductStockAsync(product.Id, product.Stock);
+                    }
+                    catch
+                    {
+                        // do nothing
+                    }
+                    
                 }
+
+                UpdateProductsFromRemoteStorage();
 
                 BasketProducts.Clear();
                 ToggleBasketStatus();
@@ -985,13 +1018,19 @@ namespace BusinessSystem
 
         private async void ButtonProductUpdate_OnClick(object sender, RoutedEventArgs e)
         {
+            UpdateProductsFromRemoteStorage();
+        }
+
+
+        private async void UpdateProductsFromRemoteStorage()
+        {
             try
             {
                 // This line will not block the UI thread.
                 var result = await Task.Run(() => new StorageService().GetProductsAsync());
 
 
-                var storageDictory =  result.ToDictionary(p => p.Id, p => p);
+                var storageDictory = result.ToDictionary(p => p.Id, p => p);
 
 
                 foreach (var product in Products)
@@ -1010,12 +1049,13 @@ namespace BusinessSystem
                     }
                 }
 
-                TextBlockProductUpdateStatus.Text = $"Produkterna uppdaterade från lagret\n{DateTime.Now.ToString("yyyy.MM.dd hh:mm:ss")}";
+                TextBlockProductUpdateStatus.Text = $"Produkterna uppdaterade från lagret\n{DateTime.Now.ToString("yyyy.MM.dd HH:mm:ss")}";
             }
             catch (Exception ex)
             {
                 TextBlockProductUpdateStatus.Text = "Ett fel uppstod vid uppdatering av produkterna";
             }
         }
+
     }
 }

@@ -11,6 +11,8 @@ namespace BusinessSystem.Services.RemoteStorageService
     public class StorageService
     {
         private const string storageApiUrl = "https://hex.cse.kau.se/~jonavest/csharp-api/";
+        
+        private const string storageUpdateAction = "?action=update&id={0}&stock={1}";
 
         public async Task<List<Product>> GetProductsAsync()
         {
@@ -56,6 +58,30 @@ namespace BusinessSystem.Services.RemoteStorageService
                 }
 
                 return products;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"An error occurred: {ex.Message}");
+            }
+        }
+
+
+        public async Task UpdateProductStockAsync(int id, int stock)
+        {
+            try
+            {
+                using (HttpClient client = new HttpClient())
+                {
+                    string url = string.Format(storageUpdateAction, id, stock);
+                    HttpResponseMessage response = await client.GetAsync(storageApiUrl + url);
+
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        throw new Exception($"An error occurred: {response.StatusCode}");
+                    }
+
+                    Console.WriteLine($"Stock for product with id {id} updated to {stock}");
+                }
             }
             catch (Exception ex)
             {
