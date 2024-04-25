@@ -417,12 +417,18 @@ namespace BusinessSystem
         /// <param name="e"></param>
         private void ButtonProductSave_OnClick(object sender, RoutedEventArgs e)
         {
+            InventoryInfo invetoryInfoItem = null;
+            DateTime inventoryDateTime = DateTime.Now;
+
 
             if (_selectedStorageProduct != null)
             {
                 _selectedStorageProduct.Name = TextBoxProductName.Text;
                 _selectedStorageProduct.Price = Convert.ToDecimal(TextBoxProductPrice.Text);
                 _selectedStorageProduct.Stock = Convert.ToInt32(TextBoxProductStock.Text);
+
+
+                invetoryInfoItem = InventoryHelper.BuildInventoryItemFromProduct(_selectedStorageProduct, inventoryDateTime);
 
                 switch (_selectedStorageProduct)
                 {
@@ -434,7 +440,7 @@ namespace BusinessSystem
                         break;
                     case Movie movie:
                         movie.Format = TextBoxProductFormat.Text;
-                        movie.PlayTime = int.Parse(TextBoxProductPlayTime.Text);
+                        movie.PlayTime = string.IsNullOrWhiteSpace(TextBoxProductPlayTime.Text) ? 0 : int.Parse(TextBoxProductPlayTime.Text);
                         break;
                     case Game game:
                         game.Platform = TextBoxProductPlatform.Text;
@@ -451,6 +457,8 @@ namespace BusinessSystem
                 newProduct.Price = Convert.ToDecimal(TextBoxProductPrice.Text);
                 newProduct.Stock = Convert.ToInt32(TextBoxProductStock.Text);
 
+                invetoryInfoItem = InventoryHelper.BuildInventoryItemFromProduct(newProduct, inventoryDateTime);
+
                 switch (newProduct)
                 {
                     case Book book:
@@ -461,7 +469,7 @@ namespace BusinessSystem
                         break;
                     case Movie movie:
                         movie.Format = TextBoxProductFormat.Text;
-                        movie.PlayTime = int.Parse(TextBoxProductPlayTime.Text);
+                        movie.PlayTime = string.IsNullOrWhiteSpace(TextBoxProductPlayTime.Text) ?  0 : int.Parse(TextBoxProductPlayTime.Text);
                         break;
                     case Game game:
                         game.Platform = TextBoxProductPlatform.Text;
@@ -480,9 +488,16 @@ namespace BusinessSystem
             _selectedStorageProduct = null;
             ListViewStorage.SelectedIndex = -1;
 
+            // update the inventory list
+            if (invetoryInfoItem != null)
+            {
+                InventoryList.Add(invetoryInfoItem);
+            }
+           
+
         }
 
-        /// <summary>
+      /// <summary>
         /// Event handler for the selection of a product in the storage
         /// </summary>
         /// <param name="sender"></param>
