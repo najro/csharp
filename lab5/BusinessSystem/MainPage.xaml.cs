@@ -4,25 +4,22 @@ using BusinessSystem.Models;
 using BusinessSystem.Models.Constants;
 using BusinessSystem.Models.Enums;
 using BusinessSystem.Repositories;
+using BusinessSystem.Services.RemoteStorageService;
+using Microcharts;
+using SkiaSharp;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.Graphics.Printing;
 using Windows.Storage;
-using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Navigation;
 using Windows.UI.Xaml.Printing;
-using BusinessSystem.Services.RemoteStorageService;
-using Microcharts;
-using SkiaSharp;
-using Microcharts.Uwp;
 
 
 namespace BusinessSystem
@@ -33,6 +30,9 @@ namespace BusinessSystem
     /// </summary>
     public sealed partial class MainPage : Page
     {
+
+        private static int counterError = 0;
+
         Product _selectedProduct;
         Product _selectedBasketProduct;
         Product _selectedStorageProduct;
@@ -50,40 +50,14 @@ namespace BusinessSystem
 
         DispatcherTimer _timerUpdateProducts;
 
-        //private void PopulateData()
-        //{
-        //    //InventoryList = new InventoryRepository().GetInventoryItems()
-        //    //// Populate sample data
-        //    InventoryList = new List<InventoryInfo>
-        //    {
-        //        new InventoryInfo { DateTime = new DateTime(2024, 4, 1, 10, 32, 33), Id = 1, Name = "Product A", Price = 10.99m, Stock = 100 },
-        //        new InventoryInfo { DateTime = new DateTime(2024, 4, 1, 10, 32, 43), Id = 2, Name = "Product A", Price = 10.99m, Stock = 95 },
-        //        new InventoryInfo { DateTime = new DateTime(2024, 4, 1, 10, 36, 33), Id = 3, Name = "Product A", Price = 10.99m, Stock = 90 },
-        //        new InventoryInfo { DateTime = new DateTime(2024, 4, 4), Id = 4, Name = "Product A", Price = 8.99m, Stock = 80 },
-        //        new InventoryInfo { DateTime = new DateTime(2024, 4, 5), Id = 5, Name = "Product A", Price = 8.99m, Stock = 85 },
-        //        new InventoryInfo { DateTime = new DateTime(2024, 4, 6), Id = 6, Name = "Product A", Price = 8.99m, Stock = 90 },
-        //        new InventoryInfo { DateTime = new DateTime(2024, 4, 7), Id = 7, Name = "Product A", Price = 10.99m, Stock = 100 },
-        //        new InventoryInfo { DateTime = new DateTime(2024, 4, 8), Id = 8, Name = "Product A", Price = 10.99m, Stock = 95 },
-        //        new InventoryInfo { DateTime = new DateTime(2024, 4, 9), Id = 9, Name = "Product A", Price = 10.99m, Stock = 90 },
-        //        new InventoryInfo { DateTime = new DateTime(2024, 4, 10), Id = 10, Name = "Product A", Price = 8.99m, Stock = 80 },
-        //        new InventoryInfo { DateTime = new DateTime(2024, 4, 11), Id = 11, Name = "Product A", Price = 8.99m, Stock = 85 },
-        //        new InventoryInfo { DateTime = new DateTime(2024, 4, 12), Id = 12, Name = "Product A", Price = 8.99m, Stock = 90 },
-        //        //new InventoryInfo { DateTime = new DateTime(2024, 4, 1), Id = 7, Name = "Product C", Price = 12.99m, Stock = 70 },
-        //        //new InventoryInfo { DateTime = new DateTime(2024, 4, 2), Id = 8, Name = "Product C", Price = 12.99m, Stock = 75 },
-        //        //new InventoryInfo { DateTime = new DateTime(2024, 4, 3), Id = 9, Name = "Product C", Price = 12.99m, Stock = 80 }
-
-
-        //    };
-        //    //DataContext = this;
-        //}
-
 
         // https://learn.microsoft.com/en-us/uwp/api/windows.ui.xaml.dispatchertimer?view=winrt-22621
         public void SetupTimerForProductsUpdate()
         {
             _timerUpdateProducts = new DispatcherTimer();
 
-            _timerUpdateProducts.Interval = new TimeSpan(0, 1, 0);
+            // TODO Set to 1.0 minutes
+            _timerUpdateProducts.Interval = new TimeSpan(0, 0, 10);
 
             _timerUpdateProducts.Tick += async (s, e) =>
             {
@@ -299,7 +273,7 @@ namespace BusinessSystem
                     {
                         // do nothing
                     }
-                    
+
                 }
 
                 UpdateProductsFromRemoteStorage();
@@ -444,7 +418,7 @@ namespace BusinessSystem
                         break;
                     case Game game:
                         game.Platform = TextBoxProductPlatform.Text;
-                        break;                    
+                        break;
                 }
 
                 ToggleBasketStatus();
@@ -469,7 +443,7 @@ namespace BusinessSystem
                         break;
                     case Movie movie:
                         movie.Format = TextBoxProductFormat.Text;
-                        movie.PlayTime = string.IsNullOrWhiteSpace(TextBoxProductPlayTime.Text) ?  0 : int.Parse(TextBoxProductPlayTime.Text);
+                        movie.PlayTime = string.IsNullOrWhiteSpace(TextBoxProductPlayTime.Text) ? 0 : int.Parse(TextBoxProductPlayTime.Text);
                         break;
                     case Game game:
                         game.Platform = TextBoxProductPlatform.Text;
@@ -493,11 +467,11 @@ namespace BusinessSystem
             {
                 InventoryList.Add(invetoryInfoItem);
             }
-           
+
 
         }
 
-      /// <summary>
+        /// <summary>
         /// Event handler for the selection of a product in the storage
         /// </summary>
         /// <param name="sender"></param>
@@ -536,24 +510,24 @@ namespace BusinessSystem
             TextBoxProductName.Text = product.Name;
             TextBoxProductPrice.Text = product.Price.ToString();
             TextBoxProductStock.Text = product.Stock.ToString();
-            
-            
+
+
             ComboBoxProductType.Visibility = Visibility.Collapsed;
             ComboBoxProductType.IsEditable = false;
-            
+
             switch (product)
             {
-                case Book book:                    
+                case Book book:
                     TextBoxProductAuthor.Text = book.Author;
                     TextBoxProductGenre.Text = book.Genre;
                     TextBoxProductFormat.Text = book.Format;
                     TextBoxProductLanguage.Text = book.Language;
                     break;
-                case Movie movie:                    
+                case Movie movie:
                     TextBoxProductFormat.Text = movie.Format;
                     TextBoxProductPlayTime.Text = movie.PlayTime.ToString();
                     break;
-                case Game game:                    
+                case Game game:
                     TextBoxProductPlatform.Text = game.Platform;
                     break;
             }
@@ -672,7 +646,7 @@ namespace BusinessSystem
                     //ComboBoxProductType.SelectedIndex = 3;
                     TextBoxProductPlatform.IsEnabled = true;
                     break;
-                  
+
             }
 
 
@@ -1078,11 +1052,16 @@ namespace BusinessSystem
         {
             try
             {
+                if(counterError++ % 2 == 0)
+                    throw new Exception("Test");
+
                 // This line will not block the UI thread.
                 var result = await Task.Run(() => new StorageService().GetProductsAsync());
 
                 var storageDictory = result.ToDictionary(p => p.Id, p => p);
 
+
+                List<Product> productsThatShouldBeInventoried = new List<Product>();
 
                 foreach (var product in Products)
                 {
@@ -1098,28 +1077,53 @@ namespace BusinessSystem
                     {
                         product.Reserved = product.Stock;
                     }
+
+                    productsThatShouldBeInventoried.Add(product);
                 }
 
-                var newInventoryList = InventoryHelper.BuildInventoryItemsFromProducts(Products.ToList(), DateTime.Now);
+                
+                var newInventoryList = InventoryHelper.BuildInventoryItemsFromProducts(productsThatShouldBeInventoried, DateTime.Now);
                 foreach (var item in newInventoryList)
                 {
                     InventoryList.Add(item);
                 }
-                
+
                 // solve inventory for this case and when you update a products stock
                 //new InventoryRepository().WriteInventoryItemsToDataFile(InventoryHelper.BuildInventoryItemsFromProducts(Products.ToList(), DateTime.Now));
 
 
                 TextBlockProductUpdateStatus.Text = $"Produkterna uppdaterade från lagret\n{DateTime.Now.ToString("yyyy.MM.dd HH:mm:ss")}";
                 TextBlockProductUpdateStatus.Foreground = new Windows.UI.Xaml.Media.SolidColorBrush(Windows.UI.Colors.Green);
+
+                PivotItemLager.Header = "Lager"; // ok
             }
-            catch (Exception ex)
+            catch
             {
-                
+
                 TextBlockProductUpdateStatus.Text = "Ett fel uppstod vid uppdatering av produkterna";
 
                 // set color on TextBlockProductUpdateStatus to red
                 TextBlockProductUpdateStatus.Foreground = new Windows.UI.Xaml.Media.SolidColorBrush(Windows.UI.Colors.Red);
+
+                PivotItemLager.Header = "Lager(!)"; // indicate that there is an error
+
+                //// https://docs.microsoft.com/en-us/windows/uwp/design/controls-and-patterns/dialogs-and-flyouts/dialogs
+                //var dialog = new ContentDialog
+                //{
+                //    Title = "Det skedde en fel",
+                //    Content = $"Ett fel uppstod vid uppdatering av produkterna : {DateTime.Now.ToString("yyyy.MM.dd HH:mm:ss")}",
+                //    PrimaryButtonText = "OK"
+                //};
+
+                //dialog.PrimaryButtonClick += async (s, args) =>
+                //{
+                //   // do nothing
+                //};
+
+
+                //dialog.ShowAsync();
+
+
             }
         }
 
@@ -1134,7 +1138,7 @@ namespace BusinessSystem
                 var filterList = InventoryList.Where(i => i.Id == selectedProduct.Id).ToList();
 
                 // build ChartEntry list to display in chartview
-                foreach (var itemInventoryInfo in filterList.OrderBy(x=>x.DateTime).Take(15))
+                foreach (var itemInventoryInfo in filterList.OrderBy(x => x.DateTime).Take(15))
                 {
                     chartEntries.Add(new ChartEntry(itemInventoryInfo.Stock)
                     {
@@ -1150,7 +1154,7 @@ namespace BusinessSystem
             var barChart = new BarChart { Entries = chartEntries };
             barChart.IsAnimated = true;
 
-            
+
             chartView.Chart = barChart;
             chartView.Width = 50 * chartEntries.Count;
 
