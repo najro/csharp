@@ -34,6 +34,8 @@ namespace BusinessSystem
         Product _selectedBasketProduct;
         Product _selectedStorageProduct;
 
+        public ObservableCollection<InventoryInfo> InventoryList { get; set; }
+
         // storage for the products that is available in total
         public ObservableCollection<Product> Products { get; set; }
 
@@ -44,6 +46,33 @@ namespace BusinessSystem
         public ObservableCollection<Product> BasketProducts { get; set; }
 
         DispatcherTimer _timerUpdateProducts;
+
+        //private void PopulateData()
+        //{
+        //    //InventoryList = new InventoryRepository().GetInventoryItems()
+        //    //// Populate sample data
+        //    InventoryList = new List<InventoryInfo>
+        //    {
+        //        new InventoryInfo { DateTime = new DateTime(2024, 4, 1, 10, 32, 33), Id = 1, Name = "Product A", Price = 10.99m, Stock = 100 },
+        //        new InventoryInfo { DateTime = new DateTime(2024, 4, 1, 10, 32, 43), Id = 2, Name = "Product A", Price = 10.99m, Stock = 95 },
+        //        new InventoryInfo { DateTime = new DateTime(2024, 4, 1, 10, 36, 33), Id = 3, Name = "Product A", Price = 10.99m, Stock = 90 },
+        //        new InventoryInfo { DateTime = new DateTime(2024, 4, 4), Id = 4, Name = "Product A", Price = 8.99m, Stock = 80 },
+        //        new InventoryInfo { DateTime = new DateTime(2024, 4, 5), Id = 5, Name = "Product A", Price = 8.99m, Stock = 85 },
+        //        new InventoryInfo { DateTime = new DateTime(2024, 4, 6), Id = 6, Name = "Product A", Price = 8.99m, Stock = 90 },
+        //        new InventoryInfo { DateTime = new DateTime(2024, 4, 7), Id = 7, Name = "Product A", Price = 10.99m, Stock = 100 },
+        //        new InventoryInfo { DateTime = new DateTime(2024, 4, 8), Id = 8, Name = "Product A", Price = 10.99m, Stock = 95 },
+        //        new InventoryInfo { DateTime = new DateTime(2024, 4, 9), Id = 9, Name = "Product A", Price = 10.99m, Stock = 90 },
+        //        new InventoryInfo { DateTime = new DateTime(2024, 4, 10), Id = 10, Name = "Product A", Price = 8.99m, Stock = 80 },
+        //        new InventoryInfo { DateTime = new DateTime(2024, 4, 11), Id = 11, Name = "Product A", Price = 8.99m, Stock = 85 },
+        //        new InventoryInfo { DateTime = new DateTime(2024, 4, 12), Id = 12, Name = "Product A", Price = 8.99m, Stock = 90 },
+        //        //new InventoryInfo { DateTime = new DateTime(2024, 4, 1), Id = 7, Name = "Product C", Price = 12.99m, Stock = 70 },
+        //        //new InventoryInfo { DateTime = new DateTime(2024, 4, 2), Id = 8, Name = "Product C", Price = 12.99m, Stock = 75 },
+        //        //new InventoryInfo { DateTime = new DateTime(2024, 4, 3), Id = 9, Name = "Product C", Price = 12.99m, Stock = 80 }
+
+
+        //    };
+        //    //DataContext = this;
+        //}
 
 
         // https://learn.microsoft.com/en-us/uwp/api/windows.ui.xaml.dispatchertimer?view=winrt-22621
@@ -71,6 +100,9 @@ namespace BusinessSystem
             // set the filtered products for user to buy
             FilteredProducts = new ObservableCollection<Product>();
 
+
+            InventoryList = new ObservableCollection<InventoryInfo>();
+
             foreach (var product in Products)
             {
                 FilteredProducts.Add(product);
@@ -89,6 +121,8 @@ namespace BusinessSystem
 
             UpdateProductsFromRemoteStorage();
             SetupTimerForProductsUpdate();
+
+            //PopulateData();
 
             this.DataContext = this;
 
@@ -1029,7 +1063,6 @@ namespace BusinessSystem
                 // This line will not block the UI thread.
                 var result = await Task.Run(() => new StorageService().GetProductsAsync());
 
-
                 var storageDictory = result.ToDictionary(p => p.Id, p => p);
 
 
@@ -1049,13 +1082,44 @@ namespace BusinessSystem
                     }
                 }
 
+                var newInventoryList = InventoryHelper.BuildInventoryItemsFromProducts(Products.ToList(), DateTime.Now);
+                foreach (var item in newInventoryList)
+                {
+                    InventoryList.Add(item);
+                }
+                
+                // solve inventory for this case and when you update a products stock
+                //new InventoryRepository().WriteInventoryItemsToDataFile(InventoryHelper.BuildInventoryItemsFromProducts(Products.ToList(), DateTime.Now));
+
+
                 TextBlockProductUpdateStatus.Text = $"Produkterna uppdaterade från lagret\n{DateTime.Now.ToString("yyyy.MM.dd HH:mm:ss")}";
+                TextBlockProductUpdateStatus.Foreground = new Windows.UI.Xaml.Media.SolidColorBrush(Windows.UI.Colors.Green);
             }
             catch (Exception ex)
             {
+                
                 TextBlockProductUpdateStatus.Text = "Ett fel uppstod vid uppdatering av produkterna";
+
+                // set color on TextBlockProductUpdateStatus to red
+                TextBlockProductUpdateStatus.Foreground = new Windows.UI.Xaml.Media.SolidColorBrush(Windows.UI.Colors.Red);
             }
         }
 
+        private void ListViewHistoricStatus_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var selectedProduct = (Product)ListViewHistoricStatus.SelectedItem;
+
+            if (selectedProduct != null)
+            {
+                var filterList = InventoryList.Where(i => i.Id == selectedProduct.Id).ToList();
+                ColumnSeriesProduct.ItemsSource = filterList;
+                ColumnSeriesProduct.Title = selectedProduct.Name;
+                ColumnSeriesProduct.Refresh();
+            }
+            else
+            {
+                ColumnSeriesProduct.ItemsSource = null;
+            }
+        }
     }
 }

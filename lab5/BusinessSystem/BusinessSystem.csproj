@@ -121,8 +121,10 @@
     </Compile>
     <Compile Include="Extensions\ProductExtensions.cs" />
     <Compile Include="Extensions\TextBoxExtensions.cs" />
+    <Compile Include="Helpers\InventoryHelper.cs" />
     <Compile Include="Helpers\OrderItemHelper.cs" />
     <Compile Include="Helpers\ReportItemHelper.cs" />
+    <Compile Include="Models\InventoryInfo.cs" />
     <Compile Include="Models\ReportItem.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
@@ -177,8 +179,14 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="LiveCharts">
+      <Version>0.9.7</Version>
+    </PackageReference>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
       <Version>6.2.14</Version>
+    </PackageReference>
+    <PackageReference Include="WinRTXamlToolkit.Controls.DataVisualization.UWP">
+      <Version>2.3.0</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
