@@ -20,6 +20,9 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Navigation;
 using Windows.UI.Xaml.Printing;
 using BusinessSystem.Services.RemoteStorageService;
+using Microcharts;
+using SkiaSharp;
+using Microcharts.Uwp;
 
 
 namespace BusinessSystem
@@ -1109,17 +1112,35 @@ namespace BusinessSystem
         {
             var selectedProduct = (Product)ListViewHistoricStatus.SelectedItem;
 
+            var chartEntries = new List<ChartEntry>();
+
             if (selectedProduct != null)
             {
                 var filterList = InventoryList.Where(i => i.Id == selectedProduct.Id).ToList();
-                ColumnSeriesProduct.ItemsSource = filterList;
-                ColumnSeriesProduct.Title = selectedProduct.Name;
-                ColumnSeriesProduct.Refresh();
+
+                // build ChartEntry list to display in chartview
+                foreach (var itemInventoryInfo in filterList.OrderBy(x=>x.DateTime).Take(15))
+                {
+                    chartEntries.Add(new ChartEntry(itemInventoryInfo.Stock)
+                    {
+                        Label = itemInventoryInfo.DateTime.ToString("yyyy.MM.dd HH:mm:ss"),
+                        ValueLabel = itemInventoryInfo.Stock.ToString(),
+                        Color = SKColor.Parse("#3498db")
+                    });
+                }
             }
-            else
-            {
-                ColumnSeriesProduct.ItemsSource = null;
-            }
+
+            // https://github.com/microcharts-dotnet/Microcharts/wiki
+            // https://github.com/microcharts-dotnet/Microcharts/wiki/BarChart
+            var barChart = new BarChart { Entries = chartEntries };
+            barChart.IsAnimated = true;
+
+            
+            chartView.Chart = barChart;
+            chartView.Width = 50 * chartEntries.Count;
+
+            // set name om chartview
+            TextBlockChartHeader.Text = $"Historik för {selectedProduct?.Name}";
         }
     }
 }
