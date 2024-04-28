@@ -5,6 +5,7 @@ using BusinessSystem.Models.Constants;
 using BusinessSystem.Models.Enums;
 using BusinessSystem.Repositories;
 using BusinessSystem.Services.RemoteStorageService;
+using BusinessSystem.Services.RemoteStorageService.Models;
 using Microcharts;
 using SkiaSharp;
 using System;
@@ -20,6 +21,7 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Navigation;
 using Windows.UI.Xaml.Printing;
+using Product = BusinessSystem.Models.Product;
 
 
 namespace BusinessSystem
@@ -51,21 +53,7 @@ namespace BusinessSystem
         DispatcherTimer _timerUpdateProducts;
 
 
-        // https://learn.microsoft.com/en-us/uwp/api/windows.ui.xaml.dispatchertimer?view=winrt-22621
-        public void SetupTimerForProductsUpdate()
-        {
-            _timerUpdateProducts = new DispatcherTimer();
 
-            // TODO Set to 1.0 minutes
-            _timerUpdateProducts.Interval = new TimeSpan(0, 0, 10);
-
-            _timerUpdateProducts.Tick += async (s, e) =>
-            {
-                UpdateProductsFromRemoteStorage();
-            };
-
-            _timerUpdateProducts.Start();
-        }
 
         public MainPage()
         {
@@ -96,7 +84,7 @@ namespace BusinessSystem
 
 
 
-            UpdateProductsFromRemoteStorage();
+            UpdateLocalProductsFromRemoteStorage();
             SetupTimerForProductsUpdate();
 
             //PopulateData();
@@ -104,6 +92,29 @@ namespace BusinessSystem
             this.DataContext = this;
 
         }
+
+        #region Time Update Products
+       
+        public void SetupTimerForProductsUpdate()
+        {
+            // https://learn.microsoft.com/en-us/uwp/api/windows.ui.xaml.dispatchertimer?view=winrt-22621
+            // setup a timer for updating the products from remote storage
+
+            _timerUpdateProducts = new DispatcherTimer();
+
+            // TODO Set to 1.0 minutes
+            _timerUpdateProducts.Interval = new TimeSpan(0, 0, 10);
+
+            _timerUpdateProducts.Tick += async (s, e) =>
+            {
+                UpdateLocalProductsFromRemoteStorage();
+            };
+
+            _timerUpdateProducts.Start();
+        }
+        #endregion
+
+
 
 
         #region Pivot Butik
@@ -257,26 +268,27 @@ namespace BusinessSystem
 
                 new Repositories.OrderRepository().WriteOrderItemsToDataFile(orderList);
 
+                UpdateLocalProductsFromRemoteStorage();
 
-                /// Clear the basket and update the stock
+                // Clear the basket and update the stock
                 foreach (var product in BasketProducts)
                 {
                     product.Stock -= product.Reserved;
+
+                    // if any product get negative stock due update from local storage just before the buy
+                    // the prodocts is still in the basket/store and the stock is set to 0
+                    if (product.Stock < 0) 
+                    {
+                        product.Stock = 0;
+                    }
+
                     product.Reserved = 0;
-
-                    // update the stock in the remote storage
-                    try
-                    {
-                        await new StorageService().UpdateProductStockAsync(product.Id, product.Stock);
-                    }
-                    catch
-                    {
-                        // do nothing
-                    }
-
                 }
 
-                UpdateProductsFromRemoteStorage();
+                SyncLocalProductsToRemoteStorage();
+
+                UpdateLocalProductsFromRemoteStorage();
+
 
                 BasketProducts.Clear();
                 ToggleBasketStatus();
@@ -373,6 +385,7 @@ namespace BusinessSystem
         {
             ButtonProductNew.Visibility = Visibility.Collapsed;
             ButtonProductUpdate.Visibility = Visibility.Collapsed;
+            ButtonProductSync.Visibility = Visibility.Collapsed;
             TextBlockProductUpdateStatus.Visibility = Visibility.Collapsed;
 
             StackPanelProductEdit.Visibility = Visibility.Visible;
@@ -392,11 +405,13 @@ namespace BusinessSystem
         private void ButtonProductSave_OnClick(object sender, RoutedEventArgs e)
         {
             InventoryInfo invetoryInfoItem = null;
+           // Models.Product savedProduct = null;
             DateTime inventoryDateTime = DateTime.Now;
 
 
             if (_selectedStorageProduct != null)
             {
+             //   savedProduct = _selectedStorageProduct;
                 _selectedStorageProduct.Name = TextBoxProductName.Text;
                 _selectedStorageProduct.Price = Convert.ToDecimal(TextBoxProductPrice.Text);
                 _selectedStorageProduct.Stock = Convert.ToInt32(TextBoxProductStock.Text);
@@ -456,6 +471,7 @@ namespace BusinessSystem
 
             ButtonProductNew.Visibility = Visibility.Visible;
             ButtonProductUpdate.Visibility = Visibility.Visible;
+            ButtonProductSync.Visibility = Visibility.Visible;
             TextBlockProductUpdateStatus.Visibility = Visibility.Visible;
             StackPanelProductEdit.Visibility = Visibility.Collapsed;
 
@@ -467,6 +483,10 @@ namespace BusinessSystem
             {
                 InventoryList.Add(invetoryInfoItem);
             }
+
+
+            // update the stock at storage
+            //await new StorageService().UpdateProductStockAsync(product.Id, product.Stock);
 
 
         }
@@ -486,6 +506,7 @@ namespace BusinessSystem
 
             ButtonProductNew.Visibility = Visibility.Collapsed;
             ButtonProductUpdate.Visibility = Visibility.Collapsed;
+            ButtonProductSync.Visibility = Visibility.Collapsed;
             TextBlockProductUpdateStatus.Visibility = Visibility.Collapsed;
             StackPanelProductEdit.Visibility = Visibility.Visible;
             ButtonProductDelete.Visibility = Visibility.Visible;
@@ -663,6 +684,7 @@ namespace BusinessSystem
 
             ButtonProductNew.Visibility = Visibility.Visible;
             ButtonProductUpdate.Visibility = Visibility.Visible;
+            ButtonProductSync.Visibility = Visibility.Visible;
             TextBlockProductUpdateStatus.Visibility = Visibility.Visible;
             StackPanelProductEdit.Visibility = Visibility.Collapsed;
 
@@ -1044,27 +1066,63 @@ namespace BusinessSystem
 
         private async void ButtonProductUpdate_OnClick(object sender, RoutedEventArgs e)
         {
-            UpdateProductsFromRemoteStorage();
+            UpdateLocalProductsFromRemoteStorage();
+        }
+        private async void ButtonProductSync_OnClick(object sender, RoutedEventArgs e)
+        {
+            SyncLocalProductsToRemoteStorage();
         }
 
 
-        private async void UpdateProductsFromRemoteStorage()
+        /// <summary>
+        /// Syncth local products stock to remote storage
+        /// </summary>
+        private async void SyncLocalProductsToRemoteStorage()
         {
             try
             {
-                if(counterError++ % 2 == 0)
-                    throw new Exception("Test");
-
-                // This line will not block the UI thread.
-                var result = await Task.Run(() => new StorageService().GetProductsAsync());
-
-                var storageDictory = result.ToDictionary(p => p.Id, p => p);
-
-
-                List<Product> productsThatShouldBeInventoried = new List<Product>();
-
                 foreach (var product in Products)
                 {
+                    await new StorageService().UpdateProductStockAsync(product.Id, product.Stock);
+                }
+
+                TextBlockProductSyncStatus.Text = $"Produktsynk mot lager {DateTime.Now.ToString("yyyy.MM.dd HH:mm:ss")}";
+                TextBlockProductSyncStatus.Foreground = new Windows.UI.Xaml.Media.SolidColorBrush(Windows.UI.Colors.Green);
+
+                PivotItemLager.Header = "Lager"; // ok text
+            }
+            catch
+            {
+
+                TextBlockProductSyncStatus.Text = "Fel på produktsynk mot lager {DateTime.Now.ToString(\"yyyy.MM.dd HH:mm:ss\")}";
+
+                // set color on TextBlockProductUpdateStatus to red
+                TextBlockProductSyncStatus.Foreground = new Windows.UI.Xaml.Media.SolidColorBrush(Windows.UI.Colors.Red);
+
+                PivotItemLager.Header = "Lager(!)"; // indicate that there is an error
+
+            }
+        }
+
+
+        /// <summary>
+        /// Update the local products from remote storage and update inventory list
+        /// </summary>
+        private async void UpdateLocalProductsFromRemoteStorage()
+        {
+            try
+            {
+                var result = await Task.Run(() => new StorageService().GetProductsAsync());
+
+                // kep track of the id of products that that should be updated and inventoried
+                var storageDictory = result.ToDictionary(p => p.Id, p => p);
+
+                var productsThatShouldBeInventoried = new List<Product>();
+
+                // update local products with stock and price from remote storage and keep track of products that should be inventoried
+                foreach (var product in Products)
+                {
+                    // check if the product is in the remote storage, if not ignore the product
                     if (!storageDictory.ContainsKey(product.Id))
                     {
                         continue;
@@ -1081,52 +1139,33 @@ namespace BusinessSystem
                     productsThatShouldBeInventoried.Add(product);
                 }
 
-                
+                // build inventory list from products that should be inventoried and update the inventory list
                 var newInventoryList = InventoryHelper.BuildInventoryItemsFromProducts(productsThatShouldBeInventoried, DateTime.Now);
                 foreach (var item in newInventoryList)
                 {
                     InventoryList.Add(item);
                 }
 
-                // solve inventory for this case and when you update a products stock
-                //new InventoryRepository().WriteInventoryItemsToDataFile(InventoryHelper.BuildInventoryItemsFromProducts(Products.ToList(), DateTime.Now));
-
-
-                TextBlockProductUpdateStatus.Text = $"Produkterna uppdaterade från lagret\n{DateTime.Now.ToString("yyyy.MM.dd HH:mm:ss")}";
+                TextBlockProductUpdateStatus.Text = $"Produktuppdatering från lagret {DateTime.Now.ToString("yyyy.MM.dd HH:mm:ss")}";
                 TextBlockProductUpdateStatus.Foreground = new Windows.UI.Xaml.Media.SolidColorBrush(Windows.UI.Colors.Green);
-
-                PivotItemLager.Header = "Lager"; // ok
+                PivotItemLager.Header = "Lager"; // ok text
             }
             catch
             {
 
-                TextBlockProductUpdateStatus.Text = "Ett fel uppstod vid uppdatering av produkterna";
-
-                // set color on TextBlockProductUpdateStatus to red
+                TextBlockProductUpdateStatus.Text = "Fel på produktuppdatering från lagret {DateTime.Now.ToString(\"yyyy.MM.dd HH:mm:ss\")}";
                 TextBlockProductUpdateStatus.Foreground = new Windows.UI.Xaml.Media.SolidColorBrush(Windows.UI.Colors.Red);
-
                 PivotItemLager.Header = "Lager(!)"; // indicate that there is an error
-
-                //// https://docs.microsoft.com/en-us/windows/uwp/design/controls-and-patterns/dialogs-and-flyouts/dialogs
-                //var dialog = new ContentDialog
-                //{
-                //    Title = "Det skedde en fel",
-                //    Content = $"Ett fel uppstod vid uppdatering av produkterna : {DateTime.Now.ToString("yyyy.MM.dd HH:mm:ss")}",
-                //    PrimaryButtonText = "OK"
-                //};
-
-                //dialog.PrimaryButtonClick += async (s, args) =>
-                //{
-                //   // do nothing
-                //};
-
-
-                //dialog.ShowAsync();
-
-
             }
         }
 
+
+
+        /// <summary>
+        /// Display the historic status for a product in a chartview
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ListViewHistoricStatus_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var selectedProduct = (Product)ListViewHistoricStatus.SelectedItem;
@@ -1135,9 +1174,10 @@ namespace BusinessSystem
 
             if (selectedProduct != null)
             {
+                // filter the inventory list for the selected product
                 var filterList = InventoryList.Where(i => i.Id == selectedProduct.Id).ToList();
 
-                // build ChartEntry list to display in chartview
+                // build a ChartEntry list to display in chartview. Only show the last 15 entries
                 foreach (var itemInventoryInfo in filterList.OrderBy(x => x.DateTime).Take(15))
                 {
                     chartEntries.Add(new ChartEntry(itemInventoryInfo.Stock)
@@ -1154,11 +1194,10 @@ namespace BusinessSystem
             var barChart = new BarChart { Entries = chartEntries };
             barChart.IsAnimated = true;
 
-
             chartView.Chart = barChart;
             chartView.Width = 50 * chartEntries.Count;
 
-            // set name om chartview
+            // set name om chartview info
             TextBlockChartHeader.Text = $"Historik för {selectedProduct?.Name}";
         }
     }

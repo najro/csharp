@@ -72,8 +72,8 @@ namespace BusinessSystem.Services.RemoteStorageService
             {
                 using (HttpClient client = new HttpClient())
                 {
-                    string url = string.Format(storageUpdateAction, id, stock);
-                    HttpResponseMessage response = await client.GetAsync(storageApiUrl + url);
+                    var url = string.Format(storageUpdateAction, id, stock);
+                    var response = await client.GetAsync(storageApiUrl + url);
 
                     if (!response.IsSuccessStatusCode)
                     {
