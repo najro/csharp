@@ -103,7 +103,7 @@ namespace BusinessSystem
             _timerUpdateProducts = new DispatcherTimer();
 
             // TODO Set to 1.0 minutes
-            _timerUpdateProducts.Interval = new TimeSpan(0, 0, 10);
+            _timerUpdateProducts.Interval = new TimeSpan(0, 0, 20);
 
             _timerUpdateProducts.Tick += async (s, e) =>
             {
@@ -268,7 +268,10 @@ namespace BusinessSystem
 
                 new Repositories.OrderRepository().WriteOrderItemsToDataFile(orderList);
 
-                UpdateLocalProductsFromRemoteStorage();
+                
+
+                SyncLocalProductsToRemoteStorage(Products.ToList());
+
 
                 // Clear the basket and update the stock
                 foreach (var product in BasketProducts)
@@ -285,10 +288,7 @@ namespace BusinessSystem
                     product.Reserved = 0;
                 }
 
-                SyncLocalProductsToRemoteStorage();
-
-                UpdateLocalProductsFromRemoteStorage();
-
+                SyncLocalProductsToRemoteStorage(BasketProducts.ToList());
 
                 BasketProducts.Clear();
                 ToggleBasketStatus();
@@ -402,20 +402,20 @@ namespace BusinessSystem
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void ButtonProductSave_OnClick(object sender, RoutedEventArgs e)
+        private async void ButtonProductSave_OnClick(object sender, RoutedEventArgs e)
         {
             InventoryInfo invetoryInfoItem = null;
            // Models.Product savedProduct = null;
-            DateTime inventoryDateTime = DateTime.Now;
-
+            var inventoryDateTime = DateTime.Now;
+            Product productToUpdate = null;
 
             if (_selectedStorageProduct != null)
             {
-             //   savedProduct = _selectedStorageProduct;
+                productToUpdate = _selectedStorageProduct;
                 _selectedStorageProduct.Name = TextBoxProductName.Text;
                 _selectedStorageProduct.Price = Convert.ToDecimal(TextBoxProductPrice.Text);
                 _selectedStorageProduct.Stock = Convert.ToInt32(TextBoxProductStock.Text);
-
+                
 
                 invetoryInfoItem = InventoryHelper.BuildInventoryItemFromProduct(_selectedStorageProduct, inventoryDateTime);
 
@@ -441,6 +441,7 @@ namespace BusinessSystem
             else
             {
                 var newProduct = GetProductTypeBySelectionName(((ComboBoxItem)ComboBoxProductType.SelectedValue)?.Content.ToString());
+                productToUpdate = newProduct;
                 newProduct.Id = Convert.ToInt32(TextBoxProductId.Text);
                 newProduct.Name = TextBoxProductName.Text;
                 newProduct.Price = Convert.ToDecimal(TextBoxProductPrice.Text);
@@ -484,11 +485,8 @@ namespace BusinessSystem
                 InventoryList.Add(invetoryInfoItem);
             }
 
-
-            // update the stock at storage
-            //await new StorageService().UpdateProductStockAsync(product.Id, product.Stock);
-
-
+            // update the stock at remote storage
+            SyncLocalProductsToRemoteStorage(new List<Product> { productToUpdate });
         }
 
         /// <summary>
@@ -1070,18 +1068,18 @@ namespace BusinessSystem
         }
         private async void ButtonProductSync_OnClick(object sender, RoutedEventArgs e)
         {
-            SyncLocalProductsToRemoteStorage();
+            SyncLocalProductsToRemoteStorage(Products.ToList());
         }
 
 
         /// <summary>
         /// Syncth local products stock to remote storage
         /// </summary>
-        private async void SyncLocalProductsToRemoteStorage()
+        private async void SyncLocalProductsToRemoteStorage(List<Product> productsToSync)
         {
             try
             {
-                foreach (var product in Products)
+                foreach (var product in productsToSync)
                 {
                     await new StorageService().UpdateProductStockAsync(product.Id, product.Stock);
                 }
