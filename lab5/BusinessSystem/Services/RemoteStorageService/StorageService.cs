@@ -81,6 +81,7 @@ namespace BusinessSystem.Services.RemoteStorageService
         /// <exception cref="Exception"></exception>
         public async Task UpdateProductStockAsync(int id, int stock)
         {
+
             try
             {
                 using (var client = new HttpClient())

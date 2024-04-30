@@ -1049,7 +1049,7 @@ namespace BusinessSystem
                 var filterList = InventoryList.Where(i => i.Id == selectedProduct.Id).ToList();
 
                 // build a ChartEntry list to display in chartview. Only show the last 15 entries
-                foreach (var itemInventoryInfo in filterList.OrderBy(x => x.DateTime).Take(15))
+                foreach (var itemInventoryInfo in filterList.OrderBy(x => x.DateTime).TakeLast(15))
                 {
                     chartEntries.Add(new ChartEntry(itemInventoryInfo.Stock)
                     {
