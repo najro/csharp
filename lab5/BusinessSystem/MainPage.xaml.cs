@@ -5,7 +5,6 @@ using BusinessSystem.Models.Constants;
 using BusinessSystem.Models.Enums;
 using BusinessSystem.Repositories;
 using BusinessSystem.Services.RemoteStorageService;
-using BusinessSystem.Services.RemoteStorageService.Models;
 using Microcharts;
 using SkiaSharp;
 using System;
@@ -29,32 +28,28 @@ namespace BusinessSystem
 {
     /// <summary>
     /// This is the main page of the business system app
-    /// Backend code :  (lab4 - alfoande100 / Örjan Andersson)
+    /// Backend code :  (lab5 - alfoande100 / Örjan Andersson)
     /// </summary>
     public sealed partial class MainPage : Page
     {
-
-        private static int counterError = 0;
-
         Product _selectedProduct;
         Product _selectedBasketProduct;
         Product _selectedStorageProduct;
 
+        // storage for the inventory list
         public ObservableCollection<InventoryInfo> InventoryList { get; set; }
 
         // storage for the products that is available in total
         public ObservableCollection<Product> Products { get; set; }
-
+        
         // storage for the products that is filtered thas is visible for the user to buy in shop
         public ObservableCollection<Product> FilteredProducts { get; set; }
 
         // storage for the products that is currently in the basket
         public ObservableCollection<Product> BasketProducts { get; set; }
 
+        // timer for updating the products from remote storage
         DispatcherTimer _timerUpdateProducts;
-
-
-
 
         public MainPage()
         {
@@ -66,7 +61,7 @@ namespace BusinessSystem
             // set the filtered products for user to buy
             FilteredProducts = new ObservableCollection<Product>();
 
-
+            // set the inventory list to keep track of the stock for each product
             InventoryList = new ObservableCollection<InventoryInfo>();
 
             foreach (var product in Products)
@@ -83,28 +78,26 @@ namespace BusinessSystem
             // set info in pivot for info about data files
             TextBoxDataFiles.Text = $"Datafiler blir lagrade här:\n{ApplicationData.Current.LocalFolder.Path}";
 
-
-
+            // update the local products from remote storage during startup
             UpdateLocalProductsFromRemoteStorage();
+
+            // start the timer for updating the local products from remote storage
             SetupTimerForProductsUpdate();
 
-            //PopulateData();
-
             this.DataContext = this;
-
         }
 
-        #region Time Update Products
-       
+        #region Time Update Products from Remote Storage
+        /// <summary>
+        /// Update the local products from remote storage each minute
+        /// </summary>
         public void SetupTimerForProductsUpdate()
         {
             // https://learn.microsoft.com/en-us/uwp/api/windows.ui.xaml.dispatchertimer?view=winrt-22621
-            // setup a timer for updating the products from remote storage
+            // setup a timer for updating the products from remote storage each minute
 
             _timerUpdateProducts = new DispatcherTimer();
-
-            // TODO Set to 1.0 minutes
-            _timerUpdateProducts.Interval = new TimeSpan(0, 0, 20);
+            _timerUpdateProducts.Interval = new TimeSpan(0, 1, 0);
 
             _timerUpdateProducts.Tick += async (s, e) =>
             {
@@ -114,9 +107,6 @@ namespace BusinessSystem
             _timerUpdateProducts.Start();
         }
         #endregion
-
-
-
 
         #region Pivot Butik
 
@@ -375,7 +365,7 @@ namespace BusinessSystem
 
         #endregion
 
-        #region Lager
+        #region Pivot Lager
 
         /// <summary>
         /// Add a new product to the storage
@@ -893,9 +883,126 @@ namespace BusinessSystem
             }
         }
 
+        /// <summary>
+        /// Update the local products from remote storage
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void ButtonProductUpdate_OnClick(object sender, RoutedEventArgs e)
+        {
+            UpdateLocalProductsFromRemoteStorage();
+        }
+
+        /// <summary>
+        /// Sync the local products to remote storage
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void ButtonProductSync_OnClick(object sender, RoutedEventArgs e)
+        {
+            SyncLocalProductsToRemoteStorage(Products.ToList());
+        }
+
+
+        /// <summary>
+        /// Syncth local products stock to remote storage
+        /// </summary>
+        private async void SyncLocalProductsToRemoteStorage(List<Product> productsToSync)
+        {
+            var productSyncCount = 0;
+
+            try
+            {
+                foreach (var product in productsToSync)
+                {
+
+                    // this can be rewritten to more dynamic solution
+                    // to enable this you can get the full list of products from the remote storage and only make use of the ids that exists in the remote storage
+                    // for now we know that there is no id higher than 15 or below 1
+                    if (product.Id > 15)
+                    {
+                        continue;
+                    }
+                    await new StorageService().UpdateProductStockAsync(product.Id, product.Stock);
+                    productSyncCount++;
+                }
+
+                TextBlockProductSyncStatus.Text = $"Synk mot lager: {DateTime.Now.ToString(DateFormats.DateTimeFormat)}\nAntal produkter: {productSyncCount}";
+                TextBlockProductSyncStatus.Foreground = new Windows.UI.Xaml.Media.SolidColorBrush(Windows.UI.Colors.Green);
+
+                PivotItemLager.Header = "Lager"; // ok text
+            }
+            catch
+            {
+                TextBlockProductSyncStatus.Text = $"Fel på produktsynk mot lager {DateTime.Now.ToString(DateFormats.DateTimeFormat)}";
+
+                // set color on TextBlockProductUpdateStatus to red
+                TextBlockProductSyncStatus.Foreground = new Windows.UI.Xaml.Media.SolidColorBrush(Windows.UI.Colors.Red);
+                PivotItemLager.Header = "Lager(!)"; // indicate that there is an error
+            }
+        }
+
+
+        /// <summary>
+        /// Update the local products from remote storage and update inventory list
+        /// </summary>
+        private async void UpdateLocalProductsFromRemoteStorage()
+        {
+            try
+            {
+                var productUpdateCount = 0;
+
+                var result = await Task.Run(() => new StorageService().GetProductsAsync());
+
+                // kep track of the id of products that that should be updated and inventoried from remote storage
+                var storageDictory = result.ToDictionary(p => p.Id, p => p);
+
+                var productsThatShouldBeInventoried = new List<Product>();
+
+                // update local products with stock and price from remote storage and keep track of products that should be inventoried
+                foreach (var product in Products)
+                {
+                    // check if the product is in the remote storage, if not ignore the product
+                    if (!storageDictory.ContainsKey(product.Id))
+                    {
+                        continue;
+                    }
+                    var storageProduct = storageDictory[product.Id];
+                    product.Stock = storageProduct.Stock;
+                    product.Price = storageProduct.Price;
+
+                    if (product.Reserved > product.Stock)
+                    {
+                        product.Reserved = product.Stock;
+                    }
+
+                    productsThatShouldBeInventoried.Add(product);
+                    productUpdateCount++;
+                }
+
+                // build inventory list from products that should be inventoried and update the inventory list
+                var newInventoryList = InventoryHelper.BuildInventoryItemsFromProducts(productsThatShouldBeInventoried, DateTime.Now);
+                foreach (var item in newInventoryList)
+                {
+                    InventoryList.Add(item);
+                }
+
+                TextBlockProductUpdateStatus.Text = $"Uppdatering från lagret {DateTime.Now.ToString(DateFormats.DateTimeFormat)}\nAntal produkter: {productUpdateCount}";
+                TextBlockProductUpdateStatus.Foreground = new Windows.UI.Xaml.Media.SolidColorBrush(Windows.UI.Colors.Green);
+                PivotItemLager.Header = "Lager"; // ok text
+            }
+            catch
+            {
+
+                TextBlockProductUpdateStatus.Text = $"Fel på produktuppdatering från lagret {DateTime.Now.ToString(DateFormats.DateTimeFormat)}";
+                TextBlockProductUpdateStatus.Foreground = new Windows.UI.Xaml.Media.SolidColorBrush(Windows.UI.Colors.Red);
+                PivotItemLager.Header = "Lager(!)"; // indicate that there is an error
+            }
+        }
+
         #endregion
 
-        #region Report Pivot
+        #region Pivot Report 
 
         /// <summary>
         /// Event handler for the button to get the report data
@@ -921,6 +1028,49 @@ namespace BusinessSystem
                 TextBlockReportHeader.Text = "Ingen rapportdata är vald";
                 TextBoxReportResult.Text = "";
             }
+        }
+
+        #endregion
+
+        #region Pivot Historisk lagerstatus
+        /// <summary>
+        /// Display the historic status for a product in a chartview
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ListViewHistoricStatus_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var selectedProduct = (Product)ListViewHistoricStatus.SelectedItem;
+
+            var chartEntries = new List<ChartEntry>();
+
+            if (selectedProduct != null)
+            {
+                // filter the inventory list for the selected product
+                var filterList = InventoryList.Where(i => i.Id == selectedProduct.Id).ToList();
+
+                // build a ChartEntry list to display in chartview. Only show the last 15 entries
+                foreach (var itemInventoryInfo in filterList.OrderBy(x => x.DateTime).Take(15))
+                {
+                    chartEntries.Add(new ChartEntry(itemInventoryInfo.Stock)
+                    {
+                        Label = itemInventoryInfo.DateTime.ToString(DateFormats.DateTimeFormat),
+                        ValueLabel = itemInventoryInfo.Stock.ToString(),
+                        Color = SKColor.Parse("#3498db")
+                    });
+                }
+            }
+
+            // https://github.com/microcharts-dotnet/Microcharts/wiki
+            // https://github.com/microcharts-dotnet/Microcharts/wiki/BarChart
+            var barChart = new BarChart { Entries = chartEntries };
+            barChart.IsAnimated = true;
+
+            chartView.Chart = barChart;
+            chartView.Width = 50 * chartEntries.Count;
+
+            // set name om chartview info
+            TextBlockChartHeader.Text = $"Historik för {selectedProduct?.Name}";
         }
 
         #endregion
@@ -1066,146 +1216,5 @@ namespace BusinessSystem
         }
 
         #endregion
-
-        private async void ButtonProductUpdate_OnClick(object sender, RoutedEventArgs e)
-        {
-            UpdateLocalProductsFromRemoteStorage();
-        }
-        private async void ButtonProductSync_OnClick(object sender, RoutedEventArgs e)
-        {
-            SyncLocalProductsToRemoteStorage(Products.ToList());
-        }
-
-
-        /// <summary>
-        /// Syncth local products stock to remote storage
-        /// </summary>
-        private async void SyncLocalProductsToRemoteStorage(List<Product> productsToSync)
-        {
-            var productSyncCount = 0;
-
-            try
-            {
-                foreach (var product in productsToSync)
-                {
-                    await new StorageService().UpdateProductStockAsync(product.Id, product.Stock);
-                    productSyncCount++;
-                }
-
-                TextBlockProductSyncStatus.Text = $"Synk mot lager: {DateTime.Now.ToString(DateFormats.DateTimeFormat)}\nAntal produkter: {productSyncCount}";
-                TextBlockProductSyncStatus.Foreground = new Windows.UI.Xaml.Media.SolidColorBrush(Windows.UI.Colors.Green);
-
-                PivotItemLager.Header = "Lager"; // ok text
-            }
-            catch
-            {
-
-                TextBlockProductSyncStatus.Text = $"Fel på produktsynk mot lager {DateTime.Now.ToString(DateFormats.DateTimeFormat)}";
-
-                // set color on TextBlockProductUpdateStatus to red
-                TextBlockProductSyncStatus.Foreground = new Windows.UI.Xaml.Media.SolidColorBrush(Windows.UI.Colors.Red);
-
-                PivotItemLager.Header = "Lager(!)"; // indicate that there is an error
-
-            }
-        }
-
-
-        /// <summary>
-        /// Update the local products from remote storage and update inventory list
-        /// </summary>
-        private async void UpdateLocalProductsFromRemoteStorage()
-        {
-            try
-            {
-                var productUpdateCount = 0;
-
-                var result = await Task.Run(() => new StorageService().GetProductsAsync());
-
-                // kep track of the id of products that that should be updated and inventoried
-                var storageDictory = result.ToDictionary(p => p.Id, p => p);
-
-                var productsThatShouldBeInventoried = new List<Product>();
-
-                // update local products with stock and price from remote storage and keep track of products that should be inventoried
-                foreach (var product in Products)
-                {
-                    // check if the product is in the remote storage, if not ignore the product
-                    if (!storageDictory.ContainsKey(product.Id))
-                    {
-                        continue;
-                    }
-                    var storageProduct = storageDictory[product.Id];
-                    product.Stock = storageProduct.Stock;
-                    product.Price = storageProduct.Price;
-
-                    if (product.Reserved > product.Stock)
-                    {
-                        product.Reserved = product.Stock;
-                    }
-
-                    productsThatShouldBeInventoried.Add(product);
-                    productUpdateCount++;
-                }
-
-                // build inventory list from products that should be inventoried and update the inventory list
-                var newInventoryList = InventoryHelper.BuildInventoryItemsFromProducts(productsThatShouldBeInventoried, DateTime.Now);
-                foreach (var item in newInventoryList)
-                {
-                    InventoryList.Add(item);
-                }
-
-                TextBlockProductUpdateStatus.Text = $"Uppdatering från lagret {DateTime.Now.ToString(DateFormats.DateTimeFormat)}\nAntal produkter: {productUpdateCount}";
-                TextBlockProductUpdateStatus.Foreground = new Windows.UI.Xaml.Media.SolidColorBrush(Windows.UI.Colors.Green);
-                PivotItemLager.Header = "Lager"; // ok text
-            }
-            catch
-            {
-
-                TextBlockProductUpdateStatus.Text = $"Fel på produktuppdatering från lagret {DateTime.Now.ToString(DateFormats.DateTimeFormat)}";
-                TextBlockProductUpdateStatus.Foreground = new Windows.UI.Xaml.Media.SolidColorBrush(Windows.UI.Colors.Red);
-                PivotItemLager.Header = "Lager(!)"; // indicate that there is an error
-            }
-        }
-
-        /// <summary>
-        /// Display the historic status for a product in a chartview
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void ListViewHistoricStatus_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            var selectedProduct = (Product)ListViewHistoricStatus.SelectedItem;
-
-            var chartEntries = new List<ChartEntry>();
-
-            if (selectedProduct != null)
-            {
-                // filter the inventory list for the selected product
-                var filterList = InventoryList.Where(i => i.Id == selectedProduct.Id).ToList();
-
-                // build a ChartEntry list to display in chartview. Only show the last 15 entries
-                foreach (var itemInventoryInfo in filterList.OrderBy(x => x.DateTime).Take(15))
-                {
-                    chartEntries.Add(new ChartEntry(itemInventoryInfo.Stock)
-                    {
-                        Label = itemInventoryInfo.DateTime.ToString(DateFormats.DateTimeFormat),
-                        ValueLabel = itemInventoryInfo.Stock.ToString(),
-                        Color = SKColor.Parse("#3498db")
-                    });
-                }
-            }
-
-            // https://github.com/microcharts-dotnet/Microcharts/wiki
-            // https://github.com/microcharts-dotnet/Microcharts/wiki/BarChart
-            var barChart = new BarChart { Entries = chartEntries };
-            barChart.IsAnimated = true;
-
-            chartView.Chart = barChart;
-            chartView.Width = 50 * chartEntries.Count;
-
-            // set name om chartview info
-            TextBlockChartHeader.Text = $"Historik för {selectedProduct?.Name}";
-        }
     }
 }
