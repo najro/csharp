@@ -4,6 +4,7 @@ using BusinessSystem.Models;
 
 namespace BusinessSystem.Helpers
 {
+    // Helper class for inventory items
     public static class InventoryHelper
     {
 

@@ -8,30 +8,37 @@ using System.Xml.Linq;
 
 namespace BusinessSystem.Services.RemoteStorageService
 {
+    /// <summary>
+    /// Service for interacting with the remote storage API
+    /// </summary>
     public class StorageService
     {
         private const string storageApiUrl = "https://hex.cse.kau.se/~jonavest/csharp-api/";
-        
         private const string storageUpdateAction = "?action=update&id={0}&stock={1}";
 
+        /// <summary>
+        /// Get all products from the remote storage API
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public async Task<List<Product>> GetProductsAsync()
         {
-            List<Product> products = new List<Product>();
+            var products = new List<Product>();
             try
             {
                 // https://learn.microsoft.com/en-us/dotnet/api/system.net.http.httpclient?view=net-8.0
-                using (HttpClient client = new HttpClient())
+                using (var client = new HttpClient())
                 {
-                    HttpResponseMessage response = await client.GetAsync(storageApiUrl);
+                    var response = await client.GetAsync(storageApiUrl);
 
                     if (response.IsSuccessStatusCode)
                     {
-                        string xmlString = await response.Content.ReadAsStringAsync();
+                        var xmlString = await response.Content.ReadAsStringAsync();
 
                         //https://learn.microsoft.com/en-us/dotnet/api/system.xml.linq.xelement?view=net-8.0
-                        XDocument doc = XDocument.Parse(xmlString);
+                        var doc = XDocument.Parse(xmlString);
 
-                        foreach (XElement element in doc.Descendants("book")
+                        foreach (var element in doc.Descendants("book")
                                      .Union(doc.Descendants("game"))
                                      .Union(doc.Descendants("movie")))
                         {
@@ -65,12 +72,18 @@ namespace BusinessSystem.Services.RemoteStorageService
             }
         }
 
-
+        /// <summary>
+        /// Update the stock of a product in the remote storage API
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="stock"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public async Task UpdateProductStockAsync(int id, int stock)
         {
             try
             {
-                using (HttpClient client = new HttpClient())
+                using (var client = new HttpClient())
                 {
                     var url = string.Format(storageUpdateAction, id, stock);
                     var response = await client.GetAsync(storageApiUrl + url);

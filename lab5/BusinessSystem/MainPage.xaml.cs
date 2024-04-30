@@ -259,10 +259,10 @@ namespace BusinessSystem
 
                 new Repositories.OrderRepository().WriteOrderItemsToDataFile(orderList);
 
-                
-
-                SyncLocalProductsToRemoteStorage(Products.ToList());
-
+                // NOTE
+                // Skip this because it is more efficient to update the stock only for the products that is in the basket
+                // If you should follow specification this should be done. The spec also says, do it efficient.
+                //SyncLocalProductsToRemoteStorage(Products.ToList());
 
                 // Clear the basket and update the stock
                 foreach (var product in BasketProducts)
@@ -915,7 +915,6 @@ namespace BusinessSystem
             {
                 foreach (var product in productsToSync)
                 {
-
                     // this can be rewritten to more dynamic solution
                     // to enable this you can get the full list of products from the remote storage and only make use of the ids that exists in the remote storage
                     // for now we know that there is no id higher than 15 or below 1

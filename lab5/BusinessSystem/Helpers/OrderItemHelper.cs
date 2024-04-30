@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 namespace BusinessSystem.Helpers
 {
+    // Helper class for order items
     public static class OrderItemHelper
     {
         // Build order items from products with order id and order date        
