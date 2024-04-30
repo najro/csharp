@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BusinessSystem.Models.Constants
+﻿namespace BusinessSystem.Models.Constants
 {
     public static class Constants
     {
@@ -23,6 +17,11 @@ namespace BusinessSystem.Models.Constants
             public const string Movie = "Movie";
             public const string Product = "Product";
         }
-        
+
+        public static class DateFormats
+        {
+            public const string DateFormat = "yyyy.MM.dd";
+            public const string DateTimeFormat = "yyyy.MM.dd HH:mm:ss";
+        }
     }
 }

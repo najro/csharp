@@ -21,6 +21,7 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Navigation;
 using Windows.UI.Xaml.Printing;
+using static BusinessSystem.Models.Constants.Constants;
 using Product = BusinessSystem.Models.Product;
 
 
@@ -387,6 +388,7 @@ namespace BusinessSystem
             ButtonProductUpdate.Visibility = Visibility.Collapsed;
             ButtonProductSync.Visibility = Visibility.Collapsed;
             TextBlockProductUpdateStatus.Visibility = Visibility.Collapsed;
+            TextBlockProductSyncStatus.Visibility = Visibility.Collapsed;
 
             StackPanelProductEdit.Visibility = Visibility.Visible;
             ButtonProductDelete.Visibility = Visibility.Collapsed;
@@ -474,6 +476,7 @@ namespace BusinessSystem
             ButtonProductUpdate.Visibility = Visibility.Visible;
             ButtonProductSync.Visibility = Visibility.Visible;
             TextBlockProductUpdateStatus.Visibility = Visibility.Visible;
+            TextBlockProductSyncStatus.Visibility = Visibility.Visible;
             StackPanelProductEdit.Visibility = Visibility.Collapsed;
 
             _selectedStorageProduct = null;
@@ -506,6 +509,7 @@ namespace BusinessSystem
             ButtonProductUpdate.Visibility = Visibility.Collapsed;
             ButtonProductSync.Visibility = Visibility.Collapsed;
             TextBlockProductUpdateStatus.Visibility = Visibility.Collapsed;
+            TextBlockProductSyncStatus.Visibility = Visibility.Collapsed;
             StackPanelProductEdit.Visibility = Visibility.Visible;
             ButtonProductDelete.Visibility = Visibility.Visible;
             ButtonProductReturn.Visibility = Visibility.Visible;
@@ -684,6 +688,7 @@ namespace BusinessSystem
             ButtonProductUpdate.Visibility = Visibility.Visible;
             ButtonProductSync.Visibility = Visibility.Visible;
             TextBlockProductUpdateStatus.Visibility = Visibility.Visible;
+            TextBlockProductSyncStatus.Visibility = Visibility.Visible;
             StackPanelProductEdit.Visibility = Visibility.Collapsed;
 
         }
@@ -1077,14 +1082,17 @@ namespace BusinessSystem
         /// </summary>
         private async void SyncLocalProductsToRemoteStorage(List<Product> productsToSync)
         {
+            var productSyncCount = 0;
+
             try
             {
                 foreach (var product in productsToSync)
                 {
                     await new StorageService().UpdateProductStockAsync(product.Id, product.Stock);
+                    productSyncCount++;
                 }
 
-                TextBlockProductSyncStatus.Text = $"Produktsynk mot lager {DateTime.Now.ToString("yyyy.MM.dd HH:mm:ss")}";
+                TextBlockProductSyncStatus.Text = $"Synk mot lager: {DateTime.Now.ToString(DateFormats.DateTimeFormat)}\nAntal produkter: {productSyncCount}";
                 TextBlockProductSyncStatus.Foreground = new Windows.UI.Xaml.Media.SolidColorBrush(Windows.UI.Colors.Green);
 
                 PivotItemLager.Header = "Lager"; // ok text
@@ -1092,7 +1100,7 @@ namespace BusinessSystem
             catch
             {
 
-                TextBlockProductSyncStatus.Text = "Fel på produktsynk mot lager {DateTime.Now.ToString(\"yyyy.MM.dd HH:mm:ss\")}";
+                TextBlockProductSyncStatus.Text = $"Fel på produktsynk mot lager {DateTime.Now.ToString(DateFormats.DateTimeFormat)}";
 
                 // set color on TextBlockProductUpdateStatus to red
                 TextBlockProductSyncStatus.Foreground = new Windows.UI.Xaml.Media.SolidColorBrush(Windows.UI.Colors.Red);
@@ -1110,6 +1118,8 @@ namespace BusinessSystem
         {
             try
             {
+                var productUpdateCount = 0;
+
                 var result = await Task.Run(() => new StorageService().GetProductsAsync());
 
                 // kep track of the id of products that that should be updated and inventoried
@@ -1135,6 +1145,7 @@ namespace BusinessSystem
                     }
 
                     productsThatShouldBeInventoried.Add(product);
+                    productUpdateCount++;
                 }
 
                 // build inventory list from products that should be inventoried and update the inventory list
@@ -1144,20 +1155,18 @@ namespace BusinessSystem
                     InventoryList.Add(item);
                 }
 
-                TextBlockProductUpdateStatus.Text = $"Produktuppdatering från lagret {DateTime.Now.ToString("yyyy.MM.dd HH:mm:ss")}";
+                TextBlockProductUpdateStatus.Text = $"Uppdatering från lagret {DateTime.Now.ToString(DateFormats.DateTimeFormat)}\nAntal produkter: {productUpdateCount}";
                 TextBlockProductUpdateStatus.Foreground = new Windows.UI.Xaml.Media.SolidColorBrush(Windows.UI.Colors.Green);
                 PivotItemLager.Header = "Lager"; // ok text
             }
             catch
             {
 
-                TextBlockProductUpdateStatus.Text = "Fel på produktuppdatering från lagret {DateTime.Now.ToString(\"yyyy.MM.dd HH:mm:ss\")}";
+                TextBlockProductUpdateStatus.Text = $"Fel på produktuppdatering från lagret {DateTime.Now.ToString(DateFormats.DateTimeFormat)}";
                 TextBlockProductUpdateStatus.Foreground = new Windows.UI.Xaml.Media.SolidColorBrush(Windows.UI.Colors.Red);
                 PivotItemLager.Header = "Lager(!)"; // indicate that there is an error
             }
         }
-
-
 
         /// <summary>
         /// Display the historic status for a product in a chartview
@@ -1180,7 +1189,7 @@ namespace BusinessSystem
                 {
                     chartEntries.Add(new ChartEntry(itemInventoryInfo.Stock)
                     {
-                        Label = itemInventoryInfo.DateTime.ToString("yyyy.MM.dd HH:mm:ss"),
+                        Label = itemInventoryInfo.DateTime.ToString(DateFormats.DateTimeFormat),
                         ValueLabel = itemInventoryInfo.Stock.ToString(),
                         Color = SKColor.Parse("#3498db")
                     });
