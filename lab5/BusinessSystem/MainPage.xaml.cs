@@ -1101,7 +1101,7 @@ namespace BusinessSystem
                 {
                     Label = $"{itemInventoryInfo.DateTime.ToString(DateFormats.DateTimeFormat)}",
                     ValueLabel = displayMode == InventoryValueLabels.Stock ?  itemInventoryInfo.Stock.ToString() : itemInventoryInfo.Price.ToString(),
-                    Color = displayMode == InventoryValueLabels.Stock ? SKColor.Parse("#3498db") : SKColor.Parse("#223344"),
+                    Color = displayMode == InventoryValueLabels.Stock ? SKColor.Parse("#66CC00") : SKColor.Parse("#3399FF"),
                 });
             }
             
@@ -1117,7 +1117,7 @@ namespace BusinessSystem
             
             if (displayMode == InventoryValueLabels.Stock)
             {
-                TextBlockChartHeader.Text = $"Lagerhistorik {_selectedInventoryProduct?.Name}";
+                TextBlockChartHeader.Text = $"Lagerhistorik för {_selectedInventoryProduct?.Name}";
             }
             else
             {

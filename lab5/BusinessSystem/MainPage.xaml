@@ -250,7 +250,7 @@
                 </StackPanel>
 
                 <StackPanel Orientation="Vertical" Margin="10,20,10,30" HorizontalAlignment="Left" Grid.Column="1" Width="500">
-                    <TextBlock Name="TextBlockChartHeader"></TextBlock>
+                    <TextBlock Name="TextBlockChartHeader" FontWeight="SemiBold" Margin="10, 0,0,0"></TextBlock>
                     <microcharts:ChartView x:Name="chartView" Height="500" HorizontalAlignment="Left" />
                 </StackPanel>
             </Grid>
