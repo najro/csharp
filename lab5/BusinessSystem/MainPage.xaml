@@ -226,7 +226,15 @@
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Orientation="Vertical" Margin="10,20,10,30" HorizontalAlignment="Left" Grid.Column="0">
-                    <TextBlock Text="Välg produkt för historisk lagerstatus" FontSize="14" Margin="0 0 0 0"  FontWeight="SemiBold"/>
+
+
+                    <TextBlock Text="Välg produkt för historisk data" FontSize="14" Margin="0 0 0 10"  FontWeight="SemiBold"/>
+
+                    <ComboBox x:Name="ComboBoxHistoricType" PlaceholderText="Välg typ" Margin="0" FontSize="12" Width="200" SelectionChanged="ComboBoxHistoricType_OnSelectionChanged" >
+                        <ComboBoxItem Content="Lagerstatus"/>
+                        <ComboBoxItem Content="Pris"/>
+                    </ComboBox>
+
                     <ListView ItemsSource="{x:Bind FilteredProducts}" x:Name="ListViewHistoricStatus" HorizontalAlignment="Left" VerticalContentAlignment="Stretch" Margin="0,30,0,0" Padding="0,0,0,0" VerticalAlignment="Top" SelectionChanged="ListViewHistoricStatus_OnSelectionChanged"  Height="500" MinWidth="300">
                         <ListView.ItemTemplate >
                             <DataTemplate>

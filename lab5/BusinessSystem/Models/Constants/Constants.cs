@@ -23,5 +23,11 @@
             public const string DateFormat = "yyyy.MM.dd";
             public const string DateTimeFormat = "yyyy.MM.dd HH:mm:ss";
         }
+
+        public static class InventoryValueLabels
+        {
+            public const string Price = "Prices";
+            public const string Stock = "Stock";
+        };
     }
 }

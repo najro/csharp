@@ -35,6 +35,7 @@ namespace BusinessSystem
         Product _selectedProduct;
         Product _selectedBasketProduct;
         Product _selectedStorageProduct;
+        Product _selectedInventoryProduct;
 
         // storage for the inventory list
         public ObservableCollection<InventoryInfo> InventoryList { get; set; }
@@ -83,6 +84,9 @@ namespace BusinessSystem
 
             // start the timer for updating the local products from remote storage
             SetupTimerForProductsUpdate();
+
+            // set the historic type combobox to default display info for number of products in stock
+            ComboBoxHistoricType.SelectedIndex = 0;
 
             this.DataContext = this;
         }
@@ -1040,25 +1044,67 @@ namespace BusinessSystem
         private void ListViewHistoricStatus_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var selectedProduct = (Product)ListViewHistoricStatus.SelectedItem;
+            _selectedInventoryProduct = selectedProduct;
+            DisplayInventoryChartView();
+        }
+
+        /// <summary>
+        /// Event handler for the selection of the historic type, refresh the chartview
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ComboBoxHistoricType_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            DisplayInventoryChartView();
+        }
+
+
+        /// <summary>
+        /// Get the current inventory value labels that should be displayed in the chart
+        /// </summary>
+        /// <returns></returns>
+        private string GetCurrentInventoryValueLabels()
+        {
+            if (ComboBoxHistoricType.SelectedIndex == 0)
+                return InventoryValueLabels.Stock;
+
+            if (ComboBoxHistoricType.SelectedIndex == 1)
+                return InventoryValueLabels.Price;
+
+            return InventoryValueLabels.Stock;
+        }
+
+
+
+        /// <summary>
+        ///  TODO: Display the historic status for a product in a chartview
+        /// </summary>
+        private void DisplayInventoryChartView()
+        {
+            if (_selectedInventoryProduct == null)
+            {
+                return;
+            }
+
+            var displayMode = GetCurrentInventoryValueLabels();
 
             var chartEntries = new List<ChartEntry>();
 
-            if (selectedProduct != null)
-            {
-                // filter the inventory list for the selected product
-                var filterList = InventoryList.Where(i => i.Id == selectedProduct.Id).ToList();
+            
+            // filter the inventory list for the selected product
+            var filterList = InventoryList.Where(i => i.Id == _selectedInventoryProduct.Id).ToList();
 
-                // build a ChartEntry list to display in chartview. Only show the last 15 entries
-                foreach (var itemInventoryInfo in filterList.OrderBy(x => x.DateTime).TakeLast(15))
+            // build a ChartEntry list to display in chartview. Only show the last 15 entries
+            foreach (var itemInventoryInfo in filterList.OrderBy(x => x.DateTime).TakeLast(15))
+            {
+                chartEntries.Add(new ChartEntry(itemInventoryInfo.Stock)
                 {
-                    chartEntries.Add(new ChartEntry(itemInventoryInfo.Stock)
-                    {
-                        Label = itemInventoryInfo.DateTime.ToString(DateFormats.DateTimeFormat),
-                        ValueLabel = itemInventoryInfo.Stock.ToString(),
-                        Color = SKColor.Parse("#3498db")
-                    });
-                }
+                    Label = $"{itemInventoryInfo.DateTime.ToString(DateFormats.DateTimeFormat)}",
+                    ValueLabel = displayMode == InventoryValueLabels.Stock ?  itemInventoryInfo.Stock.ToString() : itemInventoryInfo.Price.ToString(),
+                    Color = displayMode == InventoryValueLabels.Stock ? SKColor.Parse("#3498db") : SKColor.Parse("#223344"),
+                });
             }
+            
 
             // https://github.com/microcharts-dotnet/Microcharts/wiki
             // https://github.com/microcharts-dotnet/Microcharts/wiki/BarChart
@@ -1068,10 +1114,19 @@ namespace BusinessSystem
             chartView.Chart = barChart;
             chartView.Width = 50 * chartEntries.Count;
 
-            // set name om chartview info
-            TextBlockChartHeader.Text = $"Historik för {selectedProduct?.Name}";
+            
+            if (displayMode == InventoryValueLabels.Stock)
+            {
+                TextBlockChartHeader.Text = $"Lagerhistorik {_selectedInventoryProduct?.Name}";
+            }
+            else
+            {
+                TextBlockChartHeader.Text = $"Prishistorik för {_selectedInventoryProduct?.Name}";
+            }
+            
         }
 
+    
         #endregion
 
         #region Printer Handling
@@ -1215,5 +1270,7 @@ namespace BusinessSystem
         }
 
         #endregion
+
+        
     }
 }
