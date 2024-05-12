@@ -18,7 +18,7 @@ namespace BusinessSystem.Repositories
     {
         StorageFolder localFolder = ApplicationData.Current.LocalFolder;
         private const string ProductsInitialDataCsv = @"\Repositories\data\products_initial_data.csv";
-        const string ProductsDataCsv = "products_data_v2.csv";
+        const string ProductsDataCsv = "products_data_v3.csv";
 
         public ProductsRepository()
         {

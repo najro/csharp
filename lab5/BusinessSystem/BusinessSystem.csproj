@@ -123,6 +123,7 @@
     <Compile Include="Extensions\TextBoxExtensions.cs" />
     <Compile Include="Helpers\InventoryHelper.cs" />
     <Compile Include="Helpers\OrderItemHelper.cs" />
+    <Compile Include="Helpers\ProductHelper.cs" />
     <Compile Include="Helpers\ReportItemHelper.cs" />
     <Compile Include="Models\InventoryInfo.cs" />
     <Compile Include="Models\ReportItem.cs" />

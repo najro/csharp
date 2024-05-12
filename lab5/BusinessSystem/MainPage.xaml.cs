@@ -5,6 +5,7 @@ using BusinessSystem.Models.Constants;
 using BusinessSystem.Models.Enums;
 using BusinessSystem.Repositories;
 using BusinessSystem.Services.RemoteStorageService;
+using BusinessSystem.Services.RemoteStorageService.Models;
 using Microcharts;
 using SkiaSharp;
 using System;
@@ -716,6 +717,15 @@ namespace BusinessSystem
                     {
                         RemoveSelectedProductFromAllLists(_selectedStorageProduct);
                         _selectedStorageProduct = null;
+                        
+                        ButtonProductNew.Visibility = Visibility.Visible;
+                        ButtonProductUpdate.Visibility = Visibility.Visible;
+                        ButtonProductSync.Visibility = Visibility.Visible;
+                        TextBlockProductUpdateStatus.Visibility = Visibility.Visible;
+                        TextBlockProductSyncStatus.Visibility = Visibility.Visible;
+                        StackPanelProductEdit.Visibility = Visibility.Collapsed;
+                        ListViewStorage.SelectedIndex = -1;
+
                         ToggleBasketStatus();
                     };
 
@@ -954,34 +964,40 @@ namespace BusinessSystem
             try
             {
                 var productUpdateCount = 0;
-
-                var result = await Task.Run(() => new StorageService().GetProductsAsync());
-
-                // kep track of the id of products that that should be updated and inventoried from remote storage
-                var storageDictory = result.ToDictionary(p => p.Id, p => p);
-
                 var productsThatShouldBeInventoried = new List<Product>();
 
-                // update local products with stock and price from remote storage and keep track of products that should be inventoried
-                foreach (var product in Products)
+                var remoteStorageProducts = await Task.Run(() => new StorageService().GetProductsAsync());
+
+                foreach (var remoteProduct in remoteStorageProducts)
                 {
-                    // check if the product is in the remote storage, if not ignore the product
-                    if (!storageDictory.ContainsKey(product.Id))
+                    // if the products in local Products list then update the stock and price, otherwise add the product to the list
+                    if (Products.Any(p => p.Id == remoteProduct.Id))
                     {
-                        continue;
-                    }
-                    var storageProduct = storageDictory[product.Id];
-                    product.Stock = storageProduct.Stock;
-                    product.Price = storageProduct.Price;
+                        var localProduct = Products.First(p => p.Id == remoteProduct.Id);
+                        localProduct.Stock = remoteProduct.Stock;
+                        localProduct.Price = remoteProduct.Price;
 
-                    if (product.Reserved > product.Stock)
+                        if (localProduct.Reserved > localProduct.Stock)
+                        {
+                            localProduct.Reserved = localProduct.Stock;
+                        }
+
+                        productsThatShouldBeInventoried.Add(localProduct);
+                    }
+                    else
                     {
-                        product.Reserved = product.Stock;
+                        // create local product from remote product and add to the products list
+                        var newProduct = ProductHelper.CreateProductFromRemoteProduct(remoteProduct);
+                        productsThatShouldBeInventoried.Add(newProduct);
+                        Products.Add(newProduct);
+                        FilteredProducts.Add(newProduct);
                     }
 
-                    productsThatShouldBeInventoried.Add(product);
                     productUpdateCount++;
                 }
+
+
+
 
                 // build inventory list from products that should be inventoried and update the inventory list
                 var newInventoryList = InventoryHelper.BuildInventoryItemsFromProducts(productsThatShouldBeInventoried, DateTime.Now);
@@ -1105,15 +1121,13 @@ namespace BusinessSystem
                 });
             }
             
-
             // https://github.com/microcharts-dotnet/Microcharts/wiki
             // https://github.com/microcharts-dotnet/Microcharts/wiki/BarChart
             var barChart = new BarChart { Entries = chartEntries };
             barChart.IsAnimated = true;
-
+            
             chartView.Chart = barChart;
             chartView.Width = 50 * chartEntries.Count;
-
             
             if (displayMode == InventoryValueLabels.Stock)
             {
@@ -1123,7 +1137,7 @@ namespace BusinessSystem
             {
                 TextBlockChartHeader.Text = $"Prishistorik för {_selectedInventoryProduct?.Name}";
             }
-            
+
         }
 
     

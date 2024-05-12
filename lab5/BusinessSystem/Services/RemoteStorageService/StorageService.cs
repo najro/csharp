@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using static BusinessSystem.Models.Constants.Constants;
 
 namespace BusinessSystem.Services.RemoteStorageService
 {
@@ -54,6 +55,20 @@ namespace BusinessSystem.Services.RemoteStorageService
                                 Platform = element.Element("platform")?.Value,
                                 Playtime = element.Element("playtime") != null ? int.Parse(element.Element("playtime").Value) : (int?)null
                             };
+
+                            // set correct type
+                            if (element.Name == "book")
+                            {
+                                product.Type = ProductTypes.Book;
+                            }
+                            else if (element.Name == "game")
+                            {
+                                product.Type = ProductTypes.Game;
+                            }
+                            else if (element.Name == "movie")
+                            {
+                                product.Type = ProductTypes.Movie;
+                            }
 
                             products.Add(product);
                         }

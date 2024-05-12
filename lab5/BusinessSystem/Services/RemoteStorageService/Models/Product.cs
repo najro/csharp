@@ -11,5 +11,6 @@
         public string Language { get; set; }
         public string Platform { get; set; }
         public int? Playtime { get; set; }
+        public string Type { get; set; }
     }
 }
